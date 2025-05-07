@@ -70,6 +70,52 @@
 
 The backend API will be available at `http://localhost:8000/api/v1`
 
+## API Flow and Database Interaction
+
+The API provides CRUD (Create, Read, Update, Delete) operations for the main entities in the database schema. Here's how the API routes interact with the database tables:
+
+### 1. Roles (`roles` table)
+- **GET /api/v1/roles**: Fetches all records from the `roles` table
+- **GET /api/v1/roles/{id}**: Fetches a single record from the `roles` table where `role_id = {id}`
+- **POST /api/v1/roles**: Inserts a new record into the `roles` table
+- **PUT /api/v1/roles/{id}**: Updates a record in the `roles` table where `role_id = {id}`
+- **DELETE /api/v1/roles/{id}**: Deletes a record from the `roles` table where `role_id = {id}` (only if not used by any users)
+
+### 2. Users (`users` table)
+- **GET /api/v1/users**: Fetches all records from the `users` table with their associated `roles`
+- **GET /api/v1/users/{id}**: Fetches a single record from the `users` table with associated `role` and `student_profile`
+- **POST /api/v1/users**: Inserts a new record into the `users` table (requires valid `role_id`)
+- **PUT /api/v1/users/{id}**: Updates a record in the `users` table where `user_id = {id}`
+- **DELETE /api/v1/users/{id}**: Deletes a record from the `users` table where `user_id = {id}` (also deletes associated `student_profile`)
+
+### 3. Learning Styles (`learning_styles` table)
+- **GET /api/v1/learning-styles**: Fetches all records from the `learning_styles` table
+- **GET /api/v1/learning-styles/{id}**: Fetches a single record from the `learning_styles` table where `style_id = {id}`
+- **POST /api/v1/learning-styles**: Inserts a new record into the `learning_styles` table
+- **PUT /api/v1/learning-styles/{id}**: Updates a record in the `learning_styles` table where `style_id = {id}`
+- **DELETE /api/v1/learning-styles/{id}**: Deletes a record from the `learning_styles` table where `style_id = {id}` (only if not used by any student profiles)
+
+### 4. Student Profiles (`student_profiles` table)
+- **GET /api/v1/student-profiles**: Fetches all records from the `student_profiles` table with their associated `users` and `learning_styles`
+- **GET /api/v1/student-profiles/{id}**: Fetches a single record from the `student_profiles` table with associated `user` and `learning_style`
+- **POST /api/v1/student-profiles**: Inserts a new record into the `student_profiles` table (requires valid `user_id` and optional `dominant_learning_style_id`)
+- **PUT /api/v1/student-profiles/{id}**: Updates a record in the `student_profiles` table where `profile_id = {id}`
+- **DELETE /api/v1/student-profiles/{id}**: Deletes a record from the `student_profiles` table where `profile_id = {id}`
+
+### Database Relationships
+- A `User` belongs to a `Role` (`role_id` foreign key)
+- A `User` can have one `StudentProfile` (one-to-one)
+- A `StudentProfile` belongs to a `User` (`user_id` foreign key)
+- A `StudentProfile` belongs to a `LearningStyle` (`dominant_learning_style_id` foreign key, optional)
+- A `LearningStyle` can have many `StudentProfiles` (one-to-many)
+- A `Role` can have many `Users` (one-to-many)
+
+### Example API Flow
+1. First, create a role (`POST /api/v1/roles`)
+2. Create a user with the role ID (`POST /api/v1/users`)
+3. Create a learning style (`POST /api/v1/learning-styles`)
+4. Create a student profile with the user ID and learning style ID (`POST /api/v1/student-profiles`)
+
 ## API Documentation
 
 ### Available Endpoints

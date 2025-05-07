@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\Api\CourseController;
 use App\Http\Controllers\Api\LearningStyleController;
+use App\Http\Controllers\Api\QuestionnaireResponseController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\StudentProfileController;
 use App\Http\Controllers\Api\UserController;
@@ -24,15 +26,59 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 // Public API Routes
 Route::prefix('v1')->group(function () {
-    // Roles routes - explicit definition
-    Route::get('/roles', [RoleController::class, 'index']);
-    Route::post('/roles', [RoleController::class, 'store']);
-    Route::get('/roles/{id}', [RoleController::class, 'show']);
-    Route::put('/roles/{id}', [RoleController::class, 'update']);
-    Route::delete('/roles/{id}', [RoleController::class, 'destroy']);
+    // Roles
+    Route::apiResource('roles', RoleController::class);
     
-    // Other resources still using apiResource
+    // Users (fully RESTful, independent from roles)
     Route::apiResource('users', UserController::class);
+    
+    // User roles relationship (RESTful nested resource)
+    Route::get('users/{user}/role', [UserController::class, 'getRole']);
+    Route::put('users/{user}/role', [UserController::class, 'updateRole']);
+    
+    // Learning Styles
     Route::apiResource('learning-styles', LearningStyleController::class);
+    
+    // Student Profiles
     Route::apiResource('student-profiles', StudentProfileController::class);
+    
+    // Questionnaire Responses
+    Route::apiResource('questionnaire-responses', QuestionnaireResponseController::class);
+    
+    // Courses
+    Route::apiResource('courses', CourseController::class);
+    
+    // Course Enrollments
+    Route::get('courses/{course}/enrollments', [CourseController::class, 'getEnrollments']);
+    Route::post('courses/{course}/enrollments', [CourseController::class, 'addEnrollment']);
+    Route::delete('courses/{course}/enrollments/{enrollment}', [CourseController::class, 'removeEnrollment']);
+    
+    // User Enrollments
+    Route::get('users/{user}/enrollments', [UserController::class, 'getEnrollments']);
+    
+    // Modules
+    Route::apiResource('courses.modules', ModuleController::class)->shallow();
+    
+    // Module Content
+    Route::apiResource('modules.contents', ModuleContentController::class)->shallow();
+    
+    // Assessments
+    Route::apiResource('modules.assessments', AssessmentController::class)->shallow();
+    
+    // Assessment Questions
+    Route::apiResource('assessments.questions', AssessmentQuestionController::class)->shallow();
+    
+    // Assessment Attempts
+    Route::apiResource('assessments.attempts', AssessmentAttemptController::class)->shallow();
+    Route::get('users/{user}/assessment-attempts', [UserController::class, 'getAssessmentAttempts']);
+    
+    // Certificates
+    Route::apiResource('certificates', CertificateController::class);
+    Route::get('users/{user}/certificates', [UserController::class, 'getCertificates']);
+    Route::get('courses/{course}/certificates', [CourseController::class, 'getCertificates']);
+    
+    // Feedback
+    Route::apiResource('feedback', FeedbackController::class);
+    Route::get('users/{user}/received-feedback', [UserController::class, 'getReceivedFeedback']);
+    Route::get('users/{user}/given-feedback', [UserController::class, 'getGivenFeedback']);
 });

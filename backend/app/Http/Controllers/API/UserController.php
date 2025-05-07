@@ -9,6 +9,10 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Enrollment;
+use App\Models\AssessmentAttempt;
+use App\Models\Certificate;
+use App\Models\Feedback;
 
 class UserController extends Controller
 {
@@ -115,5 +119,134 @@ class UserController extends Controller
         $user->delete();
         
         return response()->json(null, Response::HTTP_NO_CONTENT);
+    }
+
+    /**
+     * Get the role associated with the user.
+     */
+    public function getRole(string $id): JsonResponse
+    {
+        $user = User::find($id);
+        
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
+        }
+        
+        $role = $user->role;
+        
+        if (!$role) {
+            return response()->json(['error' => 'Role not found for this user'], Response::HTTP_NOT_FOUND);
+        }
+        
+        return response()->json(['data' => $role], Response::HTTP_OK);
+    }
+
+    /**
+     * Update the role for a user.
+     */
+    public function updateRole(Request $request, string $id): JsonResponse
+    {
+        $user = User::find($id);
+        
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
+        }
+        
+        $validator = Validator::make($request->all(), [
+            'role_id' => 'required|exists:roles,role_id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], Response::HTTP_BAD_REQUEST);
+        }
+
+        $user->role_id = $request->role_id;
+        $user->save();
+        
+        return response()->json(['data' => $user->load('role')], Response::HTTP_OK);
+    }
+    
+    /**
+     * Get the enrollments for a user.
+     */
+    public function getEnrollments(string $id): JsonResponse
+    {
+        $user = User::find($id);
+        
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
+        }
+        
+        $enrollments = Enrollment::with('course')->where('user_id', $id)->get();
+        
+        return response()->json(['data' => $enrollments], Response::HTTP_OK);
+    }
+    
+    /**
+     * Get the assessment attempts for a user.
+     */
+    public function getAssessmentAttempts(string $id): JsonResponse
+    {
+        $user = User::find($id);
+        
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
+        }
+        
+        $attempts = AssessmentAttempt::with('assessment')->where('user_id', $id)->get();
+        
+        return response()->json(['data' => $attempts], Response::HTTP_OK);
+    }
+    
+    /**
+     * Get the certificates for a user.
+     */
+    public function getCertificates(string $id): JsonResponse
+    {
+        $user = User::find($id);
+        
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
+        }
+        
+        $certificates = Certificate::with('course')->where('user_id', $id)->get();
+        
+        return response()->json(['data' => $certificates], Response::HTTP_OK);
+    }
+    
+    /**
+     * Get feedback received by the user.
+     */
+    public function getReceivedFeedback(string $id): JsonResponse
+    {
+        $user = User::find($id);
+        
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
+        }
+        
+        $feedback = Feedback::with(['module', 'faculty'])
+            ->where('student_id', $id)
+            ->get();
+        
+        return response()->json(['data' => $feedback], Response::HTTP_OK);
+    }
+    
+    /**
+     * Get feedback given by the user (for faculty).
+     */
+    public function getGivenFeedback(string $id): JsonResponse
+    {
+        $user = User::find($id);
+        
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
+        }
+        
+        $feedback = Feedback::with(['module', 'student'])
+            ->where('faculty_id', $id)
+            ->get();
+        
+        return response()->json(['data' => $feedback], Response::HTTP_OK);
     }
 }
