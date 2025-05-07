@@ -1,6 +1,6 @@
 <?php
 
- use App\Http\Controllers\Api\LearningStyleController;
+use App\Http\Controllers\Api\LearningStyleController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\StudentProfileController;
 use App\Http\Controllers\Api\UserController;
@@ -24,15 +24,15 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 // Public API Routes
 Route::prefix('v1')->group(function () {
-    // Roles routes
-    Route::apiResource('roles', RoleController::class);
+    // Roles routes - explicit definition
+    Route::get('/roles', [RoleController::class, 'index']);
+    Route::post('/roles', [RoleController::class, 'store']);
+    Route::get('/roles/{id}', [RoleController::class, 'show']);
+    Route::put('/roles/{id}', [RoleController::class, 'update']);
+    Route::delete('/roles/{id}', [RoleController::class, 'destroy']);
     
-    // Users routes
+    // Other resources still using apiResource
     Route::apiResource('users', UserController::class);
-    
-    // Learning styles routes
     Route::apiResource('learning-styles', LearningStyleController::class);
-    
-    // Student profiles routes
     Route::apiResource('student-profiles', StudentProfileController::class);
 });
