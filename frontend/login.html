@@ -145,8 +145,13 @@
             form.addEventListener('submit', function(event) {
                 event.preventDefault();
                 if (form.checkValidity()) {
-                    // Handle form submission
-                    console.log('Form submitted');
+                    // Simulate successful login
+                    const email = document.getElementById('email').value;
+                    const password = document.getElementById('password').value;
+                    
+                    // In a real application, you would validate credentials with the backend here
+                    // For now, we'll just redirect to the questionnaire page
+                    window.location.href = 'students/questionnaire.html';
                 }
                 form.classList.add('was-validated');
             });
