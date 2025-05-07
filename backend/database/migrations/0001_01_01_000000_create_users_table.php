@@ -3,7 +3,6 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -22,18 +21,7 @@ return new class extends Migration
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('last_login')->nullable();
             $table->boolean('is_active')->default(true);
-            $table->rememberToken();
         });
-
-        // Insert default admin user
-        DB::table('users')->insert([
-            'role_id' => 3, // admin role
-            'email' => 'admin@foresite.com',
-            'password' => bcrypt('admin_password'),
-            'first_name' => 'System',
-            'last_name' => 'Administrator',
-            'is_active' => true
-        ]);
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();

@@ -4,15 +4,23 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasFactory, Notifiable;
 
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'users';
+    
     /**
      * The primary key for the model.
      *
@@ -23,7 +31,7 @@ class User extends Authenticatable
     /**
      * The attributes that are mass assignable.
      *
-     * @var array<int, string>
+     * @var array<string>
      */
     protected $fillable = [
         'role_id',
@@ -31,138 +39,46 @@ class User extends Authenticatable
         'password',
         'first_name',
         'last_name',
-        'is_active'
+        'is_active',
     ];
 
     /**
      * The attributes that should be hidden for serialization.
      *
-     * @var array<int, string>
+     * @var array<string>
      */
     protected $hidden = [
         'password',
-        'remember_token',
     ];
 
     /**
-     * The attributes that should be cast.
+     * Get the attributes that should be cast.
      *
-     * @var array<string, string>
+     * @return array<string, string>
      */
-    protected $casts = [
-        'is_active' => 'boolean',
-        'last_login' => 'datetime',
-        'created_at' => 'datetime',
-    ];
-
-    /**
-     * Get the role associated with the user.
-     */
-    public function role()
+    protected function casts(): array
     {
-        return $this->belongsTo(Role::class, 'role_id');
+        return [
+            'is_active' => 'boolean',
+            'password' => 'hashed',
+            'last_login' => 'datetime',
+            'created_at' => 'datetime',
+        ];
     }
-
+    
+    /**
+     * Get the role that the user belongs to.
+     */
+    public function role(): BelongsTo
+    {
+        return $this->belongsTo(Role::class, 'role_id', 'role_id');
+    }
+    
     /**
      * Get the student profile associated with the user.
      */
-    public function studentProfile()
+    public function studentProfile(): HasOne
     {
-        return $this->hasOne(StudentProfile::class, 'user_id');
-    }
-
-    /**
-     * Get the courses created by the user.
-     */
-    public function createdCourses()
-    {
-        return $this->hasMany(Course::class, 'created_by');
-    }
-
-    /**
-     * Get the course enrollments for the user.
-     */
-    public function enrollments()
-    {
-        return $this->hasMany(Enrollment::class, 'user_id');
-    }
-
-    /**
-     * Get all the enrolled courses for the user.
-     */
-    public function enrolledCourses()
-    {
-        return $this->belongsToMany(Course::class, 'enrollments', 'user_id', 'course_id')
-                    ->withPivot(['enrollment_date', 'completion_status', 'completion_date']);
-    }
-
-    /**
-     * Get the module progress records for the user.
-     */
-    public function moduleProgress()
-    {
-        return $this->hasMany(ModuleProgress::class, 'user_id');
-    }
-
-    /**
-     * Get the assessment attempts for the user.
-     */
-    public function assessmentAttempts()
-    {
-        return $this->hasMany(AssessmentAttempt::class, 'user_id');
-    }
-
-    /**
-     * Get the certificates earned by the user.
-     */
-    public function certificates()
-    {
-        return $this->hasMany(Certificate::class, 'user_id');
-    }
-
-    /**
-     * Get the faculty feedback given by the user.
-     */
-    public function givenFeedback()
-    {
-        return $this->hasMany(Feedback::class, 'faculty_id');
-    }
-
-    /**
-     * Get the feedback received by the user.
-     */
-    public function receivedFeedback()
-    {
-        return $this->hasMany(Feedback::class, 'student_id');
-    }
-
-    /**
-     * Check if user is an admin.
-     *
-     * @return bool
-     */
-    public function isAdmin()
-    {
-        return $this->role->role_name === 'admin';
-    }
-
-    /**
-     * Check if user is a faculty member.
-     *
-     * @return bool
-     */
-    public function isFaculty()
-    {
-        return $this->role->role_name === 'faculty';
-    }
-
-    /**
-     * Check if user is a student.
-     *
-     * @return bool
-     */
-    public function isStudent()
-    {
-        return $this->role->role_name === 'student';
+        return $this->hasOne(StudentProfile::class, 'user_id', 'user_id');
     }
 }

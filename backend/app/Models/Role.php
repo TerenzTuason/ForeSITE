@@ -2,20 +2,32 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Role extends Model
 {
-    use HasFactory;
-
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'roles';
+    
     /**
      * The primary key for the model.
      *
      * @var string
      */
     protected $primaryKey = 'role_id';
-
+    
+    /**
+     * Indicates if the model should be timestamped.
+     *
+     * @var bool
+     */
+    public $timestamps = false;
+    
     /**
      * The attributes that are mass assignable.
      *
@@ -25,19 +37,12 @@ class Role extends Model
         'role_name',
         'description',
     ];
-
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-
+    
     /**
      * Get the users associated with the role.
      */
-    public function users()
+    public function users(): HasMany
     {
-        return $this->hasMany(User::class, 'role_id');
+        return $this->hasMany(User::class, 'role_id', 'role_id');
     }
 }
