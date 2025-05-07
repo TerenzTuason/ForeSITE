@@ -176,6 +176,22 @@
                 max-width: 400px;
             }
         }
+        .text-maroon {
+            color: var(--maroon);
+            text-decoration: none;
+        }
+        .text-maroon:hover {
+            color: #600000;
+            text-decoration: underline;
+        }
+        .form-check-input:checked {
+            background-color: var(--maroon);
+            border-color: var(--maroon);
+        }
+        .form-check-input:focus {
+            border-color: var(--maroon);
+            box-shadow: 0 0 0 0.2rem rgba(128, 0, 0, 0.1);
+        }
     </style>
 </head>
 <body>
@@ -219,13 +235,15 @@
                 <div class="invalid-feedback">Passwords do not match.</div>
             </div>
             <div class="mb-3">
-                <label for="role" class="form-label">Role <span class="required">*</span></label>
-                <select class="form-select" id="role" name="role" required>
-                    <option value="" selected disabled>Select your role</option>
-                    <option value="student">Student</option>
-                    <option value="faculty">Faculty</option>
-                </select>
-                <div class="invalid-feedback">Please select your role.</div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="agreeTerms" name="agreeTerms" required>
+                    <label class="form-check-label" for="agreeTerms">
+                        I agree to ForeSITE's <a href="#" class="text-maroon">Privacy Policy</a> and <a href="#" class="text-maroon">Terms of Service</a> <span class="required">*</span>
+                    </label>
+                    <div class="invalid-feedback">
+                        You must agree to the Privacy Policy and Terms of Service to continue.
+                    </div>
+                </div>
             </div>
             <button type="submit" class="btn btn-primary btn-register">Register</button>
             <div class="login-link">
