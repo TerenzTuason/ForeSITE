@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CourseController;
 use App\Http\Controllers\Api\LearningStyleController;
 use App\Http\Controllers\Api\QuestionnaireResponseController;
@@ -26,6 +27,34 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 // Public API Routes
 Route::prefix('v1')->group(function () {
+    // Diagnostic route to check database connection
+    Route::get('diagnostic/db-check', function () {
+        try {
+            // Check database connection
+            \DB::connection()->getPdo();
+            
+            // Check if we can select from users table
+            $userCount = \DB::table('users')->count();
+            
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Database connection successful',
+                'connection' => \DB::connection()->getDatabaseName(),
+                'user_count' => $userCount
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Database connection failed',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    });
+    
+    // Authentication Routes
+    Route::post('auth/register', [AuthController::class, 'register']);
+    Route::post('auth/login', [AuthController::class, 'login']);
+    
     // Roles
     Route::apiResource('roles', RoleController::class);
     

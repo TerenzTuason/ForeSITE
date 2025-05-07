@@ -81,4 +81,11 @@ class User extends Authenticatable
     {
         return $this->hasOne(StudentProfile::class, 'user_id', 'user_id');
     }
+
+    /**
+     * Indicates if the model should be timestamped.
+     *
+     * @var bool
+     */
+    public $timestamps = false;
 }
