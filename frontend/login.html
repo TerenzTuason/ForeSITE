@@ -210,7 +210,9 @@
                         const role = data.data.user.role.role_name;
                         if (role === 'student') {
                             window.location.href = 'students/questionnaire.html';
-                        } else if (role === 'faculty' || role === 'admin') {
+                        } else if (role === 'faculty') {
+                            window.location.href = 'faculty/dashboard.html';
+                        } else if (role === 'admin') {
                             window.location.href = 'admin/dashboard.html';
                         }
                     }

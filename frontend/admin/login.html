@@ -234,8 +234,12 @@
                             // Store user data in session storage
                             sessionStorage.setItem('user', JSON.stringify(data.data.user));
                             
-                            // Redirect to admin dashboard
-                            window.location.href = 'dashboard.html';
+                            // Redirect based on specific role
+                            if (role === 'faculty') {
+                                window.location.href = '../faculty/dashboard.html';
+                            } else if (role === 'admin') {
+                                window.location.href = 'dashboard.html';
+                            }
                         } else {
                             // Show error for unauthorized role
                             errorAlert.textContent = 'Unauthorized access. This portal is only for faculty and administrators.';
