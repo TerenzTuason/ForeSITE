@@ -117,6 +117,10 @@
                 margin: 1rem;
             }
         }
+        .alert {
+            display: none;
+            margin-bottom: 1rem;
+        }
     </style>
 </head>
 <body>
@@ -128,6 +132,7 @@
         <div class="security-notice">
             <strong>Secure Area:</strong> This portal is restricted to authorized personnel only. Unauthorized access attempts will be logged and reported.
         </div>
+        <div class="alert alert-danger" id="errorAlert" role="alert"></div>
         <form id="loginForm" novalidate>
             <div class="mb-3">
                 <label for="email" class="form-label">Institutional Email <span class="required">*</span></label>
@@ -140,7 +145,7 @@
                 <div class="invalid-feedback">Please enter your password.</div>
                 <a href="forgot-password.html" class="forgot-password">Forgot password?</a>
             </div>
-            <button type="submit" class="btn btn-login">Sign In</button>
+            <button type="submit" class="btn btn-login" id="loginBtn">Sign In</button>
             <div class="register-link">
                 Need an account? <a href="register.html">Request access</a>
             </div>
@@ -152,14 +157,101 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('loginForm');
+            const errorAlert = document.getElementById('errorAlert');
+            const loginBtn = document.getElementById('loginBtn');
+            const apiBaseUrl = 'http://127.0.0.1:8000/api/v1';
             
             form.addEventListener('submit', function(event) {
                 event.preventDefault();
-                if (form.checkValidity()) {
-                    // Here you would handle admin/faculty authentication
-                    console.log('Admin/Faculty login attempt');
+                
+                // Hide any previous error message
+                errorAlert.style.display = 'none';
+                
+                // Disable button to prevent multiple submissions
+                loginBtn.disabled = true;
+                loginBtn.innerHTML = 'Signing In...';
+                
+                // Basic form validation
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value;
+                
+                let isValid = true;
+                
+                if (!email) {
+                    document.getElementById('email').classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    document.getElementById('email').classList.remove('is-invalid');
                 }
-                form.classList.add('was-validated');
+                
+                if (!password) {
+                    document.getElementById('password').classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    document.getElementById('password').classList.remove('is-invalid');
+                }
+                
+                if (!isValid) {
+                    loginBtn.disabled = false;
+                    loginBtn.innerHTML = 'Sign In';
+                    return;
+                }
+                
+                // Prepare login data
+                const loginData = {
+                    email: email,
+                    password: password
+                };
+                
+                // Send login request to API
+                fetch(`${apiBaseUrl}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(loginData)
+                })
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    // Re-enable button
+                    loginBtn.disabled = false;
+                    loginBtn.innerHTML = 'Sign In';
+                    
+                    console.log('API response:', data);
+                    
+                    if (data.error) {
+                        // Show error message
+                        errorAlert.textContent = Array.isArray(data.error) ? data.error.join(', ') : data.error;
+                        errorAlert.style.display = 'block';
+                    } else {
+                        // Check user role - only allow faculty and admin roles
+                        const role = data.data.user.role.role_name;
+                        if (role === 'faculty' || role === 'admin') {
+                            // Store user data in session storage
+                            sessionStorage.setItem('user', JSON.stringify(data.data.user));
+                            
+                            // Redirect to admin dashboard
+                            window.location.href = 'dashboard.html';
+                        } else {
+                            // Show error for unauthorized role
+                            errorAlert.textContent = 'Unauthorized access. This portal is only for faculty and administrators.';
+                            errorAlert.style.display = 'block';
+                        }
+                    }
+                })
+                .catch(error => {
+                    // Re-enable button
+                    loginBtn.disabled = false;
+                    loginBtn.innerHTML = 'Sign In';
+                    
+                    console.error('Login error:', error);
+                    errorAlert.textContent = 'An error occurred. Please try again.';
+                    errorAlert.style.display = 'block';
+                });
             });
         });
     </script>

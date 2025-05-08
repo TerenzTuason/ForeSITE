@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - ForeSITE</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --maroon: #800000;
+            --gold: #FFB81C;
+            --light-gray: #f8f9fa;
+            --dark-gray: #343a40;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--light-gray);
+            min-height: 100vh;
+        }
+        .sidebar {
+            background-color: var(--dark-gray);
+            min-height: 100vh;
+            color: white;
+        }
+        .sidebar-header {
+            padding: 1.5rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .sidebar-header h3 {
+            color: var(--gold);
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 0.8rem 1rem;
+            margin: 0.2rem 0;
+            border-radius: 0.25rem;
+            transition: all 0.3s;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .nav-link i {
+            margin-right: 0.5rem;
+        }
+        .top-navbar {
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .content {
+            padding: 2rem;
+        }
+        .card {
+            border: none;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-bottom: 1.5rem;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            font-weight: 600;
+        }
+        .welcome-header {
+            background-color: var(--maroon);
+            color: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
+        }
+        .btn-maroon {
+            background-color: var(--maroon);
+            border-color: var(--maroon);
+            color: white;
+        }
+        .btn-maroon:hover {
+            background-color: #600000;
+            border-color: #600000;
+            color: white;
+        }
+        .stats-card {
+            background-color: var(--maroon);
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+        }
+        .stats-card h1 {
+            font-size: 3rem;
+            margin-bottom: 0;
+        }
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--maroon);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+        .user-role {
+            background-color: var(--gold);
+            color: var(--dark-gray);
+            padding: 0.25rem 0.5rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            margin-left: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="sidebar-header">
+                    <h3>ForeSITE</h3>
+                    <small>Administration Portal</small>
+                </div>
+                <ul class="nav flex-column mt-3">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="bi bi-people"></i> Users
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="bi bi-book"></i> Courses
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="bi bi-graph-up"></i> Reports
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="bi bi-gear"></i> Settings
+                        </a>
+                    </li>
+                    <li class="nav-item mt-5">
+                        <a class="nav-link" href="#" id="logoutBtn">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Main Content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom top-navbar">
+                    <h1 class="h2">Dashboard</h1>
+                    <div class="d-flex align-items-center">
+                        <div class="user-avatar" id="userInitials"></div>
+                        <div>
+                            <span id="userName">Loading...</span>
+                            <span class="user-role" id="userRole">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="welcome-header">
+                    <h2>Welcome, <span id="welcomeName">User</span>!</h2>
+                    <p class="mb-0">This is your administration dashboard for the ForeSITE Learning System.</p>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card stats-card">
+                            <h1>0</h1>
+                            <p>Active Students</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card stats-card">
+                            <h1>0</h1>
+                            <p>Active Courses</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card stats-card">
+                            <h1>0</h1>
+                            <p>Faculty Members</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header">Recent Activity</div>
+                            <div class="card-body">
+                                <p>No recent activity to display.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">Your Information</div>
+                            <div class="card-body">
+                                <p><strong>Email:</strong> <span id="userEmail">Loading...</span></p>
+                                <p><strong>Name:</strong> <span id="userFullName">Loading...</span></p>
+                                <p><strong>Role:</strong> <span id="userRoleDetail">Loading...</span></p>
+                                <p><strong>Last Login:</strong> <span id="lastLogin">Loading...</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is logged in
+            const userString = sessionStorage.getItem('user');
+            if (!userString) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Parse user data
+            const user = JSON.parse(userString);
+            
+            // Verify user role
+            if (user.role.role_name !== 'faculty' && user.role.role_name !== 'admin') {
+                alert('Unauthorized access. This area is only for faculty and administrators.');
+                window.location.href = '../login.html';
+                return;
+            }
+            
+            // Update user information on the page
+            document.getElementById('userInitials').textContent = `${user.first_name.charAt(0)}${user.last_name.charAt(0)}`;
+            document.getElementById('userName').textContent = `${user.first_name} ${user.last_name}`;
+            document.getElementById('userRole').textContent = user.role.role_name.charAt(0).toUpperCase() + user.role.role_name.slice(1);
+            document.getElementById('welcomeName').textContent = user.first_name;
+            document.getElementById('userEmail').textContent = user.email;
+            document.getElementById('userFullName').textContent = `${user.first_name} ${user.last_name}`;
+            document.getElementById('userRoleDetail').textContent = user.role.description || user.role.role_name;
+            
+            // Format last login time if available
+            if (user.last_login) {
+                const lastLoginDate = new Date(user.last_login);
+                document.getElementById('lastLogin').textContent = lastLoginDate.toLocaleString();
+            } else {
+                document.getElementById('lastLogin').textContent = 'First login';
+            }
+            
+            // Handle logout
+            document.getElementById('logoutBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                sessionStorage.removeItem('user');
+                window.location.href = 'login.html';
+            });
+        });
+    </script>
+</body>
+</html>

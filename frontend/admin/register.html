@@ -124,6 +124,10 @@
                 padding: 0;
             }
         }
+        .alert {
+            display: none;
+            margin-bottom: 1rem;
+        }
     </style>
 </head>
 <body>
@@ -133,8 +137,10 @@
             <p>Register for faculty access to ForeSITE</p>
         </div>
         <div class="security-notice">
-            <strong>Note:</strong> This registration requires approval from system administrators. You will be notified once your account is verified.
+            <strong>Note:</strong> This registration creates a faculty account for immediate access to the system.
         </div>
+        <div class="alert alert-danger" id="errorAlert" role="alert"></div>
+        <div class="alert alert-success" id="successAlert" role="alert"></div>
         <form id="registerForm" novalidate>
             <div class="mb-3">
                 <label for="email" class="form-label">Institutional Email <span class="required">*</span></label>
@@ -178,7 +184,7 @@
                     </div>
                 </div>
             </div>
-            <button type="submit" class="btn btn-register">Submit Request</button>
+            <button type="submit" class="btn btn-register" id="registerBtn">Create Faculty Account</button>
             <div class="login-link">
                 Already have an account? <a href="login.html">Sign in</a>
             </div>
@@ -192,29 +198,146 @@
             const form = document.getElementById('registerForm');
             const password = document.getElementById('password');
             const confirmPassword = document.getElementById('confirmPassword');
+            const errorAlert = document.getElementById('errorAlert');
+            const successAlert = document.getElementById('successAlert');
+            const registerBtn = document.getElementById('registerBtn');
+            const apiBaseUrl = 'http://127.0.0.1:8000/api/v1';
 
             form.addEventListener('submit', function(event) {
                 event.preventDefault();
                 
-                // Reset previous validation
-                form.classList.remove('was-validated');
+                // Hide alerts
+                errorAlert.style.display = 'none';
+                successAlert.style.display = 'none';
                 
-                // Check if passwords match
-                if (password.value !== confirmPassword.value) {
-                    confirmPassword.setCustomValidity('Passwords do not match');
+                // Disable the button to prevent multiple submissions
+                registerBtn.disabled = true;
+                registerBtn.innerHTML = 'Creating Account...';
+                
+                // Basic validation
+                let isValid = true;
+                const email = document.getElementById('email').value.trim();
+                const firstName = document.getElementById('firstName').value.trim();
+                const lastName = document.getElementById('lastName').value.trim();
+                const passwordValue = password.value;
+                const confirmPasswordValue = confirmPassword.value;
+                const agreeTerms = document.getElementById('agreeTerms').checked;
+                
+                // Validate email
+                if (!email || !email.includes('@')) {
+                    document.getElementById('email').classList.add('is-invalid');
+                    isValid = false;
                 } else {
-                    confirmPassword.setCustomValidity('');
+                    document.getElementById('email').classList.remove('is-invalid');
                 }
-
-                if (!form.checkValidity()) {
-                    event.stopPropagation();
-                    form.classList.add('was-validated');
+                
+                // Validate first name
+                if (!firstName) {
+                    document.getElementById('firstName').classList.add('is-invalid');
+                    isValid = false;
                 } else {
-                    // Form is valid, show success message
-                    alert('Your registration request has been submitted. You will be notified once your account is approved.');
-                    form.reset();
-                    form.classList.remove('was-validated');
+                    document.getElementById('firstName').classList.remove('is-invalid');
                 }
+                
+                // Validate last name
+                if (!lastName) {
+                    document.getElementById('lastName').classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    document.getElementById('lastName').classList.remove('is-invalid');
+                }
+                
+                // Validate password
+                if (!passwordValue || passwordValue.length < 8) {
+                    password.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    password.classList.remove('is-invalid');
+                }
+                
+                // Validate confirm password
+                if (passwordValue !== confirmPasswordValue) {
+                    confirmPassword.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    confirmPassword.classList.remove('is-invalid');
+                }
+                
+                // Validate terms agreement
+                if (!agreeTerms) {
+                    document.getElementById('agreeTerms').classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    document.getElementById('agreeTerms').classList.remove('is-invalid');
+                }
+                
+                if (!isValid) {
+                    registerBtn.disabled = false;
+                    registerBtn.innerHTML = 'Create Faculty Account';
+                    return;
+                }
+                
+                // Create faculty user (role_id = 2 for faculty)
+                const registrationData = {
+                    email: email,
+                    first_name: firstName,
+                    last_name: lastName,
+                    password: passwordValue,
+                    role_id: 2  // Faculty role
+                };
+                
+                console.log('Sending registration data:', registrationData);
+                
+                // Send registration request to API
+                fetch(`${apiBaseUrl}/users`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(registrationData)
+                })
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    // Re-enable the button
+                    registerBtn.disabled = false;
+                    registerBtn.innerHTML = 'Create Faculty Account';
+                    
+                    console.log('API response:', data);
+                    
+                    if (data.error) {
+                        // Show error message
+                        const errorMsg = typeof data.error === 'object' 
+                            ? Object.values(data.error).flat().join(', ') 
+                            : data.error;
+                        errorAlert.textContent = errorMsg;
+                        errorAlert.style.display = 'block';
+                    } else {
+                        // Show success message
+                        successAlert.textContent = 'Faculty account created successfully!';
+                        successAlert.style.display = 'block';
+                        
+                        // Reset form
+                        form.reset();
+                        
+                        // Redirect to login page after a short delay
+                        setTimeout(() => {
+                            window.location.href = 'login.html';
+                        }, 2000);
+                    }
+                })
+                .catch(error => {
+                    // Re-enable the button
+                    registerBtn.disabled = false;
+                    registerBtn.innerHTML = 'Create Faculty Account';
+                    
+                    console.error('Registration error:', error);
+                    errorAlert.textContent = 'An error occurred. Please try again.';
+                    errorAlert.style.display = 'block';
+                });
             });
 
             // Real-time password match validation

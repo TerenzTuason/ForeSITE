@@ -224,4 +224,4 @@ INSERT INTO learning_styles (style_name, description) VALUES
 
 -- Insert admin user (password should be properly hashed in production)
 INSERT INTO users (role_id, email, password, first_name, last_name) VALUES
-(3, 'admin@foresite.com', 'admin_password_hash', 'System', 'Administrator'); 
+(3, 'admin@foresite.com', '$2y$10$nHipa0I9/v/SEy4HrI6mxOnBJ.a4kXnhgxyMC.2WaJnELzpikNiUi', 'System', 'Administrator'); 
