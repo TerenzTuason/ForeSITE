@@ -3,346 +3,236 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Faculty Dashboard - ForeSITE</title>
+    <title>Dashboard - ForeSITE</title>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --faculty-primary: #006400; /* Dark green for faculty */
-            --faculty-secondary: #90EE90; /* Light green accent */
-            --light-gray: #f8f9fa;
-            --dark-gray: #343a40;
+            --maroon: #800000;
+            --gold: #FFB81C;
+            --light-gray: #f5f5f5;
+            --dark-gray: #333;
+            --border-radius: 8px;
+            --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
+
         body {
             font-family: 'Poppins', sans-serif;
             background-color: var(--light-gray);
             min-height: 100vh;
         }
-        .sidebar {
-            background-color: var(--dark-gray);
-            min-height: 100vh;
-            color: white;
+
+        /* Navigation Styles */
+        .navbar {
+            background: var(--maroon);
+            padding: 1rem 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 1000;
         }
-        .sidebar-header {
-            padding: 1.5rem 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .sidebar-header h3 {
-            color: var(--faculty-secondary);
-            margin: 0;
-            font-size: 1.5rem;
+
+        .navbar-brand {
+            color: white !important;
             font-weight: 600;
-        }
-        .nav-link {
-            color: rgba(255, 255, 255, 0.8);
-            padding: 0.8rem 1rem;
-            margin: 0.2rem 0;
-            border-radius: 0.25rem;
-            transition: all 0.3s;
-        }
-        .nav-link:hover, .nav-link.active {
-            color: white;
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-        .nav-link i {
-            margin-right: 0.5rem;
-        }
-        .top-navbar {
-            background-color: white;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        .content {
-            padding: 2rem;
-        }
-        .card {
-            border: none;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s, box-shadow 0.3s;
-            margin-bottom: 1.5rem;
-        }
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-        }
-        .card-header {
-            background-color: white;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            font-weight: 600;
-        }
-        .welcome-header {
-            background-color: var(--faculty-primary);
-            color: white;
-            padding: 2rem;
-            border-radius: 0.5rem;
-            margin-bottom: 2rem;
-        }
-        .btn-faculty {
-            background-color: var(--faculty-primary);
-            border-color: var(--faculty-primary);
-            color: white;
-        }
-        .btn-faculty:hover {
-            background-color: #004d00;
-            border-color: #004d00;
-            color: white;
-        }
-        .stats-card {
-            background-color: var(--faculty-primary);
-            color: white;
-            text-align: center;
-            padding: 1.5rem;
-        }
-        .stats-card h1 {
-            font-size: 3rem;
-            margin-bottom: 0;
-        }
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: var(--faculty-primary);
-            color: white;
+            font-size: 1.2rem;
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            margin-right: 0.5rem;
+            gap: 0.75rem;
         }
-        .user-role {
-            background-color: var(--faculty-secondary);
-            color: var(--dark-gray);
-            padding: 0.25rem 0.5rem;
-            border-radius: 1rem;
-            font-size: 0.75rem;
-            margin-left: 0.5rem;
+
+        .navbar-brand img {
+            height: 35px;
         }
-        .course-card {
+
+        .nav-link {
+            color: rgba(255,255,255,0.9) !important;
+            font-weight: 500;
             transition: all 0.3s ease;
+            padding: 0.75rem 1.5rem !important;
+            border-radius: 50px;
+            margin: 0 0.5rem;
         }
-        .course-card:hover {
-            border-left: 4px solid var(--faculty-primary);
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--gold) !important;
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
         }
-        .student-list {
-            max-height: 300px;
-            overflow-y: auto;
+
+        .nav-link.btn-logout {
+            background-color: var(--gold);
+            color: var(--maroon) !important;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .nav-link.btn-logout:hover {
+            background-color: #fff;
+            transform: translateY(-2px);
+        }
+
+        /* Dashboard Styles */
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .section-title {
+            color: var(--maroon);
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: var(--card-shadow);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card i {
+            font-size: 2.5rem;
+            color: var(--maroon);
+            margin-bottom: 1rem;
+        }
+
+        .stat-card h2 {
+            color: var(--maroon);
+            font-size: 2.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .stat-card p {
+            color: var(--dark-gray);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card small {
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .navbar-brand img {
+                height: 30px;
+            }
+            .nav-link {
+                padding: 0.5rem 1rem !important;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <div class="col-md-3 col-lg-2 d-md-block sidebar collapse">
-                <div class="sidebar-header">
-                    <h3>ForeSITE</h3>
-                    <small>Faculty Portal</small>
-                </div>
-                <ul class="nav flex-column mt-3">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand" href="#">
+                <img src="../assets/logo/pup.png" alt="PUP Logo">
+                <span class="d-none d-sm-inline">FORESITE: Faculty Portal</span>
+                <span class="d-inline d-sm-none">FORESITE</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link active" href="#">
-                            <i class="bi bi-speedometer2"></i> Dashboard
+                        <a class="nav-link active" href="dashboard.html">
+                            <i class="fas fa-home me-2"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="learners.html">
+                            <i class="fas fa-users me-2"></i>Learners
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">
-                            <i class="bi bi-book"></i> My Courses
+                            <i class="fas fa-book me-2"></i>Courses
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">
-                            <i class="bi bi-people"></i> Students
+                            <i class="fas fa-user-circle me-2"></i>Profile
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="bi bi-file-earmark-text"></i> Assessments
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="bi bi-chat-left-text"></i> Feedback
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="bi bi-gear"></i> Settings
-                        </a>
-                    </li>
-                    <li class="nav-item mt-5">
-                        <a class="nav-link" href="#" id="logoutBtn">
-                            <i class="bi bi-box-arrow-right"></i> Logout
+                        <a class="nav-link btn-logout" href="../admin/login.html" id="logoutBtn">
+                            <i class="fas fa-sign-out-alt me-2"></i>Logout
                         </a>
                     </li>
                 </ul>
             </div>
+        </div>
+    </nav>
 
-            <!-- Main Content -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom top-navbar">
-                    <h1 class="h2">Faculty Dashboard</h1>
-                    <div class="d-flex align-items-center">
-                        <div class="user-avatar" id="userInitials"></div>
-                        <div>
-                            <span id="userName">Loading...</span>
-                            <span class="user-role" id="userRole">Loading...</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="welcome-header">
-                    <h2>Welcome, <span id="welcomeName">Instructor</span>!</h2>
-                    <p class="mb-0">Manage your courses, monitor student progress, and provide personalized learning experiences.</p>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="card stats-card">
-                            <h1 id="courseCount">0</h1>
-                            <p>Active Courses</p>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card stats-card">
-                            <h1 id="studentCount">0</h1>
-                            <p>Enrolled Students</p>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card stats-card">
-                            <h1 id="assessmentCount">0</h1>
-                            <p>Pending Assessments</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row mt-4">
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <span>My Courses</span>
-                                <button class="btn btn-sm btn-faculty">Create Course</button>
-                            </div>
-                            <div class="card-body">
-                                <div class="course-list">
-                                    <div class="course-card p-3 mb-2 bg-light rounded">
-                                        <h5>Introduction to Futures Thinking</h5>
-                                        <div class="d-flex justify-content-between">
-                                            <span>12 enrolled students</span>
-                                            <span class="badge bg-success">Active</span>
-                                        </div>
-                                    </div>
-                                    <div class="course-card p-3 mb-2 bg-light rounded">
-                                        <h5>Advanced Forecasting Methods</h5>
-                                        <div class="d-flex justify-content-between">
-                                            <span>8 enrolled students</span>
-                                            <span class="badge bg-success">Active</span>
-                                        </div>
-                                    </div>
-                                    <div class="course-card p-3 mb-2 bg-light rounded">
-                                        <h5>Strategic Foresight Workshop</h5>
-                                        <div class="d-flex justify-content-between">
-                                            <span>15 enrolled students</span>
-                                            <span class="badge bg-warning text-dark">Draft</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <span>Recent Student Activity</span>
-                                <button class="btn btn-sm btn-faculty">View All</button>
-                            </div>
-                            <div class="card-body">
-                                <div class="student-list">
-                                    <div class="d-flex align-items-center mb-3">
-                                        <div class="me-3">
-                                            <div style="background-color: #f0f0f0; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">JS</div>
-                                        </div>
-                                        <div>
-                                            <h6 class="mb-0">John Smith</h6>
-                                            <small>Completed Module 1 assessment with 92%</small>
-                                            <small class="text-muted d-block">Today, 9:15 AM</small>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex align-items-center mb-3">
-                                        <div class="me-3">
-                                            <div style="background-color: #f0f0f0; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">MJ</div>
-                                        </div>
-                                        <div>
-                                            <h6 class="mb-0">Maria Johnson</h6>
-                                            <small>Submitted discussion post for Week 2</small>
-                                            <small class="text-muted d-block">Yesterday, 3:42 PM</small>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex align-items-center mb-3">
-                                        <div class="me-3">
-                                            <div style="background-color: #f0f0f0; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">RP</div>
-                                        </div>
-                                        <div>
-                                            <h6 class="mb-0">Robert Parker</h6>
-                                            <small>Enrolled in Advanced Forecasting Methods</small>
-                                            <small class="text-muted d-block">Yesterday, 11:20 AM</small>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex align-items-center mb-3">
-                                        <div class="me-3">
-                                            <div style="background-color: #f0f0f0; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">KL</div>
-                                        </div>
-                                        <div>
-                                            <h6 class="mb-0">Karen Liu</h6>
-                                            <small>Posted question in course forum</small>
-                                            <small class="text-muted d-block">2 days ago</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="row mt-4">
-                    <div class="col-md-12">
-                        <div class="card">
-                            <div class="card-header">
-                                Upcoming Tasks
-                            </div>
-                            <div class="card-body">
-                                <ul class="list-group list-group-flush">
-                                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <h6 class="mb-0">Grade Module 3 Assignments</h6>
-                                            <small class="text-muted">Introduction to Futures Thinking</small>
-                                        </div>
-                                        <span class="badge bg-danger rounded-pill">Due Today</span>
-                                    </li>
-                                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <h6 class="mb-0">Prepare Week 4 Materials</h6>
-                                            <small class="text-muted">Advanced Forecasting Methods</small>
-                                        </div>
-                                        <span class="badge bg-warning text-dark rounded-pill">Due in 2 days</span>
-                                    </li>
-                                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <h6 class="mb-0">Faculty Meeting</h6>
-                                            <small class="text-muted">Curriculum Planning - All Courses</small>
-                                        </div>
-                                        <span class="badge bg-info rounded-pill">Fri, 10:00 AM</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </main>
+    <div class="dashboard-container">
+        <h1 class="section-title">Dashboard Overview</h1>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <i class="fas fa-users"></i>
+                <h2>150</h2>
+                <p>Total Learners</p>
+                <small>Active Students</small>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-book"></i>
+                <h2>5</h2>
+                <p>Active Courses</p>
+                <small>Currently Running</small>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-tasks"></i>
+                <h2>15</h2>
+                <p>Total Modules</p>
+                <small>Across All Courses</small>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-chart-line"></i>
+                <h2>85%</h2>
+                <p>Average Progress</p>
+                <small>All Students</small>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-check-circle"></i>
+                <h2>120</h2>
+                <p>Completed Modules</p>
+                <small>By All Students</small>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-clock"></i>
+                <h2>30</h2>
+                <p>Ongoing Modules</p>
+                <small>Currently Active</small>
+            </div>
         </div>
     </div>
 
@@ -350,37 +240,23 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Check if user is logged in
             const userData = JSON.parse(sessionStorage.getItem('user'));
             
             if (!userData) {
-                // Redirect to login page if not logged in
                 window.location.href = '../admin/login.html';
                 return;
             }
             
-            // Check if user has faculty role
             if (userData.role.role_name !== 'faculty') {
                 alert('Unauthorized access. This portal is only for faculty members.');
-                window.location.href = '../login.html';
+                window.location.href = '../admin/login.html';
                 return;
             }
             
-            // Set user information
-            const userName = document.getElementById('userName');
-            const userRole = document.getElementById('userRole');
-            const welcomeName = document.getElementById('welcomeName');
-            const userInitials = document.getElementById('userInitials');
-            
-            userName.textContent = `${userData.first_name} ${userData.last_name}`;
-            userRole.textContent = userData.role.role_name.toUpperCase();
-            welcomeName.textContent = userData.first_name;
-            userInitials.textContent = `${userData.first_name.charAt(0)}${userData.last_name.charAt(0)}`;
-            
-            // Set up logout button
-            document.getElementById('logoutBtn').addEventListener('click', function() {
+            document.getElementById('logoutBtn').addEventListener('click', function(e) {
+                e.preventDefault();
                 sessionStorage.removeItem('user');
-                window.location.href = '../login.html';
+                window.location.href = '../admin/login.html';
             });
         });
     </script>
