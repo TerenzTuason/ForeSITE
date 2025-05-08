@@ -120,8 +120,8 @@
 <body>
     <div class="login-container">
         <div class="login-header">
-            <h2>Welcome Back</h2>
-            <p>Sign in to your ForeSITE account</p>
+            <h2>Student Login</h2>
+            <p>Sign in to your ForeSITE student account</p>
         </div>
         <div class="alert alert-danger" id="errorAlert" role="alert"></div>
         <form id="loginForm" novalidate>
@@ -206,14 +206,24 @@
                         // Store user data in session storage
                         sessionStorage.setItem('user', JSON.stringify(data.data.user));
                         
-                        // Redirect based on user role
+                        // Get user role
                         const role = data.data.user.role.role_name;
+                        
                         if (role === 'student') {
+                            // Redirect students to questionnaire
                             window.location.href = 'students/questionnaire.html';
-                        } else if (role === 'faculty') {
-                            window.location.href = 'faculty/dashboard.html';
-                        } else if (role === 'admin') {
-                            window.location.href = 'admin/dashboard.html';
+                        } else {
+                            // Redirect faculty and admin to the admin login page
+                            errorAlert.textContent = 'Please use the Admin & Faculty portal to log in with your credentials.';
+                            errorAlert.style.display = 'block';
+                            
+                            // Clear the session storage since they shouldn't use this login
+                            sessionStorage.removeItem('user');
+                            
+                            // After a short delay, redirect to admin login
+                            setTimeout(() => {
+                                window.location.href = 'admin/login.html';
+                            }, 1500);
                         }
                     }
                 })
