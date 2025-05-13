@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Details - ForeSITE</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --maroon: #800000;
+            --gold: #FFB81C;
+            --light-gray: #f5f5f5;
+            --dark-gray: #333;
+            --border-radius: 8px;
+            --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            --success-green: #28a745;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--light-gray);
+            min-height: 100vh;
+        }
+
+        /* Navigation Styles */
+        .navbar {
+            background: var(--maroon);
+            padding: 1rem 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            color: white !important;
+            font-weight: 600;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .navbar-brand img {
+            height: 35px;
+        }
+
+        .nav-link {
+            color: rgba(255,255,255,0.9) !important;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.75rem 1.5rem !important;
+            border-radius: 50px;
+            margin: 0 0.5rem;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--gold) !important;
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+        }
+
+        .nav-link.btn-logout {
+            background-color: var(--gold);
+            color: var(--maroon) !important;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .nav-link.btn-logout:hover {
+            background-color: #fff;
+            transform: translateY(-2px);
+        }
+
+        /* Course Details Styles */
+        .course-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .course-header {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .course-header h1 {
+            color: var(--maroon);
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .course-meta {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            color: var(--dark-gray);
+            margin-bottom: 1rem;
+        }
+
+        .course-meta i {
+            color: var(--maroon);
+        }
+
+        .progress-section {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .progress-bar {
+            background-color: var(--maroon);
+        }
+
+        .section-title {
+            color: var(--maroon);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--gold);
+        }
+
+        .module-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--maroon);
+        }
+
+        .module-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .module-card h3 {
+            color: var(--maroon);
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .module-card .status {
+            font-size: 0.9rem;
+            padding: 0.25rem 1rem;
+            border-radius: 50px;
+            background: var(--light-gray);
+        }
+
+        .status.completed {
+            background: #d4edda;
+            color: var(--success-green);
+        }
+
+        .status.in-progress {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status.not-started {
+            background: #f8f9fa;
+            color: #6c757d;
+        }
+
+        .task-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.3s ease;
+        }
+
+        .task-item:last-child {
+            border-bottom: none;
+        }
+
+        .task-item:hover {
+            background-color: var(--light-gray);
+        }
+
+        .task-checkbox {
+            margin-right: 1rem;
+            width: 1.2rem;
+            height: 1.2rem;
+            border: 2px solid var(--maroon);
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .task-checkbox:checked {
+            background-color: var(--maroon);
+        }
+
+        .task-content {
+            flex-grow: 1;
+        }
+
+        .task-title {
+            font-weight: 500;
+            color: var(--dark-gray);
+            margin-bottom: 0.25rem;
+        }
+
+        .task-description {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .accomplishment-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .accomplishment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .accomplishment-title {
+            font-weight: 600;
+            color: var(--maroon);
+        }
+
+        .accomplishment-date {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .course-meta {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+            .module-card {
+                padding: 1.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img src="../../assets/logo/pup.png" alt="PUP Logo" class="me-2">
+                <span class="d-none d-sm-inline">FORESITE: Adaptive Collaborative Learning System</span>
+                <span class="d-inline d-sm-none">FORESITE</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="dashboard.html"><i class="fas fa-home me-1"></i> Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#"><i class="fas fa-book me-1"></i> My Courses</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-user-circle me-1"></i> Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn-logout" href="../../login.html"><i class="fas fa-sign-out-alt me-1"></i> Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" style="margin-top: 100px;">
+        <div class="course-container">
+            <!-- Course Header -->
+            <div class="course-header">
+                <h1>Information Management</h1>
+                <div class="course-meta">
+                    <span><i class="fas fa-user-tie me-2"></i>Prof. Maria Garcia</span>
+                    <span><i class="fas fa-users me-2"></i>IT-3101</span>
+                    <span><i class="fas fa-clock me-2"></i>MWF 9:00-10:30 AM</span>
+                    <span><i class="fas fa-calendar me-2"></i>1st Semester, 2023-2024</span>
+                </div>
+            </div>
+
+            <!-- Progress Section -->
+            <div class="progress-section">
+                <h2 class="section-title">Course Progress</h2>
+                <div class="progress" style="height: 20px;">
+                    <div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25% Complete</div>
+                </div>
+            </div>
+
+            <!-- Tasks Section -->
+            <section class="mb-4">
+                <h2 class="section-title">Course Modules</h2>
+                
+                <!-- Module 1: Theoretical Foundation -->
+                <div class="module-card">
+                    <h3>
+                        Module 1: Theoretical Foundation
+                        <span class="status in-progress">In Progress</span>
+                    </h3>
+                    <div class="task-list">
+                        <div class="task-item">
+                            <input type="checkbox" class="task-checkbox" checked disabled>
+                            <div class="task-content">
+                                <div class="task-title">Read and Analyze Core Concepts</div>
+                                <div class="task-description">Study fundamental theories and principles of the subject matter through comprehensive reading materials.</div>
+                            </div>
+                        </div>
+                        <div class="task-item">
+                            <input type="checkbox" class="task-checkbox">
+                            <div class="task-content">
+                                <div class="task-title">Concept Mapping Exercise</div>
+                                <div class="task-description">Create detailed concept maps to visualize relationships between key theories and principles.</div>
+                            </div>
+                        </div>
+                        <div class="task-item">
+                            <input type="checkbox" class="task-checkbox">
+                            <div class="task-content">
+                                <div class="task-title">Theoretical Framework Development</div>
+                                <div class="task-description">Develop a comprehensive theoretical framework based on the studied concepts.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Module 2: Critical Analysis -->
+                <div class="module-card">
+                    <h3>
+                        Module 2: Critical Analysis
+                        <span class="status not-started">Not Started</span>
+                    </h3>
+                    <div class="task-list">
+                        <div class="task-item">
+                            <input type="checkbox" class="task-checkbox">
+                            <div class="task-content">
+                                <div class="task-title">Case Study Analysis</div>
+                                <div class="task-description">Analyze complex case studies applying theoretical knowledge to real-world scenarios.</div>
+                            </div>
+                        </div>
+                        <div class="task-item">
+                            <input type="checkbox" class="task-checkbox">
+                            <div class="task-content">
+                                <div class="task-title">Research Paper Review</div>
+                                <div class="task-description">Review and critique academic papers related to the subject matter.</div>
+                            </div>
+                        </div>
+                        <div class="task-item">
+                            <input type="checkbox" class="task-checkbox">
+                            <div class="task-content">
+                                <div class="task-title">Analytical Report</div>
+                                <div class="task-description">Write a detailed analytical report synthesizing findings from case studies and research papers.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Module 3: Theoretical Application -->
+                <div class="module-card">
+                    <h3>
+                        Module 3: Theoretical Application
+                        <span class="status not-started">Not Started</span>
+                    </h3>
+                    <div class="task-list">
+                        <div class="task-item">
+                            <input type="checkbox" class="task-checkbox">
+                            <div class="task-content">
+                                <div class="task-title">Problem-Based Learning</div>
+                                <div class="task-description">Solve complex problems by applying theoretical frameworks and analytical approaches.</div>
+                            </div>
+                        </div>
+                        <div class="task-item">
+                            <input type="checkbox" class="task-checkbox">
+                            <div class="task-content">
+                                <div class="task-title">Research Project</div>
+                                <div class="task-description">Conduct a small-scale research project applying theoretical concepts to a specific problem.</div>
+                            </div>
+                        </div>
+                        <div class="task-item">
+                            <input type="checkbox" class="task-checkbox">
+                            <div class="task-content">
+                                <div class="task-title">Theory-Based Solution Design</div>
+                                <div class="task-description">Design and propose solutions based on theoretical principles and analytical findings.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Module 4: Advanced Theory Integration -->
+                <div class="module-card">
+                    <h3>
+                        Module 4: Advanced Theory Integration
+                        <span class="status not-started">Not Started</span>
+                    </h3>
+                    <div class="task-list">
+                        <div class="task-item">
+                            <input type="checkbox" class="task-checkbox">
+                            <div class="task-content">
+                                <div class="task-title">Theory Integration Workshop</div>
+                                <div class="task-description">Participate in workshops to integrate multiple theoretical frameworks.</div>
+                            </div>
+                        </div>
+                        <div class="task-item">
+                            <input type="checkbox" class="task-checkbox">
+                            <div class="task-content">
+                                <div class="task-title">Comprehensive Analysis Project</div>
+                                <div class="task-description">Complete a major project demonstrating mastery of theoretical concepts and their practical applications.</div>
+                            </div>
+                        </div>
+                        <div class="task-item">
+                            <input type="checkbox" class="task-checkbox">
+                            <div class="task-content">
+                                <div class="task-title">Final Theoretical Paper</div>
+                                <div class="task-description">Write a comprehensive paper synthesizing all theoretical learning and applications.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Accomplishments Section -->
+            <section>
+                <h2 class="section-title">Accomplishments</h2>
+                <div class="accomplishment-card">
+                    <div class="accomplishment-header">
+                        <span class="accomplishment-title">Core Concepts Analysis</span>
+                        <span class="accomplishment-date">Completed on Oct 15, 2023</span>
+                    </div>
+                    <p>Successfully completed the foundational theoretical analysis with detailed concept mapping.</p>
+                </div>
+                <div class="accomplishment-card">
+                    <div class="accomplishment-header">
+                        <span class="accomplishment-title">Initial Framework Development</span>
+                        <span class="accomplishment-date">Completed on Oct 20, 2023</span>
+                    </div>
+                    <p>Developed a comprehensive theoretical framework demonstrating strong analytical skills.</p>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 
