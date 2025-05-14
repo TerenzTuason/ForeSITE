@@ -22,8 +22,8 @@ class LearningStyleClassifier:
         
         # Initialize individual classifiers with config parameters
         self.dt_classifier = DecisionTreeClassifier(**MODEL_CONFIG['decision_tree'])
-        self.nb_classifier = BernoulliNB(**MODEL_CONFIG['naive_bayes'])
-        self.svm_classifier = SVC(**MODEL_CONFIG['svm'])
+        self.bn_classifier = BernoulliNB(**MODEL_CONFIG['bayesian_network'])
+        self.svm_classifier = SVC(**MODEL_CONFIG['support_vector_machine'])
         self.rf_classifier = RandomForestClassifier(**MODEL_CONFIG['random_forest'])
         
         # Pre-train the models
@@ -95,7 +95,7 @@ class LearningStyleClassifier:
         
         # Train each classifier
         self.dt_classifier.fit(X_train, y_train)
-        self.nb_classifier.fit(X_train, y_train)
+        self.bn_classifier.fit(X_train, y_train)
         self.svm_classifier.fit(X_train, y_train)
         self.rf_classifier.fit(X_train, y_train)
     
@@ -106,8 +106,8 @@ class LearningStyleClassifier:
         # Get predictions from each classifier
         predictions = {
             'decision_tree': self.dt_classifier.predict(X)[0],
-            'naive_bayes': self.nb_classifier.predict(X)[0],
-            'svm': self.svm_classifier.predict(X)[0],
+            'bayesian_network': self.bn_classifier.predict(X)[0],
+            'support_vector_machine': self.svm_classifier.predict(X)[0],
             'random_forest': self.rf_classifier.predict(X)[0]
         }
         

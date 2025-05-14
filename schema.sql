@@ -209,6 +209,15 @@ CREATE TABLE system_logs (
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
+CREATE TABLE courses (
+	course_id INT PRIMARY KEY AUTO_INCREMENT,
+    course_name VARCHAR(100) NOT NULL,
+    objectives TEXT NOT NULL,
+    structure TEXT NOT NULL,
+    learning_style TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Insert default roles
 INSERT INTO roles (role_name, description) VALUES
 ('student', 'Regular student user'),

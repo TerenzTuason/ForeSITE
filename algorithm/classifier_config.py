@@ -15,10 +15,10 @@ MODEL_CONFIG = {
         'max_depth': 10,  # Adjust to control tree complexity
         'min_samples_split': 2  # Minimum samples required to split a node
     },
-    'naive_bayes': {
+    'bayesian_network': {
         'alpha': 1.0  # Smoothing parameter
     },
-    'svm': {
+    'support_vector_machine': {
         'kernel': 'rbf',  # Options: 'rbf', 'linear', 'poly'
         'random_state': 42,
         'C': 1.0  # Regularization parameter
@@ -43,8 +43,8 @@ CLASSIFICATION_CONFIG = {
     'confidence_threshold': 0.6,  # Minimum confidence level for style prediction
     'style_weights': {  # Weights for each classifier in the voting
         'decision_tree': 1.0,
-        'naive_bayes': 1.0,
-        'svm': 1.0,
+        'bayesian_network': 1.0,
+        'support_vector_machine': 1.0,
         'random_forest': 1.2  # Giving slightly more weight to Random Forest
     }
 }
