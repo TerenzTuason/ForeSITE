@@ -57,26 +57,41 @@ CREATE TABLE student_profiles (
     FOREIGN KEY (dominant_learning_style_id) REFERENCES learning_styles(style_id)
 );
 
--- VARK questionnaire responses
-CREATE TABLE questionnaire_responses (
-    response_id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT NOT NULL,
-    question_id INT NOT NULL,
-    answer TEXT NOT NULL,
-    response_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
-);
-
 -- Courses table
 CREATE TABLE courses (
-    course_id INT PRIMARY KEY AUTO_INCREMENT,
-    title VARCHAR(100) NOT NULL,
+	course_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
     description TEXT,
-    created_by INT NOT NULL,
+    objectives JSON NOT NULL,
+    structure JSON NOT NULL,
+    learning_style_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
-    is_active BOOLEAN DEFAULT TRUE,
-    FOREIGN KEY (created_by) REFERENCES users(user_id)
+    FOREIGN KEY (learning_style_id) REFERENCES learning_styles(style_id)
+);
+
+-- Student enrollment in courses
+CREATE TABLE enrollments (
+    enrollment_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    course_id INT NOT NULL,
+    enrollment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    completion_status ENUM('not_started', 'in_progress', 'completed') DEFAULT 'not_started',
+    completion_date TIMESTAMP NULL,
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (course_id) REFERENCES courses(course_id),
+    UNIQUE KEY unique_enrollment (user_id, course_id)
+);
+
+-- Student assessment results
+CREATE TABLE assessment_results (
+    result_id INT PRIMARY KEY AUTO_INCREMENT,
+    first_name VARCHAR(200),
+    last_name VARCHAR(200),
+    department VARCHAR(200),
+    user_id INT NOT NULL,
+    answers JSON NOT NULL,
+    result JSON NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
 -- Modules table
@@ -109,19 +124,6 @@ CREATE TABLE module_contents (
     FOREIGN KEY (learning_style_id) REFERENCES learning_styles(style_id)
 );
 
--- Student enrollment in courses
-CREATE TABLE enrollments (
-    enrollment_id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT NOT NULL,
-    course_id INT NOT NULL,
-    enrollment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    completion_status ENUM('not_started', 'in_progress', 'completed') DEFAULT 'not_started',
-    completion_date TIMESTAMP NULL,
-    FOREIGN KEY (user_id) REFERENCES users(user_id),
-    FOREIGN KEY (course_id) REFERENCES courses(course_id),
-    UNIQUE KEY unique_enrollment (user_id, course_id)
-);
-
 -- Student progress in modules
 CREATE TABLE module_progress (
     progress_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -134,41 +136,6 @@ CREATE TABLE module_progress (
     FOREIGN KEY (user_id) REFERENCES users(user_id),
     FOREIGN KEY (module_id) REFERENCES modules(module_id),
     UNIQUE KEY unique_progress (user_id, module_id)
-);
-
--- Assessments table
-CREATE TABLE assessments (
-    assessment_id INT PRIMARY KEY AUTO_INCREMENT,
-    module_id INT NOT NULL,
-    title VARCHAR(100) NOT NULL,
-    description TEXT,
-    passing_score INT DEFAULT 75,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (module_id) REFERENCES modules(module_id)
-);
-
--- Assessment questions
-CREATE TABLE assessment_questions (
-    question_id INT PRIMARY KEY AUTO_INCREMENT,
-    assessment_id INT NOT NULL,
-    question_text TEXT NOT NULL,
-    question_type ENUM('multiple_choice', 'true_false', 'short_answer', 'essay') NOT NULL,
-    points INT DEFAULT 1,
-    FOREIGN KEY (assessment_id) REFERENCES assessments(assessment_id)
-);
-
--- Student assessment attempts
-CREATE TABLE assessment_attempts (
-    attempt_id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT NOT NULL,
-    assessment_id INT NOT NULL,
-    score INT NOT NULL,
-    passed BOOLEAN DEFAULT FALSE,
-    started_at TIMESTAMP NOT NULL,
-    submitted_at TIMESTAMP NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(user_id),
-    FOREIGN KEY (assessment_id) REFERENCES assessments(assessment_id)
 );
 
 -- Certificates table
@@ -209,15 +176,6 @@ CREATE TABLE system_logs (
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
-CREATE TABLE courses (
-	course_id INT PRIMARY KEY AUTO_INCREMENT,
-    course_name VARCHAR(100) NOT NULL,
-    objectives TEXT NOT NULL,
-    structure TEXT NOT NULL,
-    learning_style TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
 -- Insert default roles
 INSERT INTO roles (role_name, description) VALUES
 ('student', 'Regular student user'),
@@ -225,11 +183,11 @@ INSERT INTO roles (role_name, description) VALUES
 ('admin', 'System administrator with full access');
 
 -- Insert default learning styles based on VARK model
-INSERT INTO learning_styles (style_name, description) VALUES
-('visual', 'Preference for visual information like charts, graphs, and diagrams'),
-('auditory', 'Preference for spoken or heard information'),
-('reading/writing', 'Preference for information displayed as words'),
-('kinesthetic', 'Preference for learning through experience and practice');
+INSERT INTO learning_styles (style_name) VALUES
+('activist'),
+('reflector'),
+('theorist'),
+('pragmatist');
 
 -- Insert admin user (password should be properly hashed in production)
 INSERT INTO users (role_id, email, password, first_name, last_name) VALUES
