@@ -54,6 +54,13 @@
             padding: 0.75rem 1.5rem !important;
             border-radius: 50px;
             margin: 0 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-link i {
+            font-size: 1.1rem;
         }
 
         .nav-link:hover, .nav-link.active {
@@ -103,34 +110,67 @@
 
         .section-title {
             color: var(--maroon);
-            font-size: 1.5rem;
-            font-weight: 600;
+            font-size: 1.8rem;
+            font-weight: 700;
             margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: var(--gold);
+            border-radius: 2px;
         }
 
         .course-card {
             background: white;
             border-radius: var(--border-radius);
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            box-shadow: var(--card-shadow);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             transition: all 0.3s ease;
+            position: relative;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .course-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--maroon);
+            border-radius: 4px 0 0 4px;
         }
 
         .course-card:hover {
             transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
         }
 
         .course-card h3 {
             color: var(--maroon);
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            padding-right: 180px;
+            line-height: 1.4;
         }
 
         .course-card p {
             color: var(--dark-gray);
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            opacity: 0.9;
         }
 
         .course-meta {
@@ -151,13 +191,21 @@
             border: none;
             padding: 0.75rem 2rem;
             border-radius: 50px;
-            font-weight: 500;
+            font-weight: 600;
             transition: all 0.3s ease;
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
         }
 
         .btn-enroll:hover {
             background-color: #600000;
             transform: translateY(-2px);
+            color: white;
         }
 
         .profile-section {
@@ -197,8 +245,105 @@
                 padding: 1.5rem;
             }
             .course-card {
-                padding: 1.25rem;
+                padding: 1.5rem;
+                padding-bottom: 5rem;
             }
+            .course-card h3 {
+                padding-right: 0;
+                margin-bottom: 1rem;
+            }
+            .course-card p {
+                margin-bottom: 0.5rem;
+            }
+            .btn-enroll {
+                width: calc(100% - 3rem);
+                bottom: 1.5rem;
+                right: 1.5rem;
+                left: 1.5rem;
+                top: auto;
+                text-align: center;
+                justify-content: center;
+            }
+            .section-title {
+                font-size: 1.5rem;
+            }
+        }
+
+        .course-modules {
+            color: var(--dark-gray);
+        }
+        .module strong {
+            color: var(--maroon);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        .module p {
+            font-size: 0.95rem;
+            margin-left: 1rem;
+        }
+
+        .course-content {
+            max-height: 400px;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .course-content.expanded {
+            max-height: none;
+        }
+
+        .see-more-btn {
+            background: none;
+            border: none;
+            color: var(--maroon);
+            font-weight: 500;
+            padding: 0.5rem 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .see-more-btn:hover {
+            color: #600000;
+        }
+
+        .fade-bottom {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
+            background: linear-gradient(transparent, white);
+            pointer-events: none;
+            display: none;
+        }
+
+        .course-content:not(.expanded) + .fade-bottom {
+            display: block;
+        }
+
+        .no-progress-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .no-progress-card i {
+            font-size: 2.5rem;
+            color: var(--gold);
+            margin-bottom: 1rem;
+        }
+
+        .no-progress-card p {
+            color: var(--dark-gray);
+            font-size: 1.1rem;
+            margin-bottom: 0;
+            opacity: 0.8;
         }
     </style>
 </head>
@@ -236,64 +381,27 @@
 
     <div class="container" style="margin-top: 100px;">
         <div class="dashboard-container">
-            <!-- Welcome Section -->
-            <div class="welcome-section">
-                <h1>Welcome, Theorist!</h1>
-                <p>Your analytical approach to learning helps you excel in understanding complex concepts and theories. Let's make the most of your learning journey!</p>
-            </div>
-
-            <!-- Profile Section -->
-            <div class="profile-section">
-                <h2 class="section-title">My Profile</h2>
-                <div class="profile-info">
-                    <div class="profile-avatar">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <div>
-                        <h3 class="mb-2">John Doe</h3>
-                        <p class="mb-1"><i class="fas fa-id-card me-2"></i>Student Number: 2020-00123</p>
-                        <p class="mb-1"><i class="fas fa-graduation-cap me-2"></i>BSIT - 3rd Year</p>
-                        <p class="mb-0"><i class="fas fa-users me-2"></i>Section: IT-3101</p>
-                    </div>
-                </div>
-            </div>
-
             <!-- Available Courses Section -->
             <section>
-                <h2 class="section-title">Available Course Sections</h2>
+                <h2 class="section-title">Available Course</h2>
                 <div class="course-list">
                     <div class="course-card">
-                        <h3>Information Management</h3>
-                        <p>Learn about database management systems, data modeling, and information systems.</p>
-                        <div class="course-meta mb-3">
-                            <span><i class="fas fa-user-tie me-2"></i>Prof. Maria Garcia</span>
-                            <span><i class="fas fa-users me-2"></i>IT-3101</span>
-                            <span><i class="fas fa-clock me-2"></i>MWF 9:00-10:30 AM</span>
-                        </div>
-                        <a href="course-details.html" class="btn btn-enroll">Enroll Now</a>
+                        <h3>Strategic Futures Thinking: Systems, Models, and Policy Design</h3>
+                        <p style="margin-top: 30px;">A structured course for analytical minds who thrive on logic, models, and critical evaluation. Explore formal frameworks like PESTLE and the Three Horizons to design resilient strategies and understand complex future scenarios through evidence-based reasoning.</p>
+                        <a href="course-details.html" class="btn btn-enroll">
+                            Enroll Now
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
                     </div>
+                </div>
+            </section>
 
-                    <div class="course-card">
-                        <h3>Web Development</h3>
-                        <p>Master the fundamentals of web development, including HTML, CSS, and JavaScript.</p>
-                        <div class="course-meta mb-3">
-                            <span><i class="fas fa-user-tie me-2"></i>Prof. John Smith</span>
-                            <span><i class="fas fa-users me-2"></i>IT-3102</span>
-                            <span><i class="fas fa-clock me-2"></i>TTH 1:00-2:30 PM</span>
-                        </div>
-                        <button class="btn btn-enroll">Enroll Now</button>
-                    </div>
-
-                    <div class="course-card">
-                        <h3>Software Engineering</h3>
-                        <p>Study software development methodologies, project management, and system analysis.</p>
-                        <div class="course-meta mb-3">
-                            <span><i class="fas fa-user-tie me-2"></i>Prof. Sarah Johnson</span>
-                            <span><i class="fas fa-users me-2"></i>IT-3103</span>
-                            <span><i class="fas fa-clock me-2"></i>MWF 2:00-3:30 PM</span>
-                        </div>
-                        <button class="btn btn-enroll">Enroll Now</button>
-                    </div>
+            <!-- Course Progress Section -->
+            <section class="mt-5">
+                <h2 class="section-title">Course Progress</h2>
+                <div class="no-progress-card">
+                    <i class="fas fa-book-reader"></i>
+                    <p>No progress yet. Enroll in a course to start your learning journey!</p>
                 </div>
             </section>
         </div>
@@ -301,6 +409,21 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const seeMoreBtn = document.querySelector('.see-more-btn');
+            const courseContent = document.querySelector('.course-content');
+            
+            seeMoreBtn.addEventListener('click', function() {
+                courseContent.classList.toggle('expanded');
+                if (courseContent.classList.contains('expanded')) {
+                    seeMoreBtn.innerHTML = '<i class="fas fa-chevron-up"></i> See Less';
+                } else {
+                    seeMoreBtn.innerHTML = '<i class="fas fa-chevron-down"></i> See More';
+                }
+            });
+        });
+    </script>
 </body>
 </html>
 

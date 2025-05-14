@@ -18,7 +18,6 @@
             --dark-gray: #333;
             --border-radius: 8px;
             --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            --success-green: #28a745;
         }
 
         body {
@@ -27,7 +26,6 @@
             min-height: 100vh;
         }
 
-        /* Navigation Styles */
         .navbar {
             background: var(--maroon);
             padding: 1rem 0;
@@ -48,215 +46,341 @@
             height: 35px;
         }
 
-        .nav-link {
-            color: rgba(255,255,255,0.9) !important;
+        .back-button {
+            color: var(--maroon);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
             font-weight: 500;
             transition: all 0.3s ease;
-            padding: 0.75rem 1.5rem !important;
+            padding: 0.5rem 1rem;
             border-radius: 50px;
-            margin: 0 0.5rem;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
-        .nav-link:hover, .nav-link.active {
-            color: var(--gold) !important;
-            background: rgba(255,255,255,0.1);
-            transform: translateY(-2px);
-        }
-
-        .nav-link.btn-logout {
-            background-color: var(--gold);
-            color: var(--maroon) !important;
-            font-weight: 600;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
-        .nav-link.btn-logout:hover {
-            background-color: #fff;
-            transform: translateY(-2px);
-        }
-
-        /* Course Details Styles */
-        .course-container {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 1rem;
+        .back-button:hover {
+            color: var(--maroon);
+            transform: translateX(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
         .course-header {
             background: white;
-            border-radius: var(--border-radius);
-            padding: 2rem;
+            padding: 3rem;
             margin-bottom: 2rem;
+            border-radius: var(--border-radius);
             box-shadow: var(--card-shadow);
+            position: relative;
+            overflow: hidden;
         }
 
-        .course-header h1 {
+        .course-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, var(--maroon), var(--gold));
+        }
+
+        .course-title {
             color: var(--maroon);
+            font-size: 2.5rem;
             font-weight: 700;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.3;
         }
 
-        .course-meta {
-            display: flex;
-            align-items: center;
-            gap: 2rem;
+        .course-header .lead {
+            font-size: 1.2rem;
+            line-height: 1.8;
             color: var(--dark-gray);
-            margin-bottom: 1rem;
-        }
-
-        .course-meta i {
-            color: var(--maroon);
-        }
-
-        .progress-section {
-            background: white;
-            border-radius: var(--border-radius);
-            padding: 2rem;
+            opacity: 0.9;
             margin-bottom: 2rem;
-            box-shadow: var(--card-shadow);
         }
 
-        .progress-bar {
-            background-color: var(--maroon);
+        .course-section {
+            background: white;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
         }
 
         .section-title {
             color: var(--maroon);
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid var(--gold);
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            position: relative;
+            padding-bottom: 0.75rem;
         }
 
-        .module-card {
-            background: white;
-            border-radius: var(--border-radius);
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            box-shadow: var(--card-shadow);
-            transition: all 0.3s ease;
-            border-left: 4px solid var(--maroon);
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: var(--gold);
+            border-radius: 2px;
         }
 
-        .module-card:hover {
-            transform: translateY(-3px);
-        }
-
-        .module-card h3 {
-            color: var(--maroon);
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .module-card .status {
-            font-size: 0.9rem;
-            padding: 0.25rem 1rem;
-            border-radius: 50px;
-            background: var(--light-gray);
-        }
-
-        .status.completed {
-            background: #d4edda;
-            color: var(--success-green);
-        }
-
-        .status.in-progress {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .status.not-started {
-            background: #f8f9fa;
-            color: #6c757d;
-        }
-
-        .task-list {
+        .course-objectives {
             list-style: none;
             padding: 0;
             margin: 0;
         }
 
-        .task-item {
-            display: flex;
-            align-items: center;
-            padding: 1rem;
-            border-bottom: 1px solid #eee;
-            transition: background-color 0.3s ease;
-        }
-
-        .task-item:last-child {
-            border-bottom: none;
-        }
-
-        .task-item:hover {
-            background-color: var(--light-gray);
-        }
-
-        .task-checkbox {
-            margin-right: 1rem;
-            width: 1.2rem;
-            height: 1.2rem;
-            border: 2px solid var(--maroon);
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .task-checkbox:checked {
-            background-color: var(--maroon);
-        }
-
-        .task-content {
-            flex-grow: 1;
-        }
-
-        .task-title {
-            font-weight: 500;
+        .course-objectives li {
+            position: relative;
+            padding-left: 2rem;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            line-height: 1.6;
             color: var(--dark-gray);
-            margin-bottom: 0.25rem;
         }
 
-        .task-description {
-            font-size: 0.9rem;
-            color: #666;
+        .course-objectives li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--maroon);
+            font-weight: bold;
         }
 
-        .accomplishment-card {
-            background: white;
+        .module {
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(0,0,0,0.1);
             border-radius: var(--border-radius);
             padding: 1.5rem;
-            margin-bottom: 1rem;
-            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            background: white;
+            position: relative;
+            overflow: hidden;
         }
 
-        .accomplishment-header {
+        .module::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: var(--maroon);
+            border-radius: 4px 0 0 4px;
+        }
+
+        .module:hover {
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transform: translateY(-5px);
+        }
+
+        .module-number {
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
+            gap: 0.5rem;
         }
 
-        .accomplishment-title {
-            font-weight: 600;
+        .module-number::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(0,0,0,0.1);
+            margin-left: 1rem;
+        }
+
+        .module-title {
             color: var(--maroon);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
         }
 
-        .accomplishment-date {
-            font-size: 0.9rem;
-            color: #666;
+        .module-focus {
+            color: var(--dark-gray);
+            background: var(--light-gray);
+            padding: 1.25rem;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .btn-enroll {
+            background: linear-gradient(to right, var(--maroon), #600000);
+            color: white;
+            border: none;
+            padding: 1rem 3rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(128, 0, 0, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .btn-enroll:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(128, 0, 0, 0.4);
+            color: white;
+        }
+
+        .btn-enroll i {
+            transition: transform 0.3s ease;
+        }
+
+        .btn-enroll:hover i {
+            transform: translateX(5px);
+        }
+
+        /* Base responsive container */
+        .container {
+            max-width: 1400px;
+            padding: 0 1.5rem;
+        }
+
+        /* Responsive typography scale */
+        @media (min-width: 1200px) {
+            .course-title {
+                font-size: 2.75rem;
+            }
+            .section-title {
+                font-size: 2rem;
+            }
+            .lead {
+                font-size: 1.25rem;
+            }
+        }
+
+        @media (max-width: 1199px) {
+            .course-title {
+                font-size: 2.5rem;
+            }
+            .section-title {
+                font-size: 1.8rem;
+            }
+            .course-header {
+                padding: 2.5rem;
+            }
+        }
+
+        @media (max-width: 991px) {
+            .course-title {
+                font-size: 2.25rem;
+            }
+            .section-title {
+                font-size: 1.6rem;
+            }
+            .module {
+                padding: 1.25rem;
+            }
+            .module-title {
+                font-size: 1.2rem;
+            }
         }
 
         @media (max-width: 768px) {
-            .course-meta {
-                flex-direction: column;
-                gap: 1rem;
-                align-items: flex-start;
+            .container {
+                padding: 0 1rem;
             }
-            .module-card {
+            .course-header {
+                padding: 2rem;
+            }
+            .course-title {
+                font-size: 2rem;
+                margin-bottom: 1rem;
+            }
+            .section-title {
+                font-size: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+            .course-section {
+                padding: 1.5rem;
+            }
+            .lead {
+                font-size: 1.1rem;
+                line-height: 1.6;
+            }
+            .module {
+                padding: 1rem;
+            }
+            .module-focus {
+                padding: 1rem;
+            }
+            .btn-enroll {
+                padding: 0.875rem 2rem;
+                font-size: 1rem;
+            }
+            .back-button {
+                margin-bottom: 1rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .container {
+                padding: 0 0.75rem;
+            }
+            .course-header {
+                padding: 1.5rem;
+            }
+            .course-title {
+                font-size: 1.75rem;
+            }
+            .section-title {
+                font-size: 1.4rem;
+            }
+            .course-objectives li {
+                font-size: 1rem;
+                padding-left: 1.75rem;
+            }
+            .module-number {
+                font-size: 1rem;
+            }
+            .module-title {
+                font-size: 1.1rem;
+            }
+            .module-focus {
+                font-size: 0.95rem;
+            }
+            .btn-enroll {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Fix for very small devices */
+        @media (max-width: 360px) {
+            .course-title {
+                font-size: 1.5rem;
+            }
+            .section-title {
+                font-size: 1.3rem;
+            }
+            .module {
+                padding: 0.875rem;
+            }
+        }
+
+        /* Landscape orientation adjustments */
+        @media (max-height: 600px) and (orientation: landscape) {
+            .container {
+                margin-top: 80px;
+            }
+            .course-header {
+                padding: 1.5rem;
+            }
+            .course-section {
                 padding: 1.25rem;
             }
         }
@@ -271,197 +395,101 @@
                 <span class="d-none d-sm-inline">FORESITE: Adaptive Collaborative Learning System</span>
                 <span class="d-inline d-sm-none">FORESITE</span>
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-                <ul class="navbar-nav align-items-center">
-                    <li class="nav-item">
-                        <a class="nav-link" href="dashboard.html"><i class="fas fa-home me-1"></i> Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#"><i class="fas fa-book me-1"></i> My Courses</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="fas fa-user-circle me-1"></i> Profile</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link btn-logout" href="../login.html"><i class="fas fa-sign-out-alt me-1"></i> Logout</a>
-                    </li>
-                </ul>
-            </div>
         </div>
     </nav>
 
     <div class="container" style="margin-top: 100px;">
-        <div class="course-container">
-            <!-- Course Header -->
-            <div class="course-header">
-                <h1>Information Management</h1>
-                <div class="course-meta">
-                    <span><i class="fas fa-user-tie me-2"></i>Prof. Maria Garcia</span>
-                    <span><i class="fas fa-users me-2"></i>IT-3101</span>
-                    <span><i class="fas fa-clock me-2"></i>MWF 9:00-10:30 AM</span>
-                    <span><i class="fas fa-calendar me-2"></i>1st Semester, 2023-2024</span>
+        <a href="dashboard.html" class="back-button">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+
+        <div class="course-header">
+            <h1 class="course-title">Strategic Futures Thinking: Systems, Models, and Policy Design</h1>
+            <p class="lead">A structured course for analytical minds who thrive on logic, models, and critical evaluation. Explore formal frameworks like PESTLE and the Three Horizons to design resilient strategies and understand complex future scenarios through evidence-based reasoning.</p>
+            <button class="btn btn-enroll">
+                Enroll Now
+                <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+
+        <div class="course-section">
+            <h2 class="section-title">Course Objectives</h2>
+            <ul class="course-objectives">
+                <li>Analyze complex systems using formal models (e.g., Three Horizons Framework, PESTLE, Axes of Uncertainty).</li>
+                <li>Evaluate and generalize key principles from Futures Thinking applicable across various policy and strategic domains.</li>
+                <li>Design structured, evidence-informed futures processes suited to diverse contexts and stakeholders.</li>
+                <li>Apply critical comparison and theoretical reasoning to assess Futures Thinking tools.</li>
+                <li>Develop robust, adaptable policy strategies using backcasting, roadmapping, and policy stress-testing.</li>
+                <li>Critically assess the effectiveness and impact of futures tools across process, output, and influence dimensions.</li>
+            </ul>
+        </div>
+
+        <div class="course-section">
+            <h2 class="section-title">Course Structure</h2>
+            
+            <div class="module">
+                <div class="module-number">Module 1</div>
+                <h3 class="module-title">Introduction to Futures Thinking</h3>
+                <div class="module-focus">
+                    Formal models (e.g., Three Horizons), strategic preparedness, and analytical comparison
                 </div>
             </div>
 
-            <!-- Progress Section -->
-            <div class="progress-section">
-                <h2 class="section-title">Course Progress</h2>
-                <div class="progress" style="height: 20px;">
-                    <div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25% Complete</div>
+            <div class="module">
+                <div class="module-number">Module 2</div>
+                <h3 class="module-title">Futures Process Design</h3>
+                <div class="module-focus">
+                    Structuring foresight using purpose-driven design, stakeholder mapping, and tool selection
                 </div>
             </div>
 
-            <!-- Tasks Section -->
-            <section class="mb-4">
-                <h2 class="section-title">Course Modules</h2>
-                
-                <!-- Module 1: Theoretical Foundation -->
-                <div class="module-card">
-                    <h3>
-                        Module 1: Theoretical Foundation
-                        <span class="status in-progress">In Progress</span>
-                    </h3>
-                    <div class="task-list">
-                        <div class="task-item">
-                            <input type="checkbox" class="task-checkbox" checked disabled>
-                            <div class="task-content">
-                                <div class="task-title">Read and Analyze Core Concepts</div>
-                                <div class="task-description">Study fundamental theories and principles of the subject matter through comprehensive reading materials.</div>
-                            </div>
-                        </div>
-                        <div class="task-item">
-                            <input type="checkbox" class="task-checkbox">
-                            <div class="task-content">
-                                <div class="task-title">Concept Mapping Exercise</div>
-                                <div class="task-description">Create detailed concept maps to visualize relationships between key theories and principles.</div>
-                            </div>
-                        </div>
-                        <div class="task-item">
-                            <input type="checkbox" class="task-checkbox">
-                            <div class="task-content">
-                                <div class="task-title">Theoretical Framework Development</div>
-                                <div class="task-description">Develop a comprehensive theoretical framework based on the studied concepts.</div>
-                            </div>
-                        </div>
-                    </div>
+            <div class="module">
+                <div class="module-number">Module 3</div>
+                <h3 class="module-title">Pathways to Meet Business Needs</h3>
+                <div class="module-focus">
+                    Matching foresight pathways to strategic goals through comparative analysis
                 </div>
+            </div>
 
-                <!-- Module 2: Critical Analysis -->
-                <div class="module-card">
-                    <h3>
-                        Module 2: Critical Analysis
-                        <span class="status not-started">Not Started</span>
-                    </h3>
-                    <div class="task-list">
-                        <div class="task-item">
-                            <input type="checkbox" class="task-checkbox">
-                            <div class="task-content">
-                                <div class="task-title">Case Study Analysis</div>
-                                <div class="task-description">Analyze complex case studies applying theoretical knowledge to real-world scenarios.</div>
-                            </div>
-                        </div>
-                        <div class="task-item">
-                            <input type="checkbox" class="task-checkbox">
-                            <div class="task-content">
-                                <div class="task-title">Research Paper Review</div>
-                                <div class="task-description">Review and critique academic papers related to the subject matter.</div>
-                            </div>
-                        </div>
-                        <div class="task-item">
-                            <input type="checkbox" class="task-checkbox">
-                            <div class="task-content">
-                                <div class="task-title">Analytical Report</div>
-                                <div class="task-description">Write a detailed analytical report synthesizing findings from case studies and research papers.</div>
-                            </div>
-                        </div>
-                    </div>
+            <div class="module">
+                <div class="module-number">Module 4</div>
+                <h3 class="module-title">Gathering Intelligence About the Future</h3>
+                <div class="module-focus">
+                    Horizon Scanning, 7 Questions, Delphi Method — methods for rigorous evidence collection
                 </div>
+            </div>
 
-                <!-- Module 3: Theoretical Application -->
-                <div class="module-card">
-                    <h3>
-                        Module 3: Theoretical Application
-                        <span class="status not-started">Not Started</span>
-                    </h3>
-                    <div class="task-list">
-                        <div class="task-item">
-                            <input type="checkbox" class="task-checkbox">
-                            <div class="task-content">
-                                <div class="task-title">Problem-Based Learning</div>
-                                <div class="task-description">Solve complex problems by applying theoretical frameworks and analytical approaches.</div>
-                            </div>
-                        </div>
-                        <div class="task-item">
-                            <input type="checkbox" class="task-checkbox">
-                            <div class="task-content">
-                                <div class="task-title">Research Project</div>
-                                <div class="task-description">Conduct a small-scale research project applying theoretical concepts to a specific problem.</div>
-                            </div>
-                        </div>
-                        <div class="task-item">
-                            <input type="checkbox" class="task-checkbox">
-                            <div class="task-content">
-                                <div class="task-title">Theory-Based Solution Design</div>
-                                <div class="task-description">Design and propose solutions based on theoretical principles and analytical findings.</div>
-                            </div>
-                        </div>
-                    </div>
+            <div class="module">
+                <div class="module-number">Module 5</div>
+                <h3 class="module-title">Exploring the Dynamics of Change</h3>
+                <div class="module-focus">
+                    Driver Mapping and Axes of Uncertainty using systems thinking frameworks (e.g., PESTLE)
                 </div>
+            </div>
 
-                <!-- Module 4: Advanced Theory Integration -->
-                <div class="module-card">
-                    <h3>
-                        Module 4: Advanced Theory Integration
-                        <span class="status not-started">Not Started</span>
-                    </h3>
-                    <div class="task-list">
-                        <div class="task-item">
-                            <input type="checkbox" class="task-checkbox">
-                            <div class="task-content">
-                                <div class="task-title">Theory Integration Workshop</div>
-                                <div class="task-description">Participate in workshops to integrate multiple theoretical frameworks.</div>
-                            </div>
-                        </div>
-                        <div class="task-item">
-                            <input type="checkbox" class="task-checkbox">
-                            <div class="task-content">
-                                <div class="task-title">Comprehensive Analysis Project</div>
-                                <div class="task-description">Complete a major project demonstrating mastery of theoretical concepts and their practical applications.</div>
-                            </div>
-                        </div>
-                        <div class="task-item">
-                            <input type="checkbox" class="task-checkbox">
-                            <div class="task-content">
-                                <div class="task-title">Final Theoretical Paper</div>
-                                <div class="task-description">Write a comprehensive paper synthesizing all theoretical learning and applications.</div>
-                            </div>
-                        </div>
-                    </div>
+            <div class="module">
+                <div class="module-number">Module 6</div>
+                <h3 class="module-title">Describing Future Scenarios</h3>
+                <div class="module-focus">
+                    Scenario building, Visioning, and SWOT for structured foresight narratives
                 </div>
-            </section>
+            </div>
 
-            <!-- Accomplishments Section -->
-            <section>
-                <h2 class="section-title">Accomplishments</h2>
-                <div class="accomplishment-card">
-                    <div class="accomplishment-header">
-                        <span class="accomplishment-title">Core Concepts Analysis</span>
-                        <span class="accomplishment-date">Completed on Oct 15, 2023</span>
-                    </div>
-                    <p>Successfully completed the foundational theoretical analysis with detailed concept mapping.</p>
+            <div class="module">
+                <div class="module-number">Module 7</div>
+                <h3 class="module-title">Developing & Testing Strategy</h3>
+                <div class="module-focus">
+                    Strategy tools: Policy Stress-Testing, Backcasting, and Roadmapping for robust planning
                 </div>
-                <div class="accomplishment-card">
-                    <div class="accomplishment-header">
-                        <span class="accomplishment-title">Initial Framework Development</span>
-                        <span class="accomplishment-date">Completed on Oct 20, 2023</span>
-                    </div>
-                    <p>Developed a comprehensive theoretical framework demonstrating strong analytical skills.</p>
+            </div>
+
+            <div class="module">
+                <div class="module-number">Module 8</div>
+                <h3 class="module-title">Evaluating Futures Tools</h3>
+                <div class="module-focus">
+                    Post-analysis of tool effectiveness across process, outcomes, and policy impact
                 </div>
-            </section>
+            </div>
         </div>
     </div>
 
