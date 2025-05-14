@@ -463,3 +463,79 @@ All API endpoints are prefixed with `/api/v1`
       }
       ```
     - `DELETE /feedback/{id}` - Delete a feedback
+
+## Learning Style Classifier API
+
+The project includes a machine learning-based API that classifies users into Honey-Mumford learning styles based on their questionnaire responses.
+
+### Setup and Running
+
+1. Install the required dependencies:
+```bash
+cd algorithm
+pip install -r requirements.txt
+pip3 install -U scikit-learn
+```
+
+2. Run the Flask application:
+```bash
+python app.py
+```
+
+The server will start on `http://localhost:5000`.
+
+### API Usage
+
+#### Predict Learning Style
+
+**Endpoint:** `POST /predict`
+
+**Request Body:**
+```json
+{
+    "answers": [0, 1, 0, 1, ...] // Array of 80 binary values (0 or 1)
+}
+```
+
+**Example Request for Pragmatist Style:**
+```json
+{
+    "answers": [
+        0, 0, 0, 0, 1, 0, 0, 0, 1, 0,  // 1-10
+        1, 0, 0, 0, 0, 0, 0, 0, 1, 0,  // 11-20
+        1, 0, 0, 0, 0, 0, 1, 0, 0, 0,  // 21-30
+        0, 0, 0, 0, 1, 0, 1, 0, 0, 0,  // 31-40
+        0, 0, 0, 1, 0, 0, 0, 0, 1, 1,  // 41-50
+        0, 0, 1, 1, 0, 1, 0, 0, 1, 0,  // 51-60
+        0, 0, 0, 0, 1, 0, 0, 1, 1, 1,  // 61-70
+        0, 0, 1, 1, 0, 0, 0, 0, 0, 1   // 71-80
+    ]
+}
+```
+
+**Example Request for Reflector Style:**
+```json
+{
+    "answers": [
+        0, 0, 0, 0, 0, 0, 1, 0, 0, 0,  // 1-10: Yes to Q7 (likes thorough preparation)
+        0, 0, 1, 0, 1, 1, 0, 0, 0, 0,  // 11-20: Yes to Q13,15,16 (thorough job, careful interpretation, weighing alternatives)
+        0, 0, 0, 0, 1, 1, 0, 1, 1, 0,  // 21-30: Yes to Q25,26,28,29 (meticulous, careful, gathering information)
+        1, 0, 1, 0, 0, 1, 0, 0, 1, 0,  // 31-40: Yes to Q31,33,36,39 (listens first, observes others, worries about rushing)
+        0, 1, 0, 0, 0, 1, 0, 0, 0, 0,  // 41-50: Yes to Q41,46 (thorough analysis, standing back)
+        0, 1, 0, 0, 1, 0, 0, 0, 0, 1,  // 51-60: Yes to Q52,55,60 (specific discussions, multiple drafts, many alternatives)
+        0, 1, 0, 0, 0, 1, 1, 0, 0, 0,  // 61-70: Yes to Q62,66,67 (low profile, careful thinking, listening)
+        0, 0, 0, 0, 0, 1, 1, 0, 0, 0   // 71-80: Yes to Q76,77 (interested in others' thoughts, methodical)
+    ]
+}
+```
+
+This example emphasizes Reflector characteristics by setting positive responses (1) to questions that indicate:
+- Preference for thorough preparation and implementation
+- Careful observation and analysis before action
+- Interest in gathering multiple perspectives
+- Tendency to listen more than speak
+- Methodical and detailed approach to work
+- Preference for standing back and observing
+
+**Response:**
+```
