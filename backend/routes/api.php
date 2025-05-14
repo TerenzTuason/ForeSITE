@@ -3,10 +3,14 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CourseController;
 use App\Http\Controllers\Api\LearningStyleController;
-use App\Http\Controllers\Api\QuestionnaireResponseController;
+use App\Http\Controllers\Api\AssessmentResultController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\StudentProfileController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\ModuleController;
+use App\Http\Controllers\Api\ModuleContentController;
+use App\Http\Controllers\Api\FeedbackController;
+use App\Http\Controllers\Api\CertificateController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -71,8 +75,9 @@ Route::prefix('v1')->group(function () {
     // Student Profiles
     Route::apiResource('student-profiles', StudentProfileController::class);
     
-    // Questionnaire Responses
-    Route::apiResource('questionnaire-responses', QuestionnaireResponseController::class);
+    // Assessment Results
+    Route::apiResource('assessment-results', AssessmentResultController::class);
+    Route::get('users/{user}/assessment-results', [UserController::class, 'getAssessmentResults']);
     
     // Courses
     Route::apiResource('courses', CourseController::class);
@@ -90,16 +95,6 @@ Route::prefix('v1')->group(function () {
     
     // Module Content
     Route::apiResource('modules.contents', ModuleContentController::class)->shallow();
-    
-    // Assessments
-    Route::apiResource('modules.assessments', AssessmentController::class)->shallow();
-    
-    // Assessment Questions
-    Route::apiResource('assessments.questions', AssessmentQuestionController::class)->shallow();
-    
-    // Assessment Attempts
-    Route::apiResource('assessments.attempts', AssessmentAttemptController::class)->shallow();
-    Route::get('users/{user}/assessment-attempts', [UserController::class, 'getAssessmentAttempts']);
     
     // Certificates
     Route::apiResource('certificates', CertificateController::class);

@@ -90,7 +90,7 @@ The API provides CRUD (Create, Read, Update, Delete) operations for the main ent
 - **GET /api/v1/users/{user}/role**: Gets the role of a specific user
 - **PUT /api/v1/users/{user}/role**: Updates the role of a specific user
 - **GET /api/v1/users/{user}/enrollments**: Gets all enrollments for a user
-- **GET /api/v1/users/{user}/assessment-attempts**: Gets all assessment attempts for a user
+- **GET /api/v1/users/{user}/assessment-results**: Gets all assessment results for a user
 - **GET /api/v1/users/{user}/certificates**: Gets all certificates for a user
 - **GET /api/v1/users/{user}/received-feedback**: Gets feedback received by the user
 - **GET /api/v1/users/{user}/given-feedback**: Gets feedback given by the user (for faculty)
@@ -109,14 +109,14 @@ The API provides CRUD (Create, Read, Update, Delete) operations for the main ent
 - **PUT /api/v1/student-profiles/{id}**: Updates a record in the `student_profiles` table where `profile_id = {id}`
 - **DELETE /api/v1/student-profiles/{id}**: Deletes a record from the `student_profiles` table where `profile_id = {id}`
 
-### 5. Questionnaire Responses
-- **GET /api/v1/questionnaire-responses**: Fetches all questionnaire responses
-- **GET /api/v1/questionnaire-responses/{id}**: Fetches a single questionnaire response
-- **POST /api/v1/questionnaire-responses**: Creates a new questionnaire response
-- **PUT /api/v1/questionnaire-responses/{id}**: Updates a questionnaire response
-- **DELETE /api/v1/questionnaire-responses/{id}**: Deletes a questionnaire response
+### 5. Assessment Results (`assessment_results` table)
+- **GET /api/v1/assessment-results**: Fetches all assessment results
+- **GET /api/v1/assessment-results/{id}**: Fetches a single assessment result
+- **POST /api/v1/assessment-results**: Creates a new assessment result
+- **PUT /api/v1/assessment-results/{id}**: Updates an assessment result
+- **DELETE /api/v1/assessment-results/{id}**: Deletes an assessment result
 
-### 6. Courses
+### 6. Courses (`courses` table)
 - **GET /api/v1/courses**: Fetches all courses
 - **GET /api/v1/courses/{id}**: Fetches a single course with its modules
 - **POST /api/v1/courses**: Creates a new course
@@ -127,49 +127,28 @@ The API provides CRUD (Create, Read, Update, Delete) operations for the main ent
 - **DELETE /api/v1/courses/{course}/enrollments/{enrollment}**: Removes an enrollment from a course
 - **GET /api/v1/courses/{course}/certificates**: Gets all certificates for a course
 
-### 7. Modules
+### 7. Modules (`modules` table)
 - **GET /api/v1/courses/{course}/modules**: Fetches all modules for a course
 - **GET /api/v1/modules/{id}**: Fetches a single module
 - **POST /api/v1/courses/{course}/modules**: Creates a new module in a course
 - **PUT /api/v1/modules/{id}**: Updates a module
 - **DELETE /api/v1/modules/{id}**: Deletes a module
 
-### 8. Module Contents
+### 8. Module Contents (`module_contents` table)
 - **GET /api/v1/modules/{module}/contents**: Fetches all content for a module
 - **GET /api/v1/contents/{id}**: Fetches a single content item
 - **POST /api/v1/modules/{module}/contents**: Creates new content for a module
 - **PUT /api/v1/contents/{id}**: Updates a content item
 - **DELETE /api/v1/contents/{id}**: Deletes a content item
 
-### 9. Assessments
-- **GET /api/v1/modules/{module}/assessments**: Fetches all assessments for a module
-- **GET /api/v1/assessments/{id}**: Fetches a single assessment
-- **POST /api/v1/modules/{module}/assessments**: Creates a new assessment for a module
-- **PUT /api/v1/assessments/{id}**: Updates an assessment
-- **DELETE /api/v1/assessments/{id}**: Deletes an assessment
-
-### 10. Assessment Questions
-- **GET /api/v1/assessments/{assessment}/questions**: Fetches all questions for an assessment
-- **GET /api/v1/questions/{id}**: Fetches a single question
-- **POST /api/v1/assessments/{assessment}/questions**: Creates a new question for an assessment
-- **PUT /api/v1/questions/{id}**: Updates a question
-- **DELETE /api/v1/questions/{id}**: Deletes a question
-
-### 11. Assessment Attempts
-- **GET /api/v1/assessments/{assessment}/attempts**: Fetches all attempts for an assessment
-- **GET /api/v1/attempts/{id}**: Fetches a single attempt
-- **POST /api/v1/assessments/{assessment}/attempts**: Creates a new attempt for an assessment
-- **PUT /api/v1/attempts/{id}**: Updates an attempt
-- **DELETE /api/v1/attempts/{id}**: Deletes an attempt
-
-### 12. Certificates
+### 9. Certificates (`certificates` table)
 - **GET /api/v1/certificates**: Fetches all certificates
 - **GET /api/v1/certificates/{id}**: Fetches a single certificate
 - **POST /api/v1/certificates**: Creates a new certificate
 - **PUT /api/v1/certificates/{id}**: Updates a certificate
 - **DELETE /api/v1/certificates/{id}**: Deletes a certificate
 
-### 13. Feedback
+### 10. Feedback (`feedback` table)
 - **GET /api/v1/feedback**: Fetches all feedback
 - **GET /api/v1/feedback/{id}**: Fetches a single feedback
 - **POST /api/v1/feedback**: Creates a new feedback
@@ -183,13 +162,13 @@ The API provides CRUD (Create, Read, Update, Delete) operations for the main ent
 - A `StudentProfile` belongs to a `LearningStyle` (`dominant_learning_style_id` foreign key, optional)
 - A `LearningStyle` can have many `StudentProfiles` (one-to-many)
 - A `Role` can have many `Users` (one-to-many)
-- A `Course` belongs to a `User` (creator)
+- A `Course` belongs to a `LearningStyle` (`learning_style_id` foreign key)
 - A `Course` has many `Modules`
 - A `Module` belongs to a `Course`
-- A `Module` has many `ModuleContents` and `Assessments`
-- An `Assessment` belongs to a `Module`
-- An `Assessment` has many `AssessmentQuestions` and `AssessmentAttempts`
-- A `User` has many `Enrollments`, `AssessmentAttempts`, and `Certificates`
+- A `Module` has many `ModuleContents`
+- A `ModuleContent` belongs to a `Module` and optionally to a `LearningStyle`
+- A `User` has many `Enrollments`, `AssessmentResults`, and `Certificates`
+- A `User` can give and receive `Feedback`
 
 ## API Documentation
 
@@ -247,7 +226,7 @@ All API endpoints are prefixed with `/api/v1`
      }
      ```
    - `GET /users/{user}/enrollments` - Get user's enrollments
-   - `GET /users/{user}/assessment-attempts` - Get user's assessment attempts
+   - `GET /users/{user}/assessment-results` - Get user's assessment results
    - `GET /users/{user}/certificates` - Get user's certificates
    - `GET /users/{user}/received-feedback` - Get feedback received by user
    - `GET /users/{user}/given-feedback` - Get feedback given by user
@@ -288,24 +267,25 @@ All API endpoints are prefixed with `/api/v1`
      ```
    - `DELETE /student-profiles/{id}` - Delete a student profile
 
-5. **Questionnaire Responses**
-   - `GET /questionnaire-responses` - List all responses
-   - `GET /questionnaire-responses/{id}` - Get specific response
-   - `POST /questionnaire-responses` - Create a new response
+5. **Assessment Results**
+   - `GET /assessment-results` - List all assessment results
+   - `GET /assessment-results/{id}` - Get specific assessment result
+   - `POST /assessment-results` - Create a new assessment result
      ```json
      {
        "user_id": 2,
-       "question_id": 1,
-       "response_text": "Sample response"
+       "module_id": 1,
+       "score": 85,
+       "completed_date": "2023-06-15"
      }
      ```
-   - `PUT /questionnaire-responses/{id}` - Update a response
+   - `PUT /assessment-results/{id}` - Update an assessment result
      ```json
      {
-       "response_text": "Updated response"
+       "score": 90
      }
      ```
-   - `DELETE /questionnaire-responses/{id}` - Delete a response
+   - `DELETE /assessment-results/{id}` - Delete an assessment result
 
 6. **Courses**
    - `GET /courses` - List all courses
@@ -378,71 +358,28 @@ All API endpoints are prefixed with `/api/v1`
      ```
    - `DELETE /contents/{id}` - Delete a content item
 
-9. **Assessments**
-   - `GET /modules/{module}/assessments` - Fetch all assessments for a module
-   - `GET /assessments/{id}` - Fetch a single assessment
-   - `POST /modules/{module}/assessments` - Create a new assessment for a module
+9. **Certificates**
+   - `GET /certificates` - Fetch all certificates
+   - `GET /certificates/{id}` - Fetch a single certificate
+   - `POST /certificates` - Create a new certificate
      ```json
      {
-       "title": "Module 1 Quiz",
-       "description": "Test your knowledge of variables and data types",
-       "time_limit_minutes": 30,
-       "passing_score": 70
+       "user_id": 2,
+       "course_id": 1,
+       "issue_date": "2023-06-15",
+       "certificate_title": "Certificate of Completion",
+       "certificate_url": "https://example.com/certificates/12345.pdf"
      }
      ```
-   - `PUT /assessments/{id}` - Update an assessment
+   - `PUT /certificates/{id}` - Update a certificate
      ```json
      {
-       "title": "Updated Assessment Title",
-       "passing_score": 75
+       "certificate_url": "https://example.com/certificates/updated.pdf"
      }
      ```
-   - `DELETE /assessments/{id}` - Delete an assessment
+   - `DELETE /certificates/{id}` - Delete a certificate
 
-10. **Assessment Questions**
-    - `GET /assessments/{assessment}/questions` - Fetch all questions for an assessment
-    - `GET /questions/{id}` - Fetch a single question
-    - `POST /assessments/{assessment}/questions` - Create a new question for an assessment
-      ```json
-      {
-        "question_text": "What is a variable?",
-        "question_type": "multiple_choice",
-        "options": ["A memory location", "A data type", "A function", "A class"],
-        "correct_answer": "A memory location",
-        "points": 10
-      }
-      ```
-    - `PUT /questions/{id}` - Update a question
-      ```json
-      {
-        "question_text": "Updated question text",
-        "points": 15
-      }
-      ```
-    - `DELETE /questions/{id}` - Delete a question
-
-11. **Certificates**
-    - `GET /certificates` - Fetch all certificates
-    - `GET /certificates/{id}` - Fetch a single certificate
-    - `POST /certificates` - Create a new certificate
-      ```json
-      {
-        "user_id": 2,
-        "course_id": 1,
-        "issue_date": "2023-06-15",
-        "certificate_title": "Certificate of Completion",
-        "certificate_url": "https://example.com/certificates/12345.pdf"
-      }
-      ```
-    - `PUT /certificates/{id}` - Update a certificate
-      ```json
-      {
-        "certificate_url": "https://example.com/certificates/updated.pdf"
-      }
-      ```
-    - `DELETE /certificates/{id}` - Delete a certificate
-
-12. **Feedback**
+10. **Feedback**
     - `GET /feedback` - Fetch all feedback
     - `GET /feedback/{id}` - Fetch a single feedback
     - `POST /feedback` - Create a new feedback

@@ -14,10 +14,10 @@ from classifier_config import (
 class LearningStyleClassifier:
     def __init__(self):
         self.style_mapping = {
-            0: 'Activist',
-            1: 'Reflector',
-            2: 'Theorist',
-            3: 'Pragmatist'
+            0: 'activist',
+            1: 'reflector',
+            2: 'theorist',
+            3: 'pragmatist'
         }
         
         # Initialize individual classifiers with config parameters

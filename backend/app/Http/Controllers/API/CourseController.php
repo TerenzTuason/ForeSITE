@@ -18,7 +18,7 @@ class CourseController extends Controller
      */
     public function index(): JsonResponse
     {
-        $courses = Course::with('creator')->get();
+        $courses = Course::with('learningStyle')->get();
         return response()->json(['data' => $courses], Response::HTTP_OK);
     }
 
@@ -28,10 +28,15 @@ class CourseController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'title' => 'required|string|max:100',
+            'name' => 'required|string|max:100',
             'description' => 'nullable|string',
-            'created_by' => 'required|exists:users,user_id',
-            'is_active' => 'boolean',
+            'objectives' => 'required|array',
+            'objectives.*' => 'required|string',
+            'structure' => 'required|array',
+            'structure.*.module' => 'required|string',
+            'structure.*.title' => 'required|string',
+            'structure.*.focus' => 'required|string',
+            'learning_style_id' => 'required|exists:learning_styles,style_id',
         ]);
 
         if ($validator->fails()) {
@@ -47,7 +52,7 @@ class CourseController extends Controller
      */
     public function show(string $id): JsonResponse
     {
-        $course = Course::with(['creator', 'modules'])->find($id);
+        $course = Course::with(['learningStyle', 'modules'])->find($id);
         
         if (!$course) {
             return response()->json(['error' => 'Course not found'], Response::HTTP_NOT_FOUND);
@@ -68,10 +73,15 @@ class CourseController extends Controller
         }
         
         $validator = Validator::make($request->all(), [
-            'title' => 'sometimes|required|string|max:100',
+            'name' => 'sometimes|required|string|max:100',
             'description' => 'nullable|string',
-            'created_by' => 'sometimes|required|exists:users,user_id',
-            'is_active' => 'boolean',
+            'objectives' => 'sometimes|required|array',
+            'objectives.*' => 'required|string',
+            'structure' => 'sometimes|required|array',
+            'structure.*.module' => 'required|string',
+            'structure.*.title' => 'required|string',
+            'structure.*.focus' => 'required|string',
+            'learning_style_id' => 'sometimes|required|exists:learning_styles,style_id',
         ]);
 
         if ($validator->fails()) {

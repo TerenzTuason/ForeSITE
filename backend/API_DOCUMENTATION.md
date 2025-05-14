@@ -197,13 +197,23 @@ Example Response:
     "data": [
         {
             "style_id": 1,
-            "style_name": "visual",
-            "description": "Preference for visual information like charts, graphs, and diagrams"
+            "style_name": "activist",
+            "description": "Learns by doing and experiencing"
         },
         {
             "style_id": 2,
-            "style_name": "auditory",
-            "description": "Preference for spoken or heard information"
+            "style_name": "reflector",
+            "description": "Learns by observing and thinking"
+        },
+        {
+            "style_id": 3,
+            "style_name": "theorist",
+            "description": "Learns by understanding underlying reasons"
+        },
+        {
+            "style_id": 4,
+            "style_name": "pragmatist",
+            "description": "Learns by practical application"
         }
     ]
 }
@@ -290,6 +300,200 @@ Example Response:
 - **URL:** `/api/v1/student-profiles/{id}`
 - **Method:** `DELETE`
 - **Response:** No content (204)
+
+### Courses
+
+#### Get All Courses
+
+- **URL:** `/api/v1/courses`
+- **Method:** `GET`
+- **Response:** List of all courses
+
+Example Response:
+```json
+{
+    "data": [
+        {
+            "course_id": 1,
+            "name": "Introduction to Futures Thinking",
+            "description": "Learn the basics of futures thinking",
+            "objectives": [
+                "obj1",
+                "obj2",
+                "obj3",
+                "obj4",
+                "obj5"
+            ],
+            "structure": [
+                {
+                    "module": "Module 1",
+                    "title": "Introduction to Futures Thinking",
+                    "focus": "Formal models (e.g., Three Horizons), strategic preparedness, and analytical comparison"
+                },
+                {
+                    "module": "Module 2",
+                    "title": "Introduction to Futures Thinking",
+                    "focus": "Formal models (e.g., Three Horizons), strategic preparedness, and analytical comparison"
+                },
+                {
+                    "module": "Module 3",
+                    "title": "Introduction to Futures Thinking",
+                    "focus": "Formal models (e.g., Three Horizons), strategic preparedness, and analytical comparison"
+                }
+            ],
+            "learning_style_id": 1,
+            "created_at": "2023-05-07T04:00:00.000000Z"
+        }
+    ]
+}
+```
+
+### Assessment Results
+
+#### Get All Assessment Results
+
+- **URL:** `/api/v1/assessment-results`
+- **Method:** `GET`
+- **Response:** List of all assessment results
+
+Example Response:
+```json
+{
+    "data": [
+        {
+            "result_id": 1,
+            "first_name": "John",
+            "last_name": "Doe",
+            "department": "Engineering",
+            "user_id": 1,
+            "answers": {
+                "answers": [
+                    0, 0, 0, 0, 0, 0, 1, 0, 0, 0,
+                    0, 0, 1, 0, 1, 1, 0, 0, 0, 0,
+                    0, 0, 0, 0, 1, 1, 0, 1, 1, 0,
+                    1, 0, 1, 0, 0, 1, 0, 0, 1, 0,
+                    0, 1, 0, 0, 0, 1, 0, 0, 0, 0,
+                    0, 1, 0, 0, 1, 0, 0, 0, 0, 1,
+                    0, 1, 0, 0, 0, 1, 1, 0, 0, 0,
+                    0, 0, 0, 0, 0, 1, 1, 0, 0, 0
+                ]
+            },
+            "result": {
+                "confidence": 1.0,
+                "individual_votes": {
+                    "bayesian_network": "Reflector",
+                    "decision_tree": "Reflector",
+                    "random_forest": "Reflector",
+                    "support_vector_machine": "Reflector"
+                },
+                "learning_style": "Reflector"
+            }
+        }
+    ]
+}
+```
+
+### Modules
+
+#### Get Course Modules
+
+- **URL:** `/api/v1/courses/{course_id}/modules`
+- **Method:** `GET`
+- **Response:** List of modules for a course
+
+Example Response:
+```json
+{
+    "data": [
+        {
+            "module_id": 1,
+            "course_id": 1,
+            "title": "Introduction to Futures Thinking",
+            "description": "Learn the basics of futures thinking",
+            "sequence_order": 1,
+            "prerequisite_module_id": null,
+            "passing_score": 75,
+            "created_at": "2023-05-07T04:00:00.000000Z",
+            "updated_at": null
+        }
+    ]
+}
+```
+
+### Module Contents
+
+#### Get Module Contents
+
+- **URL:** `/api/v1/modules/{module_id}/contents`
+- **Method:** `GET`
+- **Response:** List of contents for a module
+
+Example Response:
+```json
+{
+    "data": [
+        {
+            "content_id": 1,
+            "module_id": 1,
+            "content_type": "text",
+            "content_title": "Introduction",
+            "content_data": "Content text goes here",
+            "learning_style_id": 1,
+            "sequence_order": 1,
+            "created_at": "2023-05-07T04:00:00.000000Z",
+            "updated_at": null
+        }
+    ]
+}
+```
+
+### Certificates
+
+#### Get User Certificates
+
+- **URL:** `/api/v1/users/{user_id}/certificates`
+- **Method:** `GET`
+- **Response:** List of certificates for a user
+
+Example Response:
+```json
+{
+    "data": [
+        {
+            "certificate_id": 1,
+            "user_id": 1,
+            "course_id": 1,
+            "issue_date": "2023-05-07T04:00:00.000000Z",
+            "certificate_url": "https://example.com/certificates/1"
+        }
+    ]
+}
+```
+
+### Feedback
+
+#### Get User Feedback
+
+- **URL:** `/api/v1/users/{user_id}/received-feedback`
+- **Method:** `GET`
+- **Response:** List of feedback received by a user
+
+Example Response:
+```json
+{
+    "data": [
+        {
+            "feedback_id": 1,
+            "faculty_id": 2,
+            "student_id": 1,
+            "module_id": 1,
+            "feedback_text": "Great work on this module!",
+            "rating": 5,
+            "created_at": "2023-05-07T04:00:00.000000Z"
+        }
+    ]
+}
+```
 
 ## Testing with Postman or APIdog
 
