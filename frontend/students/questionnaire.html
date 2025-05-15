@@ -351,6 +351,22 @@
         console.log('Request body that will be sent:', { answers: savedAnswers });
 
         document.addEventListener('DOMContentLoaded', function() {
+            // Get user data from session storage
+            const userData = JSON.parse(sessionStorage.getItem('user'));
+            if (!userData) {
+                // Redirect to login if no user data found
+                window.location.href = '../login.html';
+                return;
+            }
+
+            // Pre-fill personal information fields
+            document.querySelector('input[placeholder="First Name"]').value = userData.first_name;
+            document.querySelector('input[placeholder="Last Name"]').value = userData.last_name;
+            
+            // Make name fields readonly since they come from session
+            document.querySelector('input[placeholder="First Name"]').readOnly = true;
+            document.querySelector('input[placeholder="Last Name"]').readOnly = true;
+
             const nextBtn = document.getElementById('nextBtn');
             const prevBtn = document.getElementById('prevBtn');
             const profileSection = document.getElementById('profileSection');
@@ -511,14 +527,11 @@
                         .then(response => response.json())
                         .then(data => {
                             // Get form data
-                            const firstName = document.querySelector('input[placeholder="First Name"]').value;
-                            const lastName = document.querySelector('input[placeholder="Last Name"]').value;
+                            const firstName = userData.first_name;
+                            const lastName = userData.last_name;
                             const department = document.querySelector('input[placeholder="Department"]').value;
                             
-                            // Get user_id from localStorage (assuming it's stored during login)
-                            const userId = localStorage.getItem('user_id');
-                            
-                            // Store assessment results in database
+                            // Store assessment results in database using user_id from session storage
                             return fetch('http://127.0.0.1:8000/api/v1/assessment-results', {
                                 method: 'POST',
                                 headers: {
@@ -529,7 +542,7 @@
                                     first_name: firstName,
                                     last_name: lastName,
                                     department: department,
-                                    user_id: userId,
+                                    user_id: userData.user_id,
                                     answers: {
                                         answers: savedAnswers
                                     },
