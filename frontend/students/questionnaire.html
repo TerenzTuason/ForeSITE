@@ -211,15 +211,15 @@
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
                             <label class="form-label">First Name</label>
-                            <input type="text" class="form-control" required>
+                            <input type="text" class="form-control" required placeholder="First Name">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Last Name</label>
-                            <input type="text" class="form-control" required>
+                            <input type="text" class="form-control" required placeholder="Last Name">
                         </div>
                         <div class="col-12">
                             <label class="form-label">Department</label>
-                            <input type="text" class="form-control" required>
+                            <input type="text" class="form-control" required placeholder="Department">
                         </div>
                     </div>
                 </section>
@@ -414,20 +414,74 @@
 
             nextBtn.addEventListener('click', function() {
                 if (currentSection === 'profile') {
+                    // Validate personal information fields
+                    const firstName = document.querySelector('input[placeholder="First Name"]');
+                    const lastName = document.querySelector('input[placeholder="Last Name"]');
+                    const department = document.querySelector('input[placeholder="Department"]');
+                    
+                    // Check if any field is empty
+                    if (!firstName.value.trim()) {
+                        alert('Please enter your First Name');
+                        firstName.focus();
+                        return;
+                    }
+                    if (!lastName.value.trim()) {
+                        alert('Please enter your Last Name');
+                        lastName.focus();
+                        return;
+                    }
+                    if (!department.value.trim()) {
+                        alert('Please enter your Department');
+                        department.focus();
+                        return;
+                    }
+
                     profileSection.style.display = 'none';
                     questionnaireSection.style.display = 'block';
                     currentSection = 'questionnaire';
                     prevBtn.style.display = 'block';
                     showQuestions(currentQuestionPage);
                 } else {
-                    // Save current page answers
+                    // Validate current page questions
                     const start = currentQuestionPage * questionsPerPage;
-                    for (let i = 0; i < questionsPerPage; i++) {
-                        const questionNum = start + i + 1;
+                    const end = Math.min(start + questionsPerPage, questions.length);
+                    let allAnswered = true;
+                    let firstUnanswered = null;
+                    
+                    for (let i = start; i < end; i++) {
+                        const questionNum = i + 1;
+                        const radios = document.getElementsByName(`q${questionNum}`);
+                        let isAnswered = false;
+                        
+                        for (const radio of radios) {
+                            if (radio.checked) {
+                                isAnswered = true;
+                                break;
+                            }
+                        }
+                        
+                        if (!isAnswered) {
+                            allAnswered = false;
+                            if (!firstUnanswered) {
+                                firstUnanswered = questionNum;
+                            }
+                        }
+                    }
+                    
+                    if (!allAnswered) {
+                        alert(`Please answer all questions on this page. Question ${firstUnanswered} is not answered.`);
+                        const unansweredQuestion = document.querySelector(`[name="q${firstUnanswered}"]`).closest('.question-item');
+                        unansweredQuestion.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        return;
+                    }
+
+                    // Save current page answers
+                    for (let i = start; i < end; i++) {
+                        const questionNum = i + 1;
                         const radios = document.getElementsByName(`q${questionNum}`);
                         for (const radio of radios) {
                             if (radio.checked) {
-                                savedAnswers[start + i] = radio.value === 'agree' ? 1 : 0;
+                                savedAnswers[i] = radio.value === 'agree' ? 1 : 0;
                                 break;
                             }
                         }
@@ -440,7 +494,7 @@
                         currentQuestionPage++;
                         showQuestions(currentQuestionPage);
                     } else {
-                        // Check if all questions are answered
+                        // Check if all questions are answered before final submission
                         if (savedAnswers.includes(null)) {
                             alert('Please answer all questions before submitting.');
                             return;
@@ -455,6 +509,42 @@
                             body: JSON.stringify({ answers: savedAnswers })
                         })
                         .then(response => response.json())
+                        .then(data => {
+                            // Get form data
+                            const firstName = document.querySelector('input[placeholder="First Name"]').value;
+                            const lastName = document.querySelector('input[placeholder="Last Name"]').value;
+                            const department = document.querySelector('input[placeholder="Department"]').value;
+                            
+                            // Get user_id from localStorage (assuming it's stored during login)
+                            const userId = localStorage.getItem('user_id');
+                            
+                            // Store assessment results in database
+                            return fetch('http://127.0.0.1:8000/api/v1/assessment-results', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    first_name: firstName,
+                                    last_name: lastName,
+                                    department: department,
+                                    user_id: userId,
+                                    answers: {
+                                        answers: savedAnswers
+                                    },
+                                    result: data
+                                })
+                            })
+                            .then(response => {
+                                if (!response.ok) {
+                                    return response.json().then(err => {
+                                        throw new Error(err.error ? JSON.stringify(err.error) : 'Failed to store assessment results');
+                                    });
+                                }
+                                return data; // Return the prediction data for course matching
+                            });
+                        })
                         .then(data => {
                             // Fetch courses and find matching learning style
                             fetch('http://127.0.0.1:8000/api/v1/courses')
@@ -484,7 +574,7 @@
                         })
                         .catch(error => {
                             console.error('Error:', error);
-                            alert('An error occurred while predicting your learning style. Please try again.');
+                            alert('An error occurred while processing your assessment. Please try again.');
                         });
                     }
                 }
