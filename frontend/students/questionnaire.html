@@ -653,40 +653,6 @@
                     'input[placeholder="Department"]'
                   ).value;
 
-                  // Store assessment results in database using user_id from session storage
-                  return fetch(
-                    "http://127.0.0.1:8000/api/v1/assessment-results",
-                    {
-                      method: "POST",
-                      headers: {
-                        "Content-Type": "application/json",
-                        Accept: "application/json",
-                      },
-                      body: JSON.stringify({
-                        first_name: firstName,
-                        last_name: lastName,
-                        department: department,
-                        user_id: userData.user_id,
-                        answers: {
-                          answers: savedAnswers,
-                        },
-                        result: data,
-                      }),
-                    }
-                  ).then((response) => {
-                    if (!response.ok) {
-                      return response.json().then((err) => {
-                        throw new Error(
-                          err.error
-                            ? JSON.stringify(err.error)
-                            : "Failed to store assessment results"
-                        );
-                      });
-                    }
-                    return data; // Return the prediction data for course matching
-                  });
-                })
-                .then((data) => {
                   // Fetch courses and find matching learning style
                   fetch("http://127.0.0.1:8000/api/v1/courses")
                     .then((response) => response.json())
@@ -698,30 +664,46 @@
                           data.learning_style.toLowerCase()
                       );
 
-                      if (matchingCourse) {
-                        // Store course details in localStorage
-                        localStorage.setItem(
-                          "selectedCourse",
-                          JSON.stringify(matchingCourse)
-                        );
-                        // Navigate to course details page
-                        window.location.href = "enrollment.html";
-                      } else {
-                        console.error(
-                          "No matching course found for learning style:",
-                          data.learning_style
-                        );
-                        // Fallback to first course if no match found
-                        localStorage.setItem(
-                          "selectedCourse",
-                          JSON.stringify(coursesData.data[0])
-                        );
-                        window.location.href = "enrollment.html";
-                      }
+                      const selectedCourse = matchingCourse || coursesData.data[0];
+
+                      // Store assessment results in database using user_id from session storage
+                      return fetch(
+                        "http://127.0.0.1:8000/api/v1/assessment-results",
+                        {
+                          method: "POST",
+                          headers: {
+                            "Content-Type": "application/json",
+                            Accept: "application/json",
+                          },
+                          body: JSON.stringify({
+                            first_name: firstName,
+                            last_name: lastName,
+                            department: department,
+                            user_id: userData.user_id,
+                            answers: {
+                              answers: savedAnswers,
+                            },
+                            result: data,
+                            course_details: selectedCourse
+                          }),
+                        }
+                      ).then((response) => {
+                        if (!response.ok) {
+                          return response.json().then((err) => {
+                            throw new Error(
+                              err.error
+                                ? JSON.stringify(err.error)
+                                : "Failed to store assessment results"
+                            );
+                          });
+                        }
+                        // Navigate to dashboard page after successful storage
+                        window.location.href = "dashboard.html";
+                      });
                     })
                     .catch((error) => {
                       console.error("Error fetching courses:", error);
-                      window.location.href = "enrollment.html";
+                      alert("An error occurred while fetching courses. Please try again.");
                     });
                 })
                 .catch((error) => {

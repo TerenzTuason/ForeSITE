@@ -39,7 +39,8 @@ class AssessmentResult extends Model
         'department',
         'user_id',
         'answers',
-        'result'
+        'result',
+        'course_details'
     ];
     
     /**
@@ -49,7 +50,8 @@ class AssessmentResult extends Model
      */
     protected $casts = [
         'answers' => 'json',
-        'result' => 'json'
+        'result' => 'json',
+        'course_details' => 'json'
     ];
     
     /**

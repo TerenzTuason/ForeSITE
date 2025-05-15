@@ -91,6 +91,7 @@ CREATE TABLE assessment_results (
     user_id INT NOT NULL,
     answers JSON NOT NULL,
     result JSON NOT NULL,
+    course_details JSON,
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
