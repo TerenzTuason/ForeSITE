@@ -404,87 +404,26 @@
         </a>
 
         <div class="course-header">
-            <h1 class="course-title">Strategic Futures Thinking: Systems, Models, and Policy Design</h1>
-            <p class="lead">A structured course for analytical minds who thrive on logic, models, and critical evaluation. Explore formal frameworks like PESTLE and the Three Horizons to design resilient strategies and understand complex future scenarios through evidence-based reasoning.</p>
-                        <a href="course-details.html" class="btn btn-enroll">                Enroll Now                <i class="fas fa-arrow-right"></i>            </a>
+            <h1 class="course-title">Loading Course...</h1>
+            <p class="lead">Please wait while we fetch the course details...</p>
+            <a href="course-details.html" class="btn btn-enroll">                Enroll Now                <i class="fas fa-arrow-right"></i>            
+            </a>
         </div>
 
         <div class="course-section">
             <h2 class="section-title">Course Objectives</h2>
             <ul class="course-objectives">
-                <li>Analyze complex systems using formal models (e.g., Three Horizons Framework, PESTLE, Axes of Uncertainty).</li>
-                <li>Evaluate and generalize key principles from Futures Thinking applicable across various policy and strategic domains.</li>
-                <li>Design structured, evidence-informed futures processes suited to diverse contexts and stakeholders.</li>
-                <li>Apply critical comparison and theoretical reasoning to assess Futures Thinking tools.</li>
-                <li>Develop robust, adaptable policy strategies using backcasting, roadmapping, and policy stress-testing.</li>
-                <li>Critically assess the effectiveness and impact of futures tools across process, output, and influence dimensions.</li>
+                <li>Loading course objectives...</li>
             </ul>
         </div>
 
         <div class="course-section">
             <h2 class="section-title">Course Structure</h2>
-            
             <div class="module">
-                <div class="module-number">Module 1</div>
-                <h3 class="module-title">Introduction to Futures Thinking</h3>
+                <div class="module-number">Loading...</div>
+                <h3 class="module-title">Please wait while we fetch the course structure...</h3>
                 <div class="module-focus">
-                    Formal models (e.g., Three Horizons), strategic preparedness, and analytical comparison
-                </div>
-            </div>
-
-            <div class="module">
-                <div class="module-number">Module 2</div>
-                <h3 class="module-title">Futures Process Design</h3>
-                <div class="module-focus">
-                    Structuring foresight using purpose-driven design, stakeholder mapping, and tool selection
-                </div>
-            </div>
-
-            <div class="module">
-                <div class="module-number">Module 3</div>
-                <h3 class="module-title">Pathways to Meet Business Needs</h3>
-                <div class="module-focus">
-                    Matching foresight pathways to strategic goals through comparative analysis
-                </div>
-            </div>
-
-            <div class="module">
-                <div class="module-number">Module 4</div>
-                <h3 class="module-title">Gathering Intelligence About the Future</h3>
-                <div class="module-focus">
-                    Horizon Scanning, 7 Questions, Delphi Method — methods for rigorous evidence collection
-                </div>
-            </div>
-
-            <div class="module">
-                <div class="module-number">Module 5</div>
-                <h3 class="module-title">Exploring the Dynamics of Change</h3>
-                <div class="module-focus">
-                    Driver Mapping and Axes of Uncertainty using systems thinking frameworks (e.g., PESTLE)
-                </div>
-            </div>
-
-            <div class="module">
-                <div class="module-number">Module 6</div>
-                <h3 class="module-title">Describing Future Scenarios</h3>
-                <div class="module-focus">
-                    Scenario building, Visioning, and SWOT for structured foresight narratives
-                </div>
-            </div>
-
-            <div class="module">
-                <div class="module-number">Module 7</div>
-                <h3 class="module-title">Developing & Testing Strategy</h3>
-                <div class="module-focus">
-                    Strategy tools: Policy Stress-Testing, Backcasting, and Roadmapping for robust planning
-                </div>
-            </div>
-
-            <div class="module">
-                <div class="module-number">Module 8</div>
-                <h3 class="module-title">Evaluating Futures Tools</h3>
-                <div class="module-focus">
-                    Post-analysis of tool effectiveness across process, outcomes, and policy impact
+                    <i class="fas fa-spinner fa-spin"></i>
                 </div>
             </div>
         </div>
@@ -492,38 +431,80 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Get course details from localStorage
-            const courseDetails = JSON.parse(localStorage.getItem('selectedCourse'));
-            
-            if (courseDetails) {
-                // Update course title and learning style
-                document.querySelector('.course-title').textContent = courseDetails.name;
-                
-                // Update course objectives
-                const objectivesList = document.querySelector('.course-objectives');
-                objectivesList.innerHTML = courseDetails.objectives.map(objective => 
-                    `<li>${objective}</li>`
-                ).join('');
-                
-                // Update course structure/modules
-                const courseSection = document.querySelector('.course-section:last-child');
-                courseSection.innerHTML = `
-                    <h2 class="section-title">Course Structure</h2>
-                    ${courseDetails.structure.map(module => `
-                        <div class="module">
-                            <div class="module-number">Module ${module.module}</div>
-                            <h3 class="module-title">${module.title}</h3>
-                            <div class="module-focus">
-                                ${module.focus}
-                            </div>
-                        </div>
-                    `).join('')}
-                `;
+            // Get user data from session storage
+            const userData = JSON.parse(sessionStorage.getItem('user'));
+            if (!userData) {
+                window.location.href = '../login.html';
+                return;
+            }
+
+            // Get course ID from URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const courseId = urlParams.get('id');
+
+            if (!courseId) {
+                // If no course ID is provided, fetch the user's assessment result to get the recommended course
+                fetch(`http://127.0.0.1:8000/api/v1/users/${userData.user_id}/assessment-results`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.data && data.data.length > 0) {
+                            const assessmentResult = data.data[0]; // Get the most recent result
+                            fetchCourseDetails(assessmentResult.course_id);
+                        } else {
+                            console.error('No assessment results found');
+                            document.querySelector('.course-title').textContent = 'No course found';
+                            document.querySelector('.lead').textContent = 'Please complete the assessment first.';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching assessment results:', error);
+                    });
             } else {
-                console.error('No course details found in localStorage');
+                fetchCourseDetails(courseId);
+            }
+
+            function fetchCourseDetails(id) {
+                fetch(`http://127.0.0.1:8000/api/v1/courses/${id}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const course = data.data;
+
+                        // Update course title and description
+                        document.querySelector('.course-title').textContent = course.name;
+                        document.querySelector('.lead').textContent = course.description;
+                        
+                        // Update course objectives
+                        const objectivesList = document.querySelector('.course-objectives');
+                        objectivesList.innerHTML = course.objectives.map(objective => 
+                            `<li>${objective}</li>`
+                        ).join('');
+                        
+                        // Update course structure/modules
+                        const courseSection = document.querySelector('.course-section:last-child');
+                        courseSection.innerHTML = `
+                            <h2 class="section-title">Course Structure</h2>
+                            ${course.structure.map(module => `
+                                <div class="module">
+                                    <div class="module-number">Module ${module.module}</div>
+                                    <h3 class="module-title">${module.title}</h3>
+                                    <div class="module-focus">
+                                        ${module.focus}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        `;
+
+                        // Update enroll button to include course ID
+                        const enrollButton = document.querySelector('.btn-enroll');
+                        enrollButton.href = `course-details.html?id=${course.course_id}`;
+                    })
+                    .catch(error => {
+                        console.error('Error fetching course details:', error);
+                        document.querySelector('.course-title').textContent = 'Error loading course';
+                        document.querySelector('.lead').textContent = 'There was an error loading the course details. Please try again later.';
+                    });
             }
         });
     </script>
