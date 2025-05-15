@@ -705,7 +705,7 @@
                           JSON.stringify(matchingCourse)
                         );
                         // Navigate to course details page
-                        window.location.href = "course-details.html";
+                        window.location.href = "enrollment.html";
                       } else {
                         console.error(
                           "No matching course found for learning style:",
@@ -716,12 +716,12 @@
                           "selectedCourse",
                           JSON.stringify(coursesData.data[0])
                         );
-                        window.location.href = "course-details.html";
+                        window.location.href = "enrollment.html";
                       }
                     })
                     .catch((error) => {
                       console.error("Error fetching courses:", error);
-                      window.location.href = "course-details.html";
+                      window.location.href = "enrollment.html";
                     });
                 })
                 .catch((error) => {

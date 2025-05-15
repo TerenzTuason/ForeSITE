@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Course Details - ForeSITE</title>
+    <title>Course Progress - ForeSITE</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Bootstrap CSS -->
@@ -18,6 +18,9 @@
             --dark-gray: #333;
             --border-radius: 8px;
             --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            --success-green: #28a745;
+            --pending-orange: #ffc107;
+            --locked-gray: #6c757d;
         }
 
         body {
@@ -46,78 +49,53 @@
             height: 35px;
         }
 
-        .back-button {
-            color: var(--maroon);
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
+        .nav-link {
+            color: rgba(255,255,255,0.9) !important;
             font-weight: 500;
             transition: all 0.3s ease;
-            padding: 0.5rem 1rem;
+            padding: 0.75rem 1.5rem !important;
             border-radius: 50px;
-            background: white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin: 0 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .back-button:hover {
-            color: var(--maroon);
-            transform: translateX(-5px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        .nav-link:hover {
+            color: var(--gold) !important;
+            background: rgba(255,255,255,0.1);
         }
 
         .course-header {
             background: white;
-            padding: 3rem;
-            margin-bottom: 2rem;
+            padding: 2rem;
             border-radius: var(--border-radius);
             box-shadow: var(--card-shadow);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .course-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 5px;
-            background: linear-gradient(to right, var(--maroon), var(--gold));
+            margin-bottom: 2rem;
         }
 
         .course-title {
             color: var(--maroon);
-            font-size: 2.5rem;
+            font-size: 1.8rem;
             font-weight: 700;
-            margin-bottom: 1.5rem;
-            line-height: 1.3;
+            margin-bottom: 1rem;
         }
 
-        .course-header .lead {
-            font-size: 1.2rem;
-            line-height: 1.8;
-            color: var(--dark-gray);
-            opacity: 0.9;
-            margin-bottom: 2rem;
-        }
-
-        .course-section {
+        .progress-section {
             background: white;
-            padding: 2.5rem;
-            margin-bottom: 2rem;
+            padding: 2rem;
             border-radius: var(--border-radius);
             box-shadow: var(--card-shadow);
+            margin-bottom: 2rem;
         }
 
         .section-title {
             color: var(--maroon);
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 2rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
             position: relative;
-            padding-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
         }
 
         .section-title::after {
@@ -125,97 +103,127 @@
             position: absolute;
             bottom: 0;
             left: 0;
-            width: 60px;
-            height: 4px;
+            width: 50px;
+            height: 3px;
             background: var(--gold);
             border-radius: 2px;
         }
 
-        .course-objectives {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .course-objectives li {
-            position: relative;
-            padding-left: 2rem;
-            margin-bottom: 1rem;
-            font-size: 1.1rem;
-            line-height: 1.6;
-            color: var(--dark-gray);
-        }
-
-        .course-objectives li::before {
-            content: '✓';
-            position: absolute;
-            left: 0;
-            color: var(--maroon);
-            font-weight: bold;
-        }
-
-        .module {
-            margin-bottom: 1.5rem;
-            border: 1px solid rgba(0,0,0,0.1);
-            border-radius: var(--border-radius);
-            padding: 1.5rem;
-            transition: all 0.3s ease;
-            background: white;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .module::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            height: 100%;
-            width: 4px;
-            background: var(--maroon);
-            border-radius: 4px 0 0 4px;
-        }
-
-        .module:hover {
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-            transform: translateY(-5px);
-        }
-
-        .module-number {
-            color: var(--gold);
-            font-weight: 700;
-            font-size: 1.1rem;
-            margin-bottom: 0.75rem;
+        .task-item {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-        }
-
-        .module-number::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: rgba(0,0,0,0.1);
-            margin-left: 1rem;
-        }
-
-        .module-title {
-            color: var(--maroon);
-            font-weight: 600;
-            margin-bottom: 1rem;
-            font-size: 1.3rem;
-        }
-
-        .module-focus {
-            color: var(--dark-gray);
-            background: var(--light-gray);
-            padding: 1.25rem;
+            padding: 1rem;
+            border: 1px solid rgba(0,0,0,0.1);
             border-radius: var(--border-radius);
-            font-size: 1rem;
-            line-height: 1.6;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            background: white;
         }
 
-        .btn-enroll {
+        .task-item:hover {
+            transform: translateX(5px);
+            box-shadow: var(--card-shadow);
+        }
+
+        .task-status {
+            margin-right: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .status-pending {
+            color: var(--pending-orange);
+        }
+
+        .status-completed {
+            color: var(--success-green);
+        }
+
+        .task-content {
+            flex: 1;
+        }
+
+        .task-title {
+            font-weight: 600;
+            color: var(--dark-gray);
+            margin-bottom: 0.25rem;
+        }
+
+        .task-description {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 0;
+        }
+
+        .progress-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--maroon);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--dark-gray);
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .progress {
+            height: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .progress-bar {
+            background-color: var(--maroon);
+        }
+
+        @media (max-width: 768px) {
+            .course-header, .progress-section {
+                padding: 1.5rem;
+            }
+
+            .course-title {
+                font-size: 1.5rem;
+            }
+
+            .section-title {
+                font-size: 1.3rem;
+            }
+
+            .progress-stats {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .stat-card {
+                padding: 1rem;
+            }
+
+            .task-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .task-status {
+                margin-bottom: 0.5rem;
+            }
+        }
+
+        .btn-start-course {
             background: linear-gradient(to right, var(--maroon), #600000);
             color: white;
             border: none;
@@ -228,161 +236,48 @@
             display: inline-flex;
             align-items: center;
             gap: 0.75rem;
+            text-decoration: none;
         }
 
-        .btn-enroll:hover {
+        .btn-start-course:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(128, 0, 0, 0.4);
             color: white;
         }
 
-        .btn-enroll i {
-            transition: transform 0.3s ease;
+        .status-locked {
+            color: var(--locked-gray);
         }
 
-        .btn-enroll:hover i {
-            transform: translateX(5px);
+        .module-locked {
+            opacity: 0.7;
+            cursor: not-allowed;
         }
 
-        /* Base responsive container */
-        .container {
-            max-width: 1400px;
-            padding: 0 1.5rem;
+        .module-locked .task-title {
+            color: var(--locked-gray);
         }
 
-        /* Responsive typography scale */
-        @media (min-width: 1200px) {
-            .course-title {
-                font-size: 2.75rem;
-            }
-            .section-title {
-                font-size: 2rem;
-            }
-            .lead {
-                font-size: 1.25rem;
-            }
+        .welcome-message {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            margin-bottom: 2rem;
+            text-align: center;
         }
 
-        @media (max-width: 1199px) {
-            .course-title {
-                font-size: 2.5rem;
-            }
-            .section-title {
-                font-size: 1.8rem;
-            }
-            .course-header {
-                padding: 2.5rem;
-            }
+        .welcome-message h2 {
+            color: var(--maroon);
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
         }
 
-        @media (max-width: 991px) {
-            .course-title {
-                font-size: 2.25rem;
-            }
-            .section-title {
-                font-size: 1.6rem;
-            }
-            .module {
-                padding: 1.25rem;
-            }
-            .module-title {
-                font-size: 1.2rem;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 0 1rem;
-            }
-            .course-header {
-                padding: 2rem;
-            }
-            .course-title {
-                font-size: 2rem;
-                margin-bottom: 1rem;
-            }
-            .section-title {
-                font-size: 1.5rem;
-                margin-bottom: 1.5rem;
-            }
-            .course-section {
-                padding: 1.5rem;
-            }
-            .lead {
-                font-size: 1.1rem;
-                line-height: 1.6;
-            }
-            .module {
-                padding: 1rem;
-            }
-            .module-focus {
-                padding: 1rem;
-            }
-            .btn-enroll {
-                padding: 0.875rem 2rem;
-                font-size: 1rem;
-            }
-            .back-button {
-                margin-bottom: 1rem;
-            }
-        }
-
-        @media (max-width: 576px) {
-            .container {
-                padding: 0 0.75rem;
-            }
-            .course-header {
-                padding: 1.5rem;
-            }
-            .course-title {
-                font-size: 1.75rem;
-            }
-            .section-title {
-                font-size: 1.4rem;
-            }
-            .course-objectives li {
-                font-size: 1rem;
-                padding-left: 1.75rem;
-            }
-            .module-number {
-                font-size: 1rem;
-            }
-            .module-title {
-                font-size: 1.1rem;
-            }
-            .module-focus {
-                font-size: 0.95rem;
-            }
-            .btn-enroll {
-                width: 100%;
-                justify-content: center;
-            }
-        }
-
-        /* Fix for very small devices */
-        @media (max-width: 360px) {
-            .course-title {
-                font-size: 1.5rem;
-            }
-            .section-title {
-                font-size: 1.3rem;
-            }
-            .module {
-                padding: 0.875rem;
-            }
-        }
-
-        /* Landscape orientation adjustments */
-        @media (max-height: 600px) and (orientation: landscape) {
-            .container {
-                margin-top: 80px;
-            }
-            .course-header {
-                padding: 1.5rem;
-            }
-            .course-section {
-                padding: 1.25rem;
-            }
+        .welcome-message p {
+            color: var(--dark-gray);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
         }
     </style>
 </head>
@@ -395,99 +290,148 @@
                 <span class="d-none d-sm-inline">FORESITE: Adaptive Collaborative Learning System</span>
                 <span class="d-inline d-sm-none">FORESITE</span>
             </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-user-circle"></i> Profile</a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </nav>
 
     <div class="container" style="margin-top: 100px;">
-        <a href="dashboard.html" class="back-button">
-            <i class="fas fa-arrow-left"></i> Back to Dashboard
-        </a>
+        <div class="welcome-message">
+            <h2>Welcome to Your Course!</h2>
+            <p>You're about to begin your journey in Strategic Futures Thinking. Click the button below to start your learning experience.</p>
+            <a href="#" class="btn-start-course">
+                Start Course <i class="fas fa-play"></i>
+            </a>
+        </div>
 
         <div class="course-header">
             <h1 class="course-title">Strategic Futures Thinking: Systems, Models, and Policy Design</h1>
-            <p class="lead">A structured course for analytical minds who thrive on logic, models, and critical evaluation. Explore formal frameworks like PESTLE and the Three Horizons to design resilient strategies and understand complex future scenarios through evidence-based reasoning.</p>
-            <button class="btn btn-enroll">
-                Enroll Now
-                <i class="fas fa-arrow-right"></i>
-            </button>
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+            <div class="text-end">
+                <small class="text-muted">Overall Progress: 0%</small>
+            </div>
         </div>
 
-        <div class="course-section">
-            <h2 class="section-title">Course Objectives</h2>
-            <ul class="course-objectives">
-                <li>Analyze complex systems using formal models (e.g., Three Horizons Framework, PESTLE, Axes of Uncertainty).</li>
-                <li>Evaluate and generalize key principles from Futures Thinking applicable across various policy and strategic domains.</li>
-                <li>Design structured, evidence-informed futures processes suited to diverse contexts and stakeholders.</li>
-                <li>Apply critical comparison and theoretical reasoning to assess Futures Thinking tools.</li>
-                <li>Develop robust, adaptable policy strategies using backcasting, roadmapping, and policy stress-testing.</li>
-                <li>Critically assess the effectiveness and impact of futures tools across process, output, and influence dimensions.</li>
-            </ul>
+        <div class="progress-stats">
+            <div class="stat-card">
+                <div class="stat-number">0/8</div>
+                <div class="stat-label">Modules Completed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">8</div>
+                <div class="stat-label">Modules Remaining</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">0</div>
+                <div class="stat-label">Hours Spent Learning</div>
+            </div>
         </div>
 
-        <div class="course-section">
-            <h2 class="section-title">Course Structure</h2>
-            
-            <div class="module">
-                <div class="module-number">Module 1</div>
-                <h3 class="module-title">Introduction to Futures Thinking</h3>
-                <div class="module-focus">
-                    Formal models (e.g., Three Horizons), strategic preparedness, and analytical comparison
+        <div class="progress-section">
+            <h2 class="section-title">Course Modules</h2>
+            <div class="task-list">
+                <div class="task-item">
+                    <div class="task-status status-pending">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div class="task-content">
+                        <h3 class="task-title">Module 1: Introduction to Futures Thinking</h3>
+                        <p class="task-description">Start your journey with fundamental concepts</p>
+                    </div>
+                </div>
+
+                <div class="task-item module-locked">
+                    <div class="task-status status-locked">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div class="task-content">
+                        <h3 class="task-title">Module 2: Futures Process Design</h3>
+                        <p class="task-description">Locked - Complete Module 1 to unlock</p>
+                    </div>
+                </div>
+
+                <div class="task-item module-locked">
+                    <div class="task-status status-locked">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div class="task-content">
+                        <h3 class="task-title">Module 3: Pathways to Meet Business Needs</h3>
+                        <p class="task-description">Locked - Complete Module 2 to unlock</p>
+                    </div>
+                </div>
+
+                <div class="task-item module-locked">
+                    <div class="task-status status-locked">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div class="task-content">
+                        <h3 class="task-title">Module 4: Gathering Intelligence About the Future</h3>
+                        <p class="task-description">Locked - Complete Module 3 to unlock</p>
+                    </div>
+                </div>
+
+                <div class="task-item module-locked">
+                    <div class="task-status status-locked">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div class="task-content">
+                        <h3 class="task-title">Module 5: Exploring the Dynamics of Change</h3>
+                        <p class="task-description">Locked - Complete Module 4 to unlock</p>
+                    </div>
+                </div>
+
+                <div class="task-item module-locked">
+                    <div class="task-status status-locked">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div class="task-content">
+                        <h3 class="task-title">Module 6: Describing Future Scenarios</h3>
+                        <p class="task-description">Locked - Complete Module 5 to unlock</p>
+                    </div>
+                </div>
+
+                <div class="task-item module-locked">
+                    <div class="task-status status-locked">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div class="task-content">
+                        <h3 class="task-title">Module 7: Developing & Testing Strategy</h3>
+                        <p class="task-description">Locked - Complete Module 6 to unlock</p>
+                    </div>
+                </div>
+
+                <div class="task-item module-locked">
+                    <div class="task-status status-locked">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div class="task-content">
+                        <h3 class="task-title">Module 8: Evaluating Futures Tools</h3>
+                        <p class="task-description">Locked - Complete Module 7 to unlock</p>
+                    </div>
                 </div>
             </div>
+        </div>
 
-            <div class="module">
-                <div class="module-number">Module 2</div>
-                <h3 class="module-title">Futures Process Design</h3>
-                <div class="module-focus">
-                    Structuring foresight using purpose-driven design, stakeholder mapping, and tool selection
-                </div>
-            </div>
-
-            <div class="module">
-                <div class="module-number">Module 3</div>
-                <h3 class="module-title">Pathways to Meet Business Needs</h3>
-                <div class="module-focus">
-                    Matching foresight pathways to strategic goals through comparative analysis
-                </div>
-            </div>
-
-            <div class="module">
-                <div class="module-number">Module 4</div>
-                <h3 class="module-title">Gathering Intelligence About the Future</h3>
-                <div class="module-focus">
-                    Horizon Scanning, 7 Questions, Delphi Method — methods for rigorous evidence collection
-                </div>
-            </div>
-
-            <div class="module">
-                <div class="module-number">Module 5</div>
-                <h3 class="module-title">Exploring the Dynamics of Change</h3>
-                <div class="module-focus">
-                    Driver Mapping and Axes of Uncertainty using systems thinking frameworks (e.g., PESTLE)
-                </div>
-            </div>
-
-            <div class="module">
-                <div class="module-number">Module 6</div>
-                <h3 class="module-title">Describing Future Scenarios</h3>
-                <div class="module-focus">
-                    Scenario building, Visioning, and SWOT for structured foresight narratives
-                </div>
-            </div>
-
-            <div class="module">
-                <div class="module-number">Module 7</div>
-                <h3 class="module-title">Developing & Testing Strategy</h3>
-                <div class="module-focus">
-                    Strategy tools: Policy Stress-Testing, Backcasting, and Roadmapping for robust planning
-                </div>
-            </div>
-
-            <div class="module">
-                <div class="module-number">Module 8</div>
-                <h3 class="module-title">Evaluating Futures Tools</h3>
-                <div class="module-focus">
-                    Post-analysis of tool effectiveness across process, outcomes, and policy impact
+        <div class="progress-section">
+            <h2 class="section-title">Accomplishments</h2>
+            <div class="task-list">
+                <div class="text-center py-4">
+                    <i class="fas fa-trophy fa-3x" style="color: var(--locked-gray);"></i>
+                    <p class="mt-3 text-muted">Complete modules to earn achievements!</p>
                 </div>
             </div>
         </div>
@@ -498,35 +442,13 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Get course details from localStorage
-            const courseDetails = JSON.parse(localStorage.getItem('selectedCourse'));
+            // Check if user has any progress
+            const userProgress = localStorage.getItem('courseProgress');
+            const startButton = document.querySelector('.btn-start-course');
             
-            if (courseDetails) {
-                // Update course title and learning style
-                document.querySelector('.course-title').textContent = courseDetails.name;
-                
-                // Update course objectives
-                const objectivesList = document.querySelector('.course-objectives');
-                objectivesList.innerHTML = courseDetails.objectives.map(objective => 
-                    `<li>${objective}</li>`
-                ).join('');
-                
-                // Update course structure/modules
-                const courseSection = document.querySelector('.course-section:last-child');
-                courseSection.innerHTML = `
-                    <h2 class="section-title">Course Structure</h2>
-                    ${courseDetails.structure.map(module => `
-                        <div class="module">
-                            <div class="module-number">Module ${module.module}</div>
-                            <h3 class="module-title">${module.title}</h3>
-                            <div class="module-focus">
-                                ${module.focus}
-                            </div>
-                        </div>
-                    `).join('')}
-                `;
-            } else {
-                console.error('No course details found in localStorage');
+            if (userProgress) {
+                startButton.textContent = 'Continue Course';
+                startButton.innerHTML = 'Continue Course <i class="fas fa-forward"></i>';
             }
         });
     </script>
