@@ -13,6 +13,7 @@ use App\Models\Enrollment;
 use App\Models\AssessmentAttempt;
 use App\Models\Certificate;
 use App\Models\Feedback;
+use App\Models\AssessmentResult;
 
 class UserController extends Controller
 {
@@ -248,5 +249,30 @@ class UserController extends Controller
             ->get();
         
         return response()->json(['data' => $feedback], Response::HTTP_OK);
+    }
+
+    /**
+     * Get assessment results for a user.
+     */
+    public function getAssessmentResults(string $id): JsonResponse
+    {
+        $user = User::find($id);
+        
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
+        }
+        
+        $assessmentResults = AssessmentResult::with(['course.learningStyle'])
+            ->where('user_id', $id)
+            ->orderBy('result_id', 'desc')
+            ->get();
+        
+        // Decode JSON fields
+        foreach ($assessmentResults as $result) {
+            $result->answers = json_decode($result->answers);
+            $result->result = json_decode($result->result);
+        }
+        
+        return response()->json(['data' => $assessmentResults], Response::HTTP_OK);
     }
 }

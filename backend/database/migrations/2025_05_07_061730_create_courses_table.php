@@ -12,8 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('courses', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+            $table->id('course_id');
+            $table->string('name', 100);
+            $table->text('description')->nullable();
+            $table->json('objectives');
+            $table->json('structure');
+            $table->foreignId('learning_style_id')->constrained('learning_styles', 'style_id');
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->nullable()->useCurrentOnUpdate();
         });
     }
 

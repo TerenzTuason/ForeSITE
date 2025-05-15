@@ -386,11 +386,11 @@
                 <h2 class="section-title">Available Course</h2>
                 <div class="course-list">
                     <div class="course-card">
-                        <h3>Strategic Futures Thinking: Systems, Models, and Policy Design</h3>
-                        <p style="margin-top: 30px;">A structured course for analytical minds who thrive on logic, models, and critical evaluation. Explore formal frameworks like PESTLE and the Three Horizons to design resilient strategies and understand complex future scenarios through evidence-based reasoning.</p>
-                        <a href="enrollment.html" class="btn btn-enroll">
-                            Enroll Now
-                            <i class="fas fa-arrow-right"></i>
+                        <h3>Loading course information...</h3>
+                        <p style="margin-top: 30px;">Please wait while we fetch your personalized course details...</p>
+                        <a href="#" class="btn btn-enroll">
+                            Loading...
+                            <i class="fas fa-spinner fa-spin"></i>
                         </a>
                     </div>
                 </div>
@@ -411,17 +411,54 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const seeMoreBtn = document.querySelector('.see-more-btn');
-            const courseContent = document.querySelector('.course-content');
-            
-            seeMoreBtn.addEventListener('click', function() {
-                courseContent.classList.toggle('expanded');
-                if (courseContent.classList.contains('expanded')) {
-                    seeMoreBtn.innerHTML = '<i class="fas fa-chevron-up"></i> See Less';
-                } else {
-                    seeMoreBtn.innerHTML = '<i class="fas fa-chevron-down"></i> See More';
-                }
-            });
+            // Get user data from session storage
+            const userData = JSON.parse(sessionStorage.getItem('user'));
+            if (!userData) {
+                window.location.href = '../login.html';
+                return;
+            }
+
+            // Fetch user's assessment results
+            fetch(`http://127.0.0.1:8000/api/v1/users/${userData.user_id}/assessment-results`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.data && data.data.length > 0) {
+                        const assessmentResult = data.data[0]; // Get the most recent result
+                        
+                        // Fetch course details using the course_id from assessment result
+                        fetch(`http://127.0.0.1:8000/api/v1/courses/${assessmentResult.course_id}`)
+                            .then(response => response.json())
+                            .then(courseData => {
+                                const course = courseData.data;
+                                
+                                // Update the course card with fetched data
+                                document.querySelector('.course-card h3').textContent = course.name;
+                                document.querySelector('.course-card p').textContent = course.description;
+                                
+                                // Update the course progress section
+                                document.querySelector('.course-progress').innerHTML = `
+                                    <div class="course-card">
+                                        <h3>${course.name}</h3>
+                                        <p>Your learning style: ${assessmentResult.result.learning_style}</p>
+                                        <div class="course-meta">
+                                            <span><i class="fas fa-chart-line"></i> Progress: Not Started</span>
+                                            <span><i class="fas fa-clock"></i> Enrolled: ${new Date().toLocaleDateString()}</span>
+                                        </div>
+                                        <a href="course.html?id=${course.course_id}" class="btn btn-enroll">
+                                            Start Learning
+                                            <i class="fas fa-arrow-right"></i>
+                                        </a>
+                                    </div>
+                                `;
+                            })
+                            .catch(error => {
+                                console.error('Error fetching course details:', error);
+                            });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching assessment results:', error);
+                });
         });
     </script>
 </body>

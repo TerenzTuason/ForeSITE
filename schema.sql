@@ -89,10 +89,11 @@ CREATE TABLE assessment_results (
     last_name VARCHAR(200),
     department VARCHAR(200),
     user_id INT NOT NULL,
+    course_id INT NOT NULL,
     answers JSON NOT NULL,
     result JSON NOT NULL,
-    course_details JSON,
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (course_id) REFERENCES courses(course_id)
 );
 
 -- Modules table

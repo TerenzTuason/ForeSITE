@@ -38,9 +38,9 @@ class AssessmentResult extends Model
         'last_name',
         'department',
         'user_id',
+        'course_id',
         'answers',
-        'result',
-        'course_details'
+        'result'
     ];
     
     /**
@@ -50,8 +50,7 @@ class AssessmentResult extends Model
      */
     protected $casts = [
         'answers' => 'json',
-        'result' => 'json',
-        'course_details' => 'json'
+        'result' => 'json'
     ];
     
     /**
@@ -60,5 +59,13 @@ class AssessmentResult extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
+    }
+
+    /**
+     * Get the course associated with this assessment result.
+     */
+    public function course(): BelongsTo
+    {
+        return $this->belongsTo(Course::class, 'course_id', 'course_id');
     }
 } 

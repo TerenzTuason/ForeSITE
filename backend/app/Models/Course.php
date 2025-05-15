@@ -9,6 +9,20 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Course extends Model
 {
     /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'courses';
+
+    /**
+     * The primary key for the model.
+     *
+     * @var string
+     */
+    protected $primaryKey = 'course_id';
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array<string>

@@ -16,13 +16,12 @@ class AssessmentResultController extends Controller
      */
     public function index(): JsonResponse
     {
-        $results = AssessmentResult::with('user')->get();
+        $results = AssessmentResult::with(['user', 'course'])->get();
         
         // Decode JSON fields
         foreach ($results as $result) {
             $result->answers = json_decode($result->answers);
             $result->result = json_decode($result->result);
-            $result->course_details = json_decode($result->course_details);
         }
         
         return response()->json(['data' => $results], Response::HTTP_OK);
@@ -38,6 +37,7 @@ class AssessmentResultController extends Controller
             'last_name' => 'required|string|max:200',
             'department' => 'required|string|max:200',
             'user_id' => 'required|exists:users,user_id',
+            'course_id' => 'required|exists:courses,course_id',
             'answers' => 'required|array',
             'answers.answers' => 'required|array',
             'answers.answers.*' => 'required|integer|in:0,1',
@@ -49,13 +49,6 @@ class AssessmentResultController extends Controller
             'result.individual_votes.random_forest' => 'required|string',
             'result.individual_votes.support_vector_machine' => 'required|string',
             'result.learning_style' => 'required|string',
-            'course_details' => 'required|array',
-            'course_details.course_id' => 'required|integer',
-            'course_details.name' => 'required|string',
-            'course_details.description' => 'nullable|string',
-            'course_details.objectives' => 'required|array',
-            'course_details.structure' => 'required|array',
-            'course_details.learning_style_id' => 'required|integer'
         ]);
 
         if ($validator->fails()) {
@@ -67,15 +60,14 @@ class AssessmentResultController extends Controller
             'last_name' => $request->last_name,
             'department' => $request->department,
             'user_id' => $request->user_id,
+            'course_id' => $request->course_id,
             'answers' => json_encode($request->answers),
             'result' => json_encode($request->result),
-            'course_details' => json_encode($request->course_details)
         ]);
 
         // Decode JSON fields for response
         $result->answers = json_decode($result->answers);
         $result->result = json_decode($result->result);
-        $result->course_details = json_decode($result->course_details);
 
         return response()->json(['data' => $result], Response::HTTP_CREATED);
     }
@@ -85,7 +77,7 @@ class AssessmentResultController extends Controller
      */
     public function show(string $id): JsonResponse
     {
-        $result = AssessmentResult::with('user')->find($id);
+        $result = AssessmentResult::with(['user', 'course'])->find($id);
         
         if (!$result) {
             return response()->json(['error' => 'Assessment result not found'], Response::HTTP_NOT_FOUND);
@@ -94,7 +86,6 @@ class AssessmentResultController extends Controller
         // Decode JSON fields
         $result->answers = json_decode($result->answers);
         $result->result = json_decode($result->result);
-        $result->course_details = json_decode($result->course_details);
         
         return response()->json(['data' => $result], Response::HTTP_OK);
     }
@@ -115,6 +106,7 @@ class AssessmentResultController extends Controller
             'last_name' => 'sometimes|required|string|max:200',
             'department' => 'sometimes|required|string|max:200',
             'user_id' => 'sometimes|required|exists:users,user_id',
+            'course_id' => 'sometimes|required|exists:courses,course_id',
             'answers' => 'sometimes|required|array',
             'answers.answers' => 'required|array',
             'answers.answers.*' => 'required|integer|in:0,1',
@@ -126,13 +118,6 @@ class AssessmentResultController extends Controller
             'result.individual_votes.random_forest' => 'required|string',
             'result.individual_votes.support_vector_machine' => 'required|string',
             'result.learning_style' => 'required|string',
-            'course_details' => 'sometimes|required|array',
-            'course_details.course_id' => 'required|integer',
-            'course_details.name' => 'required|string',
-            'course_details.description' => 'nullable|string',
-            'course_details.objectives' => 'required|array',
-            'course_details.structure' => 'required|array',
-            'course_details.learning_style_id' => 'required|integer'
         ]);
 
         if ($validator->fails()) {
@@ -144,6 +129,7 @@ class AssessmentResultController extends Controller
             'last_name' => $request->last_name ?? $result->last_name,
             'department' => $request->department ?? $result->department,
             'user_id' => $request->user_id ?? $result->user_id,
+            'course_id' => $request->course_id ?? $result->course_id,
         ];
 
         if ($request->has('answers')) {
@@ -154,16 +140,11 @@ class AssessmentResultController extends Controller
             $updateData['result'] = json_encode($request->result);
         }
 
-        if ($request->has('course_details')) {
-            $updateData['course_details'] = json_encode($request->course_details);
-        }
-
         $result->update($updateData);
         
         // Decode JSON fields for response
         $result->answers = json_decode($result->answers);
         $result->result = json_decode($result->result);
-        $result->course_details = json_decode($result->course_details);
         
         return response()->json(['data' => $result], Response::HTTP_OK);
     }
