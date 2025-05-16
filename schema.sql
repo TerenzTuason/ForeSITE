@@ -192,8 +192,9 @@ INSERT INTO learning_styles (style_name) VALUES
 ('pragmatist');
 
 -- Insert default courses
-INSERT INTO courses (name, objectives, structure, learning_style_id) VALUES (
+INSERT INTO courses (name, description, objectives, structure, learning_style_id) VALUES (
   'Applied Strategic Foresight: Practical Tools for Future-Ready Decision Making',
+  'This course provides a comprehensive overview of strategic foresight tools and techniques, including scenario planning, driver mapping, and SWOT analysis. It equips learners with the skills to effectively navigate complex decision-making environments and prepare for future challenges.',
   '[
     "Apply futures thinking tools to real policy and business contexts using scenario planning and drivers analysis.",
     "Design and implement future-oriented project frameworks grounded in practical foresight pathways.",
@@ -256,8 +257,9 @@ INSERT INTO courses (name, objectives, structure, learning_style_id) VALUES (
   ]',
   1
 );
-INSERT INTO courses (name, objectives, structure, learning_style_id) VALUES (
+INSERT INTO courses (name, description, objectives, structure, learning_style_id) VALUES (
   'Strategic Futures Thinking: Systems, Models, and Policy Design',
+  'This course provides a comprehensive overview of strategic foresight tools and techniques, including scenario planning, driver mapping, and SWOT analysis. It equips learners with the skills to effectively navigate complex decision-making environments and prepare for future challenges.',
   '[
     "Analyze complex systems using formal models (e.g., Three Horizons Framework, PESTLE, Axes of Uncertainty).",
     "Evaluate and generalize key principles from Futures Thinking applicable across various policy and strategic domains.",
@@ -310,8 +312,9 @@ INSERT INTO courses (name, objectives, structure, learning_style_id) VALUES (
   ]',
   2
 );
-INSERT INTO courses (name, objectives, structure, learning_style_id) VALUES (
+INSERT INTO courses (name, description, objectives, structure, learning_style_id) VALUES (
   'Strategic Futures Thinking: Systems, Models, and Policy Design',
+  'This course provides a comprehensive overview of strategic foresight tools and techniques, including scenario planning, driver mapping, and SWOT analysis. It equips learners with the skills to effectively navigate complex decision-making environments and prepare for future challenges.',
   '[
     "Analyze complex systems using formal models (e.g., Three Horizons Framework, PESTLE, Axes of Uncertainty).",
     "Evaluate and generalize key principles from Futures Thinking applicable across various policy and strategic domains.",
@@ -364,8 +367,9 @@ INSERT INTO courses (name, objectives, structure, learning_style_id) VALUES (
   ]',
   3
 );
-INSERT INTO courses (name, objectives, structure, learning_style_id) VALUES (
+INSERT INTO courses (name, description, objectives, structure, learning_style_id) VALUES (
   'Futures in Reflection: Designing Thoughtful Strategies for Uncertain Times',
+  'This course provides a comprehensive overview of strategic foresight tools and techniques, including scenario planning, driver mapping, and SWOT analysis. It equips learners with the skills to effectively navigate complex decision-making environments and prepare for future challenges.',
   '[
     "Define the principles of Futures Thinking and explain its relevance in policy and strategic planning.",
     "Reflect on trends, changes, and drivers influencing the future across sectors.",

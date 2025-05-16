@@ -416,14 +416,7 @@
                         errorAlert.textContent = errorMsg;
                         errorAlert.style.display = 'block';
                     } else {
-                        // Show success message
-                        successAlert.textContent = 'Registration successful! You can now log in.';
-                        successAlert.style.display = 'block';
-                        
-                        // Reset form
-                        form.reset();
-                        
-                        // No automatic redirect for now
+                        window.location.href = "login.html";
                     }
                 })
                 .catch(error => {
