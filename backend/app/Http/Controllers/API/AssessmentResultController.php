@@ -44,10 +44,13 @@ class AssessmentResultController extends Controller
             'result' => 'required|array',
             'result.confidence' => 'required|numeric',
             'result.individual_votes' => 'required|array',
-            'result.individual_votes.bayesian_network' => 'required|string',
             'result.individual_votes.decision_tree' => 'required|string',
             'result.individual_votes.random_forest' => 'required|string',
             'result.individual_votes.support_vector_machine' => 'required|string',
+            'result.individual_votes.logistic_regression' => 'required|string',
+            'result.individual_votes.cnn' => 'required|string',
+            'result.individual_votes.xgboost' => 'required|string',
+            'result.individual_votes.blending_ensemble' => 'required|string',
             'result.learning_style' => 'required|string',
         ]);
 
@@ -113,10 +116,13 @@ class AssessmentResultController extends Controller
             'result' => 'sometimes|required|array',
             'result.confidence' => 'required|numeric',
             'result.individual_votes' => 'required|array',
-            'result.individual_votes.bayesian_network' => 'required|string',
             'result.individual_votes.decision_tree' => 'required|string',
             'result.individual_votes.random_forest' => 'required|string',
             'result.individual_votes.support_vector_machine' => 'required|string',
+            'result.individual_votes.logistic_regression' => 'required|string',
+            'result.individual_votes.cnn' => 'required|string',
+            'result.individual_votes.xgboost' => 'required|string',
+            'result.individual_votes.blending_ensemble' => 'required|string',
             'result.learning_style' => 'required|string',
         ]);
 

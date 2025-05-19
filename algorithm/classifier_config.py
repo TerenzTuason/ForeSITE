@@ -12,22 +12,49 @@ STYLE_QUESTIONS = {
 MODEL_CONFIG = {
     'decision_tree': {
         'random_state': 42,
-        'max_depth': 10,  # Adjust to control tree complexity
-        'min_samples_split': 2  # Minimum samples required to split a node
-    },
-    'bayesian_network': {
-        'alpha': 1.0  # Smoothing parameter
-    },
-    'support_vector_machine': {
-        'kernel': 'rbf',  # Options: 'rbf', 'linear', 'poly'
-        'random_state': 42,
-        'C': 1.0  # Regularization parameter
+        'max_depth': 10,
+        'min_samples_split': 2
     },
     'random_forest': {
-        'n_estimators': 100,  # Number of trees
+        'n_estimators': 100,
         'random_state': 42,
-        'max_depth': 10,  # Maximum depth of trees
+        'max_depth': 10,
         'min_samples_split': 2
+    },
+    'support_vector_machine': {
+        'kernel': 'rbf',
+        'random_state': 42,
+        'C': 1.0
+    },
+    'logistic_regression': {
+        'random_state': 42,
+        'max_iter': 1000,
+        'multi_class': 'multinomial',
+        'solver': 'lbfgs'
+    },
+    'cnn': {
+        'epochs': 50,
+        'batch_size': 32,
+        'learning_rate': 0.001,
+        'conv_layers': [
+            {'filters': 32, 'kernel_size': 3},
+            {'filters': 64, 'kernel_size': 3}
+        ],
+        'dense_layers': [128, 64]
+    },
+    'xgboost': {
+        'n_estimators': 100,
+        'learning_rate': 0.1,
+        'max_depth': 6,
+        'random_state': 42
+    },
+    'blending_ensemble': {
+        'meta_learner': 'logistic_regression',
+        'base_models': ['decision_tree', 'random_forest', 'support_vector_machine', 'xgboost'],
+        'meta_learner_params': {
+            'random_state': 42,
+            'max_iter': 1000
+        }
     }
 }
 
@@ -43,9 +70,12 @@ CLASSIFICATION_CONFIG = {
     'confidence_threshold': 0.6,  # Minimum confidence level for style prediction
     'style_weights': {  # Weights for each classifier in the voting
         'decision_tree': 1.0,
-        'bayesian_network': 1.0,
+        'random_forest': 1.2,
         'support_vector_machine': 1.0,
-        'random_forest': 1.2  # Giving slightly more weight to Random Forest
+        'logistic_regression': 1.0,
+        'cnn': 1.2,
+        'xgboost': 1.2,
+        'blending_ensemble': 1.3
     }
 }
 
