@@ -442,325 +442,351 @@
           return;
         }
 
-        // Pre-fill personal information fields
-        document.querySelector('input[placeholder="First Name"]').value =
-          userData.first_name;
-        document.querySelector('input[placeholder="Last Name"]').value =
-          userData.last_name;
+        // Add logout functionality
+        const logoutBtn = document.querySelector('.btn-logout');
+        logoutBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          sessionStorage.removeItem('user');
+          window.location.href = '../login.html';
+        });
 
-        // Make name fields readonly since they come from session
-        document.querySelector(
-          'input[placeholder="First Name"]'
-        ).readOnly = true;
-        document.querySelector(
-          'input[placeholder="Last Name"]'
-        ).readOnly = true;
-
-        const nextBtn = document.getElementById("nextBtn");
-        const prevBtn = document.getElementById("prevBtn");
-        const profileSection = document.getElementById("profileSection");
-        const questionnaireSection = document.getElementById(
-          "questionnaireSection"
-        );
-        const questionsContainer =
-          document.getElementById("questionsContainer");
-        const progressBar = document.querySelector(".progress-bar");
-
-        function showQuestions(page) {
-          const start = page * questionsPerPage;
-          const end = start + questionsPerPage;
-          const currentQuestions = questions.slice(start, end);
-
-          questionsContainer.innerHTML = currentQuestions
-            .map((question, index) => {
-              const questionNumber = start + index + 1;
-              const savedAnswer = savedAnswers[start + index];
-              return `
-                    <div class="question-item">
-                        <p class="mb-2"><strong>Q${questionNumber}.</strong> ${question}</p>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="q${questionNumber}" value="agree" required ${
-                savedAnswer === 1 ? "checked" : ""
-              }>
-                            <label class="form-check-label">Agree</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="q${questionNumber}" value="disagree" required ${
-                savedAnswer === 0 ? "checked" : ""
-              }>
-                            <label class="form-check-label">Disagree</label>
-                        </div>
-                    </div>
-                `;
-            })
-            .join("");
-
-          // Add change event listeners to save answers
-          const radios = questionsContainer.querySelectorAll(
-            'input[type="radio"]'
-          );
-          radios.forEach((radio) => {
-            radio.addEventListener("change", function () {
-              const questionNum = parseInt(this.name.substring(1)) - 1;
-              savedAnswers[questionNum] = this.value === "agree" ? 1 : 0;
-            });
+        // Check if user has already taken the assessment
+        fetch(`http://127.0.0.1:8000/api/v1/users/${userData.user_id}/assessment-results`)
+          .then(response => response.json())
+          .then(data => {
+            if (data.data && data.data.length > 0) {
+              // User has already taken the assessment, redirect to enrollment page
+              window.location.href = "enrollment.html";
+              return;
+            }
+            // Continue with the rest of the code if no assessment results found
+            initializeQuestionnaire();
+          })
+          .catch(error => {
+            console.error('Error checking assessment results:', error);
           });
 
-          updateProgress();
-        }
+        function initializeQuestionnaire() {
+          // Pre-fill personal information fields
+          document.querySelector('input[placeholder="First Name"]').value =
+            userData.first_name;
+          document.querySelector('input[placeholder="Last Name"]').value =
+            userData.last_name;
 
-        function getPageAnswers(page) {
-          const start = page * questionsPerPage;
-          const end = start + questionsPerPage;
-          return savedAnswers.slice(start, end);
-        }
+          // Make name fields readonly since they come from session
+          document.querySelector(
+            'input[placeholder="First Name"]'
+          ).readOnly = true;
+          document.querySelector(
+            'input[placeholder="Last Name"]'
+          ).readOnly = true;
 
-        function logAnswers(page) {
-          const start = page * questionsPerPage + 1;
-          const end = start + questionsPerPage - 1;
-          const answers = getPageAnswers(page);
-          console.log(`Q${start} to Q${end} - [${answers.join(",")}]`);
-        }
+          const nextBtn = document.getElementById("nextBtn");
+          const prevBtn = document.getElementById("prevBtn");
+          const profileSection = document.getElementById("profileSection");
+          const questionnaireSection = document.getElementById(
+            "questionnaireSection"
+          );
+          const questionsContainer =
+            document.getElementById("questionsContainer");
+          const progressBar = document.querySelector(".progress-bar");
 
-        function updateProgress() {
-          const totalPages = Math.ceil(questions.length / questionsPerPage);
-          const progress =
-            currentSection === "profile"
-              ? 0
-              : ((currentQuestionPage + 1) / (totalPages + 1)) * 100;
-          progressBar.style.width = `${progress}%`;
-          progressBar.setAttribute("aria-valuenow", progress);
-        }
+          function showQuestions(page) {
+            const start = page * questionsPerPage;
+            const end = start + questionsPerPage;
+            const currentQuestions = questions.slice(start, end);
 
-        nextBtn.addEventListener("click", function () {
-          if (currentSection === "profile") {
-            // Validate personal information fields
-            const firstName = document.querySelector(
-              'input[placeholder="First Name"]'
+            questionsContainer.innerHTML = currentQuestions
+              .map((question, index) => {
+                const questionNumber = start + index + 1;
+                const savedAnswer = savedAnswers[start + index];
+                return `
+                      <div class="question-item">
+                          <p class="mb-2"><strong>Q${questionNumber}.</strong> ${question}</p>
+                          <div class="form-check form-check-inline">
+                              <input class="form-check-input" type="radio" name="q${questionNumber}" value="agree" required ${
+                savedAnswer === 1 ? "checked" : ""
+              }>
+                              <label class="form-check-label">Agree</label>
+                          </div>
+                          <div class="form-check form-check-inline">
+                              <input class="form-check-input" type="radio" name="q${questionNumber}" value="disagree" required ${
+                savedAnswer === 0 ? "checked" : ""
+              }>
+                              <label class="form-check-label">Disagree</label>
+                          </div>
+                      </div>
+                  `;
+              })
+              .join("");
+
+            // Add change event listeners to save answers
+            const radios = questionsContainer.querySelectorAll(
+              'input[type="radio"]'
             );
-            const lastName = document.querySelector(
-              'input[placeholder="Last Name"]'
-            );
-            const department = document.querySelector(
-              'input[placeholder="Department"]'
-            );
-
-            // Check if any field is empty
-            if (!firstName.value.trim()) {
-              alert("Please enter your First Name");
-              firstName.focus();
-              return;
-            }
-            if (!lastName.value.trim()) {
-              alert("Please enter your Last Name");
-              lastName.focus();
-              return;
-            }
-            if (!department.value.trim()) {
-              alert("Please enter your Department");
-              department.focus();
-              return;
-            }
-
-            profileSection.style.display = "none";
-            questionnaireSection.style.display = "block";
-            currentSection = "questionnaire";
-            prevBtn.style.display = "block";
-            showQuestions(currentQuestionPage);
-          } else {
-            // Validate current page questions
-            const start = currentQuestionPage * questionsPerPage;
-            const end = Math.min(start + questionsPerPage, questions.length);
-            let allAnswered = true;
-            let firstUnanswered = null;
-
-            for (let i = start; i < end; i++) {
-              const questionNum = i + 1;
-              const radios = document.getElementsByName(`q${questionNum}`);
-              let isAnswered = false;
-
-              for (const radio of radios) {
-                if (radio.checked) {
-                  isAnswered = true;
-                  break;
-                }
-              }
-
-              if (!isAnswered) {
-                allAnswered = false;
-                if (!firstUnanswered) {
-                  firstUnanswered = questionNum;
-                }
-              }
-            }
-
-            if (!allAnswered) {
-              alert(
-                `Please answer all questions on this page. Question ${firstUnanswered} is not answered.`
-              );
-              const unansweredQuestion = document
-                .querySelector(`[name="q${firstUnanswered}"]`)
-                .closest(".question-item");
-              unansweredQuestion.scrollIntoView({
-                behavior: "smooth",
-                block: "center",
+            radios.forEach((radio) => {
+              radio.addEventListener("change", function () {
+                const questionNum = parseInt(this.name.substring(1)) - 1;
+                savedAnswers[questionNum] = this.value === "agree" ? 1 : 0;
               });
-              return;
-            }
+            });
 
-            // Save current page answers
-            for (let i = start; i < end; i++) {
-              const questionNum = i + 1;
-              const radios = document.getElementsByName(`q${questionNum}`);
-              for (const radio of radios) {
-                if (radio.checked) {
-                  savedAnswers[i] = radio.value === "agree" ? 1 : 0;
-                  break;
-                }
+            updateProgress();
+          }
+
+          function getPageAnswers(page) {
+            const start = page * questionsPerPage;
+            const end = start + questionsPerPage;
+            return savedAnswers.slice(start, end);
+          }
+
+          function logAnswers(page) {
+            const start = page * questionsPerPage + 1;
+            const end = start + questionsPerPage - 1;
+            const answers = getPageAnswers(page);
+            console.log(`Q${start} to Q${end} - [${answers.join(",")}]`);
+          }
+
+          function updateProgress() {
+            const totalPages = Math.ceil(questions.length / questionsPerPage);
+            const progress =
+              currentSection === "profile"
+                ? 0
+                : ((currentQuestionPage + 1) / (totalPages + 1)) * 100;
+            progressBar.style.width = `${progress}%`;
+            progressBar.setAttribute("aria-valuenow", progress);
+          }
+
+          nextBtn.addEventListener("click", function () {
+            if (currentSection === "profile") {
+              // Validate personal information fields
+              const firstName = document.querySelector(
+                'input[placeholder="First Name"]'
+              );
+              const lastName = document.querySelector(
+                'input[placeholder="Last Name"]'
+              );
+              const department = document.querySelector(
+                'input[placeholder="Department"]'
+              );
+
+              // Check if any field is empty
+              if (!firstName.value.trim()) {
+                alert("Please enter your First Name");
+                firstName.focus();
+                return;
               }
-            }
-
-            // Log current page answers
-            logAnswers(currentQuestionPage);
-
-            if (
-              (currentQuestionPage + 1) * questionsPerPage <
-              questions.length
-            ) {
-              currentQuestionPage++;
-              showQuestions(currentQuestionPage);
-            } else {
-              // Check if all questions are answered before final submission
-              if (savedAnswers.includes(null)) {
-                alert("Please answer all questions before submitting.");
+              if (!lastName.value.trim()) {
+                alert("Please enter your Last Name");
+                lastName.focus();
+                return;
+              }
+              if (!department.value.trim()) {
+                alert("Please enter your Department");
+                department.focus();
                 return;
               }
 
-              // Send answers to prediction API
-              fetch("http://127.0.0.1:5000/predict", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ answers: savedAnswers }),
-              })
-                .then((response) => response.json())
-                .then((data) => {
-                  // Fetch courses and find matching learning style
-                  fetch("http://127.0.0.1:8000/api/v1/courses")
-                    .then((response) => response.json())
-                    .then((coursesData) => {
-                      // Find the course matching the predicted learning style
-                      const matchingCourse = coursesData.data.find(
-                        (course) =>
-                          course.learning_style.style_name.toLowerCase() ===
-                          data.learning_style.toLowerCase()
-                      );
+              profileSection.style.display = "none";
+              questionnaireSection.style.display = "block";
+              currentSection = "questionnaire";
+              prevBtn.style.display = "block";
+              showQuestions(currentQuestionPage);
+            } else {
+              // Validate current page questions
+              const start = currentQuestionPage * questionsPerPage;
+              const end = Math.min(start + questionsPerPage, questions.length);
+              let allAnswered = true;
+              let firstUnanswered = null;
 
-                      if (matchingCourse) {
-                        // Get form data
-                        const firstName = userData.first_name;
-                        const lastName = userData.last_name;
-                        const department = document.querySelector(
-                          'input[placeholder="Department"]'
-                        ).value;
+              for (let i = start; i < end; i++) {
+                const questionNum = i + 1;
+                const radios = document.getElementsByName(`q${questionNum}`);
+                let isAnswered = false;
 
-                        // Store assessment results in database with course_id
-                        fetch("http://127.0.0.1:8000/api/v1/assessment-results", {
-                          method: "POST",
-                          headers: {
-                            "Content-Type": "application/json",
-                            Accept: "application/json",
-                          },
-                          body: JSON.stringify({
-                            first_name: firstName,
-                            last_name: lastName,
-                            department: department,
-                            user_id: userData.user_id,
-                            course_id: matchingCourse.course_id,
-                            answers: {
-                              answers: savedAnswers,
-                            },
-                            result: data,
-                          }),
-                        })
-                        .then((response) => {
-                          // Log the request payload
-                          console.log('Request payload:', {
-                            first_name: firstName,
-                            last_name: lastName,
-                            department: department,
-                            user_id: userData.user_id,
-                            course_id: matchingCourse.course_id,
-                            answers: {
-                              answers: savedAnswers,
-                            },
-                            result: data,
-                          });
+                for (const radio of radios) {
+                  if (radio.checked) {
+                    isAnswered = true;
+                    break;
+                  }
+                }
 
-                          if (!response.ok) {
-                            return response.json().then((err) => {
-                              // Log the error details
-                              console.error('Server validation errors:', err);
-                              throw new Error(
-                                err.error
-                                  ? JSON.stringify(err.error)
-                                  : "Failed to store assessment results"
-                              );
-                            });
-                          }
-                          // Navigate to dashboard page
-                          window.location.href = "dashboard.html";
-                        })
-                        .catch((error) => {
-                          console.error('Error storing assessment results:', error);
-                          alert(
-                            "An error occurred while storing your assessment results. Please try again."
-                          );
-                        });
-                      } else {
-                        console.error(
-                          "No matching course found for learning style:",
-                          data.learning_style
-                        );
-                        alert("No matching course found for your learning style. Please try again.");
-                      }
-                    })
-                    .catch((error) => {
-                      console.error("Error fetching courses:", error);
-                      alert("An error occurred while fetching courses. Please try again.");
-                    });
-                })
-                .catch((error) => {
-                  console.error("Error:", error);
-                  alert(
-                    "An error occurred while processing your assessment. Please try again."
-                  );
+                if (!isAnswered) {
+                  allAnswered = false;
+                  if (!firstUnanswered) {
+                    firstUnanswered = questionNum;
+                  }
+                }
+              }
+
+              if (!allAnswered) {
+                alert(
+                  `Please answer all questions on this page. Question ${firstUnanswered} is not answered.`
+                );
+                const unansweredQuestion = document
+                  .querySelector(`[name="q${firstUnanswered}"]`)
+                  .closest(".question-item");
+                unansweredQuestion.scrollIntoView({
+                  behavior: "smooth",
+                  block: "center",
                 });
+                return;
+              }
+
+              // Save current page answers
+              for (let i = start; i < end; i++) {
+                const questionNum = i + 1;
+                const radios = document.getElementsByName(`q${questionNum}`);
+                for (const radio of radios) {
+                  if (radio.checked) {
+                    savedAnswers[i] = radio.value === "agree" ? 1 : 0;
+                    break;
+                  }
+                }
+              }
+
+              // Log current page answers
+              logAnswers(currentQuestionPage);
+
+              if (
+                (currentQuestionPage + 1) * questionsPerPage <
+                questions.length
+              ) {
+                currentQuestionPage++;
+                showQuestions(currentQuestionPage);
+              } else {
+                // Check if all questions are answered before final submission
+                if (savedAnswers.includes(null)) {
+                  alert("Please answer all questions before submitting.");
+                  return;
+                }
+
+                // Send answers to prediction API
+                fetch("http://127.0.0.1:5000/predict", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({ answers: savedAnswers }),
+                })
+                  .then((response) => response.json())
+                  .then((data) => {
+                    // Fetch courses and find matching learning style
+                    fetch("http://127.0.0.1:8000/api/v1/courses")
+                      .then((response) => response.json())
+                      .then((coursesData) => {
+                        // Find the course matching the predicted learning style
+                        const matchingCourse = coursesData.data.find(
+                          (course) =>
+                            course.learning_style.style_name.toLowerCase() ===
+                            data.learning_style.toLowerCase()
+                        );
+
+                        if (matchingCourse) {
+                          // Get form data
+                          const firstName = userData.first_name;
+                          const lastName = userData.last_name;
+                          const department = document.querySelector(
+                            'input[placeholder="Department"]'
+                          ).value;
+
+                          // Store assessment results in database with course_id
+                          fetch("http://127.0.0.1:8000/api/v1/assessment-results", {
+                            method: "POST",
+                            headers: {
+                              "Content-Type": "application/json",
+                              Accept: "application/json",
+                            },
+                            body: JSON.stringify({
+                              first_name: firstName,
+                              last_name: lastName,
+                              department: department,
+                              user_id: userData.user_id,
+                              course_id: matchingCourse.course_id,
+                              answers: {
+                                answers: savedAnswers,
+                              },
+                              result: data,
+                            }),
+                          })
+                          .then((response) => {
+                            // Log the request payload
+                            console.log('Request payload:', {
+                              first_name: firstName,
+                              last_name: lastName,
+                              department: department,
+                              user_id: userData.user_id,
+                              course_id: matchingCourse.course_id,
+                              answers: {
+                                answers: savedAnswers,
+                              },
+                              result: data,
+                            });
+
+                            if (!response.ok) {
+                              return response.json().then((err) => {
+                                // Log the error details
+                                console.error('Server validation errors:', err);
+                                throw new Error(
+                                  err.error
+                                    ? JSON.stringify(err.error)
+                                    : "Failed to store assessment results"
+                                );
+                              });
+                                                         }
+                             // Navigate to enrollment page
+                             window.location.href = "enrollment.html";
+                           })
+                           .catch((error) => {
+                            console.error('Error storing assessment results:', error);
+                            alert(
+                              "An error occurred while storing your assessment results. Please try again."
+                            );
+                          });
+                        } else {
+                          console.error(
+                            "No matching course found for learning style:",
+                            data.learning_style
+                          );
+                          alert("No matching course found for your learning style. Please try again.");
+                        }
+                      })
+                      .catch((error) => {
+                        console.error("Error fetching courses:", error);
+                        alert("An error occurred while fetching courses. Please try again.");
+                      });
+                  })
+                  .catch((error) => {
+                    console.error("Error:", error);
+                    alert(
+                      "An error occurred while processing your assessment. Please try again."
+                    );
+                  });
+              }
             }
-          }
 
-          if (
-            (currentQuestionPage + 1) * questionsPerPage >=
-            questions.length
-          ) {
-            nextBtn.textContent = "Submit";
-          }
-        });
+            if (
+              (currentQuestionPage + 1) * questionsPerPage >=
+              questions.length
+            ) {
+              nextBtn.textContent = "Submit";
+            }
+          });
 
-        prevBtn.addEventListener("click", function () {
-          if (currentQuestionPage === 0) {
-            profileSection.style.display = "block";
-            questionnaireSection.style.display = "none";
-            currentSection = "profile";
-            prevBtn.style.display = "none";
-          } else {
-            currentQuestionPage--;
-            showQuestions(currentQuestionPage);
-          }
-          nextBtn.textContent = "Next";
-          updateProgress();
-        });
+          prevBtn.addEventListener("click", function () {
+            if (currentQuestionPage === 0) {
+              profileSection.style.display = "block";
+              questionnaireSection.style.display = "none";
+              currentSection = "profile";
+              prevBtn.style.display = "none";
+            } else {
+              currentQuestionPage--;
+              showQuestions(currentQuestionPage);
+            }
+            nextBtn.textContent = "Next";
+            updateProgress();
+          });
+        }
       });
     </script>
   </body>

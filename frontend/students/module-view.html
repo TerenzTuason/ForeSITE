@@ -383,6 +383,27 @@
         document.querySelector('.toggle-sidebar').addEventListener('click', function() {
             document.querySelector('.sidebar').classList.toggle('show');
         });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get user data from session storage
+            const userData = JSON.parse(sessionStorage.getItem('user'));
+            if (!userData) {
+                window.location.href = '../login.html';
+                return;
+            }
+
+            // Add logout functionality
+            const logoutBtn = document.querySelector('.btn-logout');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    sessionStorage.removeItem('user');
+                    window.location.href = '../login.html';
+                });
+            }
+
+            // Rest of your code
+        });
     </script>
 </body>
 </html> 

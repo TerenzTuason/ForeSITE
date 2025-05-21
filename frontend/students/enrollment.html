@@ -440,28 +440,54 @@
                 return;
             }
 
+            // Add logout functionality
+            const logoutBtn = document.querySelector('.btn-logout');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    sessionStorage.removeItem('user');
+                    window.location.href = '../login.html';
+                });
+            }
+
+            // Check if user has any enrollments
+            fetch(`http://127.0.0.1:8000/api/v1/users/${userData.user_id}/enrollments`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.data && data.data.length > 0) {
+                        // User is already enrolled in a course, redirect to dashboard
+                        window.location.href = "dashboard.html";
+                        return;
+                    }
+
+                    // Check if user has taken the assessment
+                    fetch(`http://127.0.0.1:8000/api/v1/users/${userData.user_id}/assessment-results`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (!data.data || data.data.length === 0) {
+                                // No assessment results found, redirect to questionnaire
+                                window.location.href = "questionnaire.html";
+                                return;
+                            }
+                            // Continue with enrollment page if assessment exists but no enrollment
+                            const assessmentResult = data.data[0]; // Get the most recent result
+                            fetchCourseDetails(assessmentResult.course_id);
+                        })
+                        .catch(error => {
+                            console.error('Error fetching assessment results:', error);
+                            alert('Error checking assessment status. Please try again later.');
+                        });
+                })
+                .catch(error => {
+                    console.error('Error checking enrollment status:', error);
+                    alert('Error checking enrollment status. Please try again later.');
+                });
+
             // Get course ID from URL parameters
             const urlParams = new URLSearchParams(window.location.search);
             const courseId = urlParams.get('id');
 
-            if (!courseId) {
-                // If no course ID is provided, fetch the user's assessment result to get the recommended course
-                fetch(`http://127.0.0.1:8000/api/v1/users/${userData.user_id}/assessment-results`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.data && data.data.length > 0) {
-                            const assessmentResult = data.data[0]; // Get the most recent result
-                            fetchCourseDetails(assessmentResult.course_id);
-                        } else {
-                            console.error('No assessment results found');
-                            document.querySelector('.course-title').textContent = 'No course found';
-                            document.querySelector('.lead').textContent = 'Please complete the assessment first.';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error fetching assessment results:', error);
-                    });
-            } else {
+            if (courseId) {
                 fetchCourseDetails(courseId);
             }
 

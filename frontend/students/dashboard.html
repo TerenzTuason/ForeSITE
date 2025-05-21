@@ -418,6 +418,16 @@
                 return;
             }
 
+            // Add logout functionality
+            const logoutBtn = document.querySelector('.btn-logout');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    sessionStorage.removeItem('user');
+                    window.location.href = '../login.html';
+                });
+            }
+
             // Fetch user's assessment results
             fetch(`http://127.0.0.1:8000/api/v1/users/${userData.user_id}/assessment-results`)
                 .then(response => response.json())
