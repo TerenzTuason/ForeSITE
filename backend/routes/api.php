@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\ModuleController;
 use App\Http\Controllers\Api\ModuleContentController;
 use App\Http\Controllers\Api\FeedbackController;
 use App\Http\Controllers\Api\CertificateController;
+use App\Http\Controllers\Api\EnrollmentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -105,4 +106,7 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('feedback', FeedbackController::class);
     Route::get('users/{user}/received-feedback', [UserController::class, 'getReceivedFeedback']);
     Route::get('users/{user}/given-feedback', [UserController::class, 'getGivenFeedback']);
+
+    // Enrollments
+    Route::post('/enrollments', [EnrollmentController::class, 'store']);
 });

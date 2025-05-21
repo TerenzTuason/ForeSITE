@@ -30,490 +30,141 @@ Error responses include an `error` key containing the error message:
 }
 ```
 
-## API Endpoints
+## API Flow and Database Interaction
 
-### Roles
+The API provides CRUD (Create, Read, Update, Delete) operations for the main entities in the database schema. Here's how the API routes interact with the database tables:
 
-#### Get All Roles
+### 1. Authentication
+- **POST /api/v1/auth/register**: Register a new user
+- **POST /api/v1/auth/login**: Login a user
 
-- **URL:** `/api/v1/roles`
-- **Method:** `GET`
-- **Response:** List of all roles
+### 2. Users (`users` table)
+- **GET /api/v1/users**: Fetches all users with their associated roles
+- **GET /api/v1/users/{id}**: Fetches a single user with associated role and student profile
+- **POST /api/v1/users**: Creates a new user
+- **PUT /api/v1/users/{id}**: Updates a user
+- **DELETE /api/v1/users/{id}**: Deletes a user
+- **GET /api/v1/users/{user}/role**: Gets the role of a specific user
+- **PUT /api/v1/users/{user}/role**: Updates the role of a specific user
+- **GET /api/v1/users/{user}/enrollments**: Gets all enrollments for a user
+- **GET /api/v1/users/{user}/assessment-results**: Gets all assessment results for a user
+- **GET /api/v1/users/{user}/certificates**: Gets all certificates for a user
+- **GET /api/v1/users/{user}/received-feedback**: Gets feedback received by the user
+- **GET /api/v1/users/{user}/given-feedback**: Gets feedback given by the user
 
-Example Response:
-```json
-{
-    "data": [
-        {
-            "role_id": 1,
-            "role_name": "student",
-            "description": "Regular student user"
-        },
-        {
-            "role_id": 2,
-            "role_name": "faculty",
-            "description": "Faculty member with teaching privileges"
-        },
-        {
-            "role_id": 3,
-            "role_name": "admin",
-            "description": "System administrator with full access"
-        }
-    ]
-}
-```
+### 3. Roles (`roles` table)
+- **GET /api/v1/roles**: List all roles
+- **GET /api/v1/roles/{id}**: Get specific role
+- **POST /api/v1/roles**: Create a new role
+- **PUT /api/v1/roles/{id}**: Update a role
+- **DELETE /api/v1/roles/{id}**: Delete a role
 
-#### Get Role by ID
+### 4. Learning Styles (`learning_styles` table)
+- **GET /api/v1/learning-styles**: List all learning styles
+- **GET /api/v1/learning-styles/{id}**: Get specific learning style
+- **POST /api/v1/learning-styles**: Create a new learning style
+- **PUT /api/v1/learning-styles/{id}**: Update a learning style
+- **DELETE /api/v1/learning-styles/{id}**: Delete a learning style
 
-- **URL:** `/api/v1/roles/{id}`
-- **Method:** `GET`
-- **Response:** Single role
+### 5. Student Profiles (`student_profiles` table)
+- **GET /api/v1/student-profiles**: List all student profiles
+- **GET /api/v1/student-profiles/{id}**: Get specific student profile
+- **POST /api/v1/student-profiles**: Create a new student profile
+- **PUT /api/v1/student-profiles/{id}**: Update a student profile
+- **DELETE /api/v1/student-profiles/{id}**: Delete a student profile
 
-Example Response:
-```json
-{
+### 6. Assessment Results (`assessment_results` table)
+- **GET /api/v1/assessment-results**: List all assessment results
+- **GET /api/v1/assessment-results/{id}**: Get specific assessment result
+- **POST /api/v1/assessment-results**: Create a new assessment result
+- **PUT /api/v1/assessment-results/{id}**: Update an assessment result
+- **DELETE /api/v1/assessment-results/{id}**: Delete an assessment result
+
+### 7. Courses (`courses` table)
+- **GET /api/v1/courses**: List all courses
+- **GET /api/v1/courses/{id}**: Get specific course
+- **POST /api/v1/courses**: Create a new course
+- **PUT /api/v1/courses/{id}**: Update a course
+- **DELETE /api/v1/courses/{id}**: Delete a course
+- **GET /api/v1/courses/{course}/enrollments**: Get course enrollments
+- **POST /api/v1/courses/{course}/enrollments**: Add new enrollment
+- **DELETE /api/v1/courses/{course}/enrollments/{enrollment}**: Remove enrollment
+- **GET /api/v1/courses/{course}/certificates**: Get course certificates
+
+### 8. Modules (`modules` table)
+- **GET /api/v1/courses/{course}/modules**: List course modules
+- **GET /api/v1/modules/{id}**: Get specific module
+- **POST /api/v1/courses/{course}/modules**: Create a new module
+- **PUT /api/v1/modules/{id}**: Update a module
+- **DELETE /api/v1/modules/{id}**: Delete a module
+
+### 9. Module Contents (`module_contents` table)
+- **GET /api/v1/modules/{module}/contents**: List all content for a module
+- **GET /api/v1/contents/{id}**: Get specific content
+- **POST /api/v1/modules/{module}/contents**: Create new content
+- **PUT /api/v1/contents/{id}**: Update content
+- **DELETE /api/v1/contents/{id}**: Delete content
+
+### 10. Certificates (`certificates` table)
+- **GET /api/v1/certificates**: List all certificates
+- **GET /api/v1/certificates/{id}**: Get specific certificate
+- **POST /api/v1/certificates**: Create a new certificate
+- **PUT /api/v1/certificates/{id}**: Update a certificate
+- **DELETE /api/v1/certificates/{id}**: Delete a certificate
+
+### 11. Feedback (`feedback` table)
+- **GET /api/v1/feedback**: List all feedback
+- **GET /api/v1/feedback/{id}**: Get specific feedback
+- **POST /api/v1/feedback**: Create a new feedback
+- **PUT /api/v1/feedback/{id}**: Update a feedback
+- **DELETE /api/v1/feedback/{id}**: Delete a feedback
+
+### 12. Enrollments (`enrollments` table)
+- **POST /api/v1/enrollments**: Create a new enrollment
+  ```json
+  {
+    "user_id": 1,
+    "course_id": 1,
+    "assessment_result_id": 1
+  }
+  ```
+  **Response (201 Created)**
+  ```json
+  {
+    "status": "success",
+    "message": "Enrollment created successfully",
     "data": {
-        "role_id": 1,
-        "role_name": "student",
-        "description": "Regular student user"
+      "enrollment_id": 1,
+      "user_id": 1,
+      "course_id": 1,
+      "assessment_result_id": 1,
+      "enrollment_date": "2024-03-20T12:00:00Z",
+      "completion_status": "not_started",
+      "completion_date": null
     }
-}
-```
-
-#### Create Role
-
-- **URL:** `/api/v1/roles`
-- **Method:** `POST`
-- **Request Body:**
-  ```json
-  {
-      "role_name": "student",
-      "description": "Regular student user"
   }
   ```
-- **Response:** Created role
-
-#### Update Role
-
-- **URL:** `/api/v1/roles/{id}`
-- **Method:** `PUT`
-- **Request Body:**
-  ```json
-  {
-      "description": "Updated description"
-  }
-  ```
-- **Response:** Updated role
-
-#### Delete Role
-
-- **URL:** `/api/v1/roles/{id}`
-- **Method:** `DELETE`
-- **Response:** No content (204)
-
-### Users
-
-#### Get All Users
-
-- **URL:** `/api/v1/users`
-- **Method:** `GET`
-- **Response:** List of all users with their roles
-
-Example Response:
-```json
-{
-    "data": [
-        {
-            "user_id": 1,
-            "role_id": 3,
-            "email": "admin@example.com",
-            "first_name": "John",
-            "last_name": "Doe",
-            "created_at": "2023-05-07T04:00:00.000000Z",
-            "last_login": null,
-            "is_active": true,
-            "role": {
-                "role_id": 3,
-                "role_name": "admin",
-                "description": "System administrator with full access"
-            }
-        }
-    ]
-}
-```
-
-#### Get User by ID
-
-- **URL:** `/api/v1/users/{id}`
-- **Method:** `GET`
-- **Response:** Single user with role and student profile if exists
-
-#### Create User
-
-- **URL:** `/api/v1/users`
-- **Method:** `POST`
-- **Request Body:**
-  ```json
-  {
-      "role_id": 1,
-      "email": "student@example.com",
-      "password": "password123",
-      "first_name": "John",
-      "last_name": "Doe",
-      "is_active": true
-  }
-  ```
-- **Response:** Created user
-
-#### Update User
-
-- **URL:** `/api/v1/users/{id}`
-- **Method:** `PUT`
-- **Request Body:**
-  ```json
-  {
-      "first_name": "Updated Name"
-  }
-  ```
-- **Response:** Updated user
-
-#### Delete User
-
-- **URL:** `/api/v1/users/{id}`
-- **Method:** `DELETE`
-- **Response:** No content (204)
-
-### Learning Styles
-
-#### Get All Learning Styles
-
-- **URL:** `/api/v1/learning-styles`
-- **Method:** `GET`
-- **Response:** List of all learning styles
-
-Example Response:
-```json
-{
-    "data": [
-        {
-            "style_id": 1,
-            "style_name": "activist",
-            "description": "Learns by doing and experiencing"
-        },
-        {
-            "style_id": 2,
-            "style_name": "reflector",
-            "description": "Learns by observing and thinking"
-        },
-        {
-            "style_id": 3,
-            "style_name": "theorist",
-            "description": "Learns by understanding underlying reasons"
-        },
-        {
-            "style_id": 4,
-            "style_name": "pragmatist",
-            "description": "Learns by practical application"
-        }
-    ]
-}
-```
-
-#### Get Learning Style by ID
-
-- **URL:** `/api/v1/learning-styles/{id}`
-- **Method:** `GET`
-- **Response:** Single learning style
-
-#### Create Learning Style
-
-- **URL:** `/api/v1/learning-styles`
-- **Method:** `POST`
-- **Request Body:**
-  ```json
-  {
-      "style_name": "tactile",
-      "description": "Preference for hands-on learning"
-  }
-  ```
-- **Response:** Created learning style
-
-#### Update Learning Style
-
-- **URL:** `/api/v1/learning-styles/{id}`
-- **Method:** `PUT`
-- **Request Body:**
-  ```json
-  {
-      "description": "Updated description"
-  }
-  ```
-- **Response:** Updated learning style
-
-#### Delete Learning Style
-
-- **URL:** `/api/v1/learning-styles/{id}`
-- **Method:** `DELETE`
-- **Response:** No content (204)
-
-### Student Profiles
-
-#### Get All Student Profiles
-
-- **URL:** `/api/v1/student-profiles`
-- **Method:** `GET`
-- **Response:** List of all student profiles with their users and learning styles
-
-#### Get Student Profile by ID
-
-- **URL:** `/api/v1/student-profiles/{id}`
-- **Method:** `GET`
-- **Response:** Single student profile with user and learning style
-
-#### Create Student Profile
-
-- **URL:** `/api/v1/student-profiles`
-- **Method:** `POST`
-- **Request Body:**
-  ```json
-  {
-      "user_id": 2,
-      "dominant_learning_style_id": 1
-  }
-  ```
-- **Response:** Created student profile
-
-#### Update Student Profile
-
-- **URL:** `/api/v1/student-profiles/{id}`
-- **Method:** `PUT`
-- **Request Body:**
-  ```json
-  {
-      "dominant_learning_style_id": 2
-  }
-  ```
-- **Response:** Updated student profile
-
-#### Delete Student Profile
-
-- **URL:** `/api/v1/student-profiles/{id}`
-- **Method:** `DELETE`
-- **Response:** No content (204)
-
-### Courses
-
-#### Get All Courses
-
-- **URL:** `/api/v1/courses`
-- **Method:** `GET`
-- **Response:** List of all courses
-
-Example Response:
-```json
-{
-    "data": [
-        {
-            "course_id": 1,
-            "name": "Introduction to Futures Thinking",
-            "description": "Learn the basics of futures thinking",
-            "objectives": [
-                "obj1",
-                "obj2",
-                "obj3",
-                "obj4",
-                "obj5"
-            ],
-            "structure": [
-                {
-                    "module": "Module 1",
-                    "title": "Introduction to Futures Thinking",
-                    "focus": "Formal models (e.g., Three Horizons), strategic preparedness, and analytical comparison"
-                },
-                {
-                    "module": "Module 2",
-                    "title": "Introduction to Futures Thinking",
-                    "focus": "Formal models (e.g., Three Horizons), strategic preparedness, and analytical comparison"
-                },
-                {
-                    "module": "Module 3",
-                    "title": "Introduction to Futures Thinking",
-                    "focus": "Formal models (e.g., Three Horizons), strategic preparedness, and analytical comparison"
-                }
-            ],
-            "learning_style_id": 1,
-            "created_at": "2023-05-07T04:00:00.000000Z"
-        }
-    ]
-}
-```
-
-### Assessment Results
-
-#### Get All Assessment Results
-
-- **URL:** `/api/v1/assessment-results`
-- **Method:** `GET`
-- **Response:** List of all assessment results
-
-Example Response:
-```json
-{
-    "data": [
-        {
-            "result_id": 1,
-            "first_name": "John",
-            "last_name": "Doe",
-            "department": "Engineering",
-            "user_id": 1,
-            "answers": {
-                "answers": [
-                    0, 0, 0, 0, 0, 0, 1, 0, 0, 0,
-                    0, 0, 1, 0, 1, 1, 0, 0, 0, 0,
-                    0, 0, 0, 0, 1, 1, 0, 1, 1, 0,
-                    1, 0, 1, 0, 0, 1, 0, 0, 1, 0,
-                    0, 1, 0, 0, 0, 1, 0, 0, 0, 0,
-                    0, 1, 0, 0, 1, 0, 0, 0, 0, 1,
-                    0, 1, 0, 0, 0, 1, 1, 0, 0, 0,
-                    0, 0, 0, 0, 0, 1, 1, 0, 0, 0
-                ]
-            },
-            "result": {
-                "confidence": 1.0,
-                "individual_votes": {
-                    "bayesian_network": "Reflector",
-                    "decision_tree": "Reflector",
-                    "random_forest": "Reflector",
-                    "support_vector_machine": "Reflector"
-                },
-                "learning_style": "Reflector"
-            }
-        }
-    ]
-}
-```
-
-### Modules
-
-#### Get Course Modules
-
-- **URL:** `/api/v1/courses/{course_id}/modules`
-- **Method:** `GET`
-- **Response:** List of modules for a course
-
-Example Response:
-```json
-{
-    "data": [
-        {
-            "module_id": 1,
-            "course_id": 1,
-            "title": "Introduction to Futures Thinking",
-            "description": "Learn the basics of futures thinking",
-            "sequence_order": 1,
-            "prerequisite_module_id": null,
-            "passing_score": 75,
-            "created_at": "2023-05-07T04:00:00.000000Z",
-            "updated_at": null
-        }
-    ]
-}
-```
-
-### Module Contents
-
-#### Get Module Contents
-
-- **URL:** `/api/v1/modules/{module_id}/contents`
-- **Method:** `GET`
-- **Response:** List of contents for a module
-
-Example Response:
-```json
-{
-    "data": [
-        {
-            "content_id": 1,
-            "module_id": 1,
-            "content_type": "text",
-            "content_title": "Introduction",
-            "content_data": "Content text goes here",
-            "learning_style_id": 1,
-            "sequence_order": 1,
-            "created_at": "2023-05-07T04:00:00.000000Z",
-            "updated_at": null
-        }
-    ]
-}
-```
-
-### Certificates
-
-#### Get User Certificates
-
-- **URL:** `/api/v1/users/{user_id}/certificates`
-- **Method:** `GET`
-- **Response:** List of certificates for a user
-
-Example Response:
-```json
-{
-    "data": [
-        {
-            "certificate_id": 1,
-            "user_id": 1,
-            "course_id": 1,
-            "issue_date": "2023-05-07T04:00:00.000000Z",
-            "certificate_url": "https://example.com/certificates/1"
-        }
-    ]
-}
-```
-
-### Feedback
-
-#### Get User Feedback
-
-- **URL:** `/api/v1/users/{user_id}/received-feedback`
-- **Method:** `GET`
-- **Response:** List of feedback received by a user
-
-Example Response:
-```json
-{
-    "data": [
-        {
-            "feedback_id": 1,
-            "faculty_id": 2,
-            "student_id": 1,
-            "module_id": 1,
-            "feedback_text": "Great work on this module!",
-            "rating": 5,
-            "created_at": "2023-05-07T04:00:00.000000Z"
-        }
-    ]
-}
-```
+  **Error Responses**
+  - 409 Conflict: User already enrolled in the course
+  - 422 Unprocessable Entity: Validation failed (invalid/missing fields)
+  - 500 Internal Server Error: Something went wrong during enrollment creation
 
 ## Testing with Postman or APIdog
 
 1. Import the following cURL commands into your API client to test the API:
 
-```
+```bash
+# Get all roles
 curl -X GET "http://localhost:8000/api/v1/roles" -H "Accept: application/json"
-```
 
-```
-curl -X POST "http://localhost:8000/api/v1/users" \
+# Create a new enrollment
+curl -X POST "http://localhost:8000/api/v1/enrollments" \
   -H "Content-Type: application/json" \
   -H "Accept: application/json" \
   -d '{
-    "role_id": 1,
-    "email": "student@example.com",
-    "password": "password123",
-    "first_name": "John",
-    "last_name": "Doe",
-    "is_active": true
+    "user_id": 1,
+    "course_id": 1,
+    "assessment_result_id": 1
 }'
 ```
 

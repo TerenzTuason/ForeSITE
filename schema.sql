@@ -88,13 +88,13 @@ CREATE TABLE enrollments (
     enrollment_id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
     course_id INT NOT NULL,
-    assessment_id INT NOT NULL,
+    assessment_result_id INT NOT NULL,
     enrollment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     completion_status ENUM('not_started', 'in_progress', 'completed') DEFAULT 'not_started',
     completion_date TIMESTAMP NULL,
     FOREIGN KEY (user_id) REFERENCES users(user_id),
     FOREIGN KEY (course_id) REFERENCES courses(course_id),
-    FOREIGN KEY (assessment_id) REFERENCES assessment_results(result_id),
+    FOREIGN KEY (assessment_result_id) REFERENCES assessment_results(result_id),
     UNIQUE KEY unique_enrollment (user_id, course_id)
 );
 
