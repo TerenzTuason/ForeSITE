@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ForeSITE Adaptive Learning System</title>
+    <!-- Google Fonts - Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles/main.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Responsive Container */
+        .container {
+            width: 100%;
+            padding-right: 15px;
+            padding-left: 15px;
+            margin-right: auto;
+            margin-left: auto;
+            max-width: 100%;
+        }
+
+        @media (min-width: 576px) {
+            .container {
+                max-width: 540px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                max-width: 720px;
+            }
+        }
+
+        @media (min-width: 992px) {
+            .container {
+                max-width: 960px;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .container {
+                max-width: 1140px;
+            }
+        }
+
+        @media (min-width: 1400px) {
+            .container {
+                max-width: 1320px;
+            }
+        }
+
+        /* Navigation Styles */
+        .navbar {
+            padding: 1rem 0;
+            background: #800000;
+        }
+
+        .navbar-brand img {
+            height: 35px;
+        }
+
+        @media (max-width: 576px) {
+            .navbar-brand img {
+                height: 30px;
+            }
+        }
+
+        /* Hero Section Responsive Styles */
+        .hero-section {
+            min-height: 80vh;
+            padding: 4rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .hero-section {
+                min-height: 70vh;
+                padding: 3rem 0;
+            }
+
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.5rem;
+            }
+
+            .hero-description {
+                font-size: 1.1rem;
+                padding: 0 1rem;
+            }
+
+            .hero-button {
+                padding: 0.8rem 2rem;
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero-section {
+                min-height: 60vh;
+                padding: 2rem 0;
+            }
+
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.25rem;
+            }
+
+            .hero-description {
+                font-size: 1rem;
+                padding: 0 0.5rem;
+            }
+        }
+
+        /* Core Principle Section Responsive */
+        .core-principle-section {
+            padding: 6rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .core-principle-section {
+                padding: 4rem 0;
+            }
+
+            .principle-card {
+                padding: 2rem;
+            }
+
+            .principle-card .lead {
+                font-size: 1.1rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+        }
+
+        /* Objectives Section Responsive */
+        .specific-objectives {
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        }
+
+        @media (max-width: 992px) {
+            .objective-card {
+                padding: 2rem;
+            }
+
+            .objective-card h3 {
+                font-size: 1.5rem;
+            }
+
+            .objective-item {
+                padding: 1.5rem;
+            }
+
+            .objective-item h4 {
+                font-size: 1.2rem;
+            }
+        }
+
+        /* Team Section Responsive */
+        .team-grid {
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            padding: 0 1rem;
+        }
+
+        .team-grid .bottom-row {
+            padding: 0 2rem;
+        }
+
+        @media (max-width: 992px) {
+            .team-grid .bottom-row {
+                padding: 0 1rem;
+            }
+
+            .team-member {
+                padding: 2rem;
+            }
+
+            .team-member h3 {
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .team-grid {
+                gap: 1.5rem;
+                padding: 0;
+            }
+
+            .team-grid .bottom-row {
+                padding: 0;
+            }
+
+            .team-member {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Footer Responsive */
+        @media (max-width: 768px) {
+            .footer {
+                text-align: center;
+            }
+
+            .footer .text-md-end {
+                text-align: center !important;
+                margin-top: 1rem;
+            }
+        }
+
+        /* Scroll to Top Button Responsive */
+        @media (max-width: 576px) {
+            .scroll-to-top {
+                bottom: 15px;
+                right: 15px;
+                width: 35px;
+                height: 35px;
+            }
+
+            .scroll-to-top i {
+                font-size: 1.2rem;
+            }
+        }
+
+        /* Modern UI Styles */
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(120deg, #800000, #FFD700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+        }
+
+        .section-subtitle {
+            color: #666;
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        /* Core Principle Styles */
+        .core-principle-section {
+            background: #800000;
+            position: relative;
+            overflow: hidden;
+            padding: 8rem 0;
+        }
+
+        .core-principle-section .section-title {
+            background: linear-gradient(120deg, #FFD700, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .core-principle-section .section-subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 2rem;
+        }
+
+        .principle-card {
+            background: white;
+            border-radius: 30px;
+            padding: 4.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .principle-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255, 215, 0, 0.05), rgba(255, 255, 255, 0.1));
+            border-radius: 30px;
+            z-index: -1;
+        }
+
+        .principle-card .feature-icon {
+            font-size: 4rem;
+            color: #800000;
+            margin-bottom: 2rem;
+            background: linear-gradient(45deg, #800000, #FFD700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .principle-card .lead {
+            font-size: 1.4rem;
+            line-height: 1.8;
+            color: #444;
+            font-weight: 400;
+            margin-bottom: 0;
+        }
+
+        /* Objectives Styles */
+        .objectives-section {
+            background: #fff;
+            padding: 7rem 0;
+            position: relative;
+        }
+
+        .objectives-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(128, 0, 0, 0.2), transparent);
+        }
+
+        .objective-card {
+            background: #800000;
+            border-radius: 30px;
+            padding: 3rem;
+            margin-bottom: 4rem;
+            transform: translateZ(0);
+            transition: all 0.3s ease;
+            box-shadow: 0 15px 30px rgba(128, 0, 0, 0.15);
+        }
+
+        .objective-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: #FFD700;
+            font-weight: 600;
+        }
+
+        .objective-card p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 300;
+        }
+
+        .specific-objectives {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .objective-item {
+            background: white;
+            border-radius: 25px;
+            padding: 2.5rem;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(128, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .objective-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #800000, #FFD700);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+            transform-origin: left;
+        }
+
+        .objective-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .objective-item:hover::before {
+            transform: scaleX(1);
+        }
+
+        .objective-item h4 {
+            color: #800000;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .objective-item i {
+            font-size: 2rem;
+            color: #FFD700;
+            background: linear-gradient(45deg, #800000, #FFD700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .objective-item p {
+            color: #666;
+            line-height: 1.7;
+            font-size: 1.1rem;
+            font-weight: 300;
+        }
+
+        /* Team Section Styles */
+        .team-section {
+            background: #800000;
+            padding: 7rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .team-section .section-title {
+            background: linear-gradient(120deg, #FFD700, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .team-section .section-subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 4rem;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2.5rem;
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .team-grid .bottom-row {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2.5rem;
+            margin-top: 2.5rem;
+            padding: 0 8rem;
+        }
+
+        @media (max-width: 1200px) {
+            .team-grid .bottom-row {
+                padding: 0 4rem;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .team-grid .bottom-row {
+                padding: 0 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .team-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            .team-grid .bottom-row {
+                grid-template-columns: 1fr;
+                padding: 0;
+                margin-top: 1.5rem;
+            }
+        }
+
+        .team-member {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            text-align: center;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .team-member::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(255, 215, 0, 0.1), rgba(255, 255, 255, 0.1));
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .team-member:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .team-member:hover::before {
+            opacity: 1;
+        }
+
+        .team-member .member-avatar {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .team-member .member-avatar::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #800000, #FFD700);
+            opacity: 0.1;
+            z-index: -1;
+            transition: all 0.4s ease;
+        }
+
+        .team-member:hover .member-avatar::before {
+            transform: scale(1.1);
+            opacity: 0.2;
+        }
+
+        .team-member i {
+            font-size: 4rem;
+            background: linear-gradient(45deg, #800000, #FFD700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .team-member h3 {
+            color: #800000;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin: 0;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 10px;
+        }
+
+        .team-member h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%) scaleX(0);
+            width: 80%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #FFD700, transparent);
+            transition: transform 0.4s ease;
+        }
+
+        .team-member:hover h3::after {
+            transform: translateX(-50%) scaleX(1);
+        }
+
+        .team-member .role {
+            color: #666;
+            font-size: 1rem;
+            font-weight: 400;
+            margin-top: 0.5rem;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fadeInUp {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        /* Footer Styles */
+        .footer {
+            background: white;
+            color: #800000;
+        }
+
+        .footer p {
+            font-weight: 600;
+            margin-bottom: 0;
+        }
+
+        .footer a {
+            color: #800000 !important;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            font-weight: 600;
+        }
+
+        .footer a:hover {
+            color: #FFD700 !important;
+        }
+
+        /* Hero Section Styles */
+        .hero-section {
+            background: #ffffff;
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('assets/pattern.png') repeat;
+            opacity: 0.1;
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: #800000;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .hero-description {
+            font-size: 1.25rem;
+            color: #666;
+            margin-bottom: 2rem;
+            line-height: 1.8;
+            font-weight: 300;
+        }
+
+        .hero-button {
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: #800000;
+            color: #ffffff;
+            border: none;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(128, 0, 0, 0.2);
+        }
+
+        .hero-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(128, 0, 0, 0.3);
+            background: #FFD700;
+            color: #800000;
+        }
+
+        /* Section Titles */
+        .section-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+        }
+
+        .section-subtitle {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 300;
+        }
+
+        /* Cards and Text */
+        .principle-card .lead,
+        .objective-card p,
+        .objective-item p,
+        .team-member h3 {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .navbar-brand {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+        }
+
+        .nav-link {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            .hero-subtitle {
+                font-size: 1.5rem;
+            }
+            .hero-description {
+                font-size: 1.1rem;
+            }
+            .principle-card {
+                padding: 2.5rem;
+            }
+            .principle-card .lead {
+                font-size: 1.2rem;
+            }
+            .specific-objectives {
+                grid-template-columns: 1fr;
+            }
+            .objective-item {
+                padding: 2rem;
+            }
+            .team-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 1.5rem;
+            }
+            .team-member {
+                padding: 2rem;
+            }
+        }
+
+        /* Scroll to Top Button */
+        .scroll-to-top {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background: #800000;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FFD700;
+            text-decoration: none;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+
+        .scroll-to-top.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .scroll-to-top:hover {
+            background: #FFD700;
+            color: #800000;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .scroll-to-top i {
+            font-size: 1.5rem;
+        }
+
+        /* Objectives Section Enhanced Responsive Styles */
+        .objectives-section {
+            padding: 5rem 1rem;
+        }
+
+        .objective-card {
+            margin-bottom: 2rem;
+            padding: 2.5rem 2rem;
+        }
+
+        .specific-objectives {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+            padding: 0;
+        }
+
+        @media (max-width: 1200px) {
+            .specific-objectives {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .objectives-section {
+                padding: 3rem 1rem;
+            }
+
+            .specific-objectives {
+                grid-template-columns: 1fr;
+                gap: 1.25rem;
+            }
+
+            .objective-card {
+                padding: 2rem 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .objective-card h3 {
+                font-size: 1.5rem;
+                margin-bottom: 1rem;
+            }
+
+            .objective-card p {
+                font-size: 1rem;
+            }
+
+            .objective-item {
+                padding: 1.75rem;
+            }
+
+            .objective-item h4 {
+                font-size: 1.2rem;
+                gap: 0.75rem;
+            }
+
+            .objective-item i {
+                font-size: 1.75rem;
+            }
+
+            .objective-item p {
+                font-size: 0.95rem;
+                line-height: 1.6;
+            }
+        }
+
+        /* Team Section Enhanced Responsive Styles */
+        .team-section {
+            padding: 5rem 1rem;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0;
+        }
+
+        .team-grid .bottom-row {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-top: 2rem;
+            padding: 0 4rem;
+        }
+
+        .team-member {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        @media (max-width: 1200px) {
+            .team-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+            }
+
+            .team-grid .bottom-row {
+                padding: 0 2rem;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .team-section {
+                padding: 4rem 1rem;
+            }
+
+            .team-grid .bottom-row {
+                padding: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .team-grid {
+                grid-template-columns: 1fr;
+                gap: 1.25rem;
+            }
+
+            .team-grid .bottom-row {
+                grid-template-columns: 1fr;
+                margin-top: 1.25rem;
+            }
+
+            .team-member {
+                padding: 1.75rem;
+            }
+
+            .team-member .member-avatar {
+                width: 100px;
+                height: 100px;
+                margin-bottom: 1rem;
+            }
+
+            .team-member i {
+                font-size: 3.5rem;
+            }
+
+            .team-member h3 {
+                font-size: 1.15rem;
+                padding-bottom: 8px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .team-section {
+                padding: 3rem 1rem;
+            }
+
+            .team-grid {
+                gap: 1rem;
+            }
+
+            .team-member {
+                padding: 1.5rem;
+            }
+
+            .team-member .member-avatar {
+                width: 80px;
+                height: 80px;
+            }
+
+            .team-member i {
+                font-size: 3rem;
+            }
+
+            .team-member h3 {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img src="assets/logo/pup.png" alt="PUP Logo" height="40" class="me-2">
+                <span class="d-none d-sm-inline">FORESITE: Adaptive Collaborative Learning System</span>
+                <span class="d-inline d-sm-none">FORESITE</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav align-items-center">
+                    <li class="nav-item mx-3">
+                        <a class="nav-link py-2" href="#core-principle">Core Principle</a>
+                    </li>
+                    <li class="nav-item mx-3">
+                        <a class="nav-link py-2" href="#objectives">Objectives</a>
+                    </li>
+                    <li class="nav-item mx-3">
+                        <a class="nav-link py-2" href="#team">Team</a>
+                    </li>
+                    <li class="nav-item mt-2 mt-lg-0 ms-3">
+                        <a class="nav-link btn btn-primary px-4 rounded" style="background-color: #FFD700; color: #800000 !important;" href="login.html">Sign In</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero-section">
+        <div class="container">
+            <div class="hero-content animate-fadeInUp">
+                <h1 class="hero-title">Welcome to ForeSITE</h1>
+                <h2 class="hero-subtitle">Adaptive Learning System</h2>
+                <p class="hero-description">Empowering learners through personalized education and innovative technology. Experience the future of learning with our adaptive collaborative platform.</p>
+                <a href="login.html" class="btn hero-button">Get Started</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Core Principle Section -->
+    <section class="core-principle-section py-20" id="core-principle">
+        <div class="container">
+            <h2 class="section-title mb-2">Core Principle</h2>
+            <p class="section-subtitle mb-4">Our foundation for innovative education</p>
+            <div class="row justify-content-center">
+                <div class="col-lg-10 animate-fadeInUp">
+                    <div class="principle-card text-center">
+                        <i class="fas fa-lightbulb feature-icon"></i>
+                        <p class="lead">Empowering Futures Thinking Education Through an Adaptive Learning System that personalizes learner experience using Hard Majority Voting for learning style assessment and K-Means Clustering for dynamic collaborative group formation.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Objectives Section -->
+    <section class="objectives-section" id="objectives">
+        <div class="container">
+            <h2 class="section-title text-center mb-2">Objectives</h2>
+            <p class="section-subtitle text-center mb-5">Driving innovation in adaptive learning</p>
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="objective-card">
+                        <h3>General Objective</h3>
+                        <p>To develop and evaluate an Adaptive Learning System (ALS) for Futures Thinking education which employs Hard Majority Voting for Honey and Mumford model learner style assessment and K-Means Clustering for collaborative group creation.</p>
+                    </div>
+                    
+                    <div class="specific-objectives">
+                        <div class="objective-item">
+                            <h4><i class="fas fa-laptop-code"></i>Accessible Online ALS</h4>
+                            <p>Design and develop an accessible online Adaptive Learning System with automatic content adaptation based on Honey and Mumford model learner style results.</p>
+                        </div>
+                        <div class="objective-item">
+                            <h4><i class="fas fa-book-reader"></i>Learning Modules Integration</h4>
+                            <p>Create and integrate various learning modules based on "The Futures Toolkit", catering to all four learning styles: Activist, Reflector, Theorist, and Pragmatist.</p>
+                        </div>
+                        <div class="objective-item">
+                            <h4><i class="fas fa-brain"></i>Learner Classification</h4>
+                            <p>Implement Hard Majority Voting with multiple algorithms to determine accurate learner classifications using the Honey and Mumford Learning Styles model.</p>
+                        </div>
+                        <div class="objective-item">
+                            <h4><i class="fas fa-users-cog"></i>Collaborative Team Building</h4>
+                            <p>Apply K-Means Clustering to create effective collaborative teams based on learner style results and user profiles.</p>
+                        </div>
+                        <div class="objective-item">
+                            <h4><i class="fas fa-chart-bar"></i>System Evaluation</h4>
+                            <p>Conduct comprehensive evaluation of the ALS, including learner achievement assessment and algorithm performance analysis.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="team-section" id="team">
+        <div class="container">
+            <h2 class="section-title">Development Team</h2>
+            <p class="section-subtitle">The minds behind ForeSITE</p>
+            <div class="row justify-content-center">
+                <div class="col-lg-12">
+                    <div class="team-grid">
+                        <div class="team-member">
+                            <div class="member-avatar">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <h3>Althea Denisse D. Baltero</h3>
+                        </div>
+                        <div class="team-member">
+                            <div class="member-avatar">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <h3>Erin Joy M. Comendador</h3>
+                        </div>
+                        <div class="team-member">
+                            <div class="member-avatar">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <h3>Charize Mikaela M. Hipona</h3>
+                        </div>
+                        <div class="bottom-row">
+                            <div class="team-member">
+                                <div class="member-avatar">
+                                    <i class="fas fa-user-circle"></i>
+                                </div>
+                                <h3>Jan Mc Elroy P. Tolentino</h3>
+                            </div>
+                            <div class="team-member">
+                                <div class="member-avatar">
+                                    <i class="fas fa-user-circle"></i>
+                                </div>
+                                <h3>Janna Mae M. Torres</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <p>&copy; 2024 ForeSITE. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="#" class="me-3">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scroll to Top Button -->
+    <a href="#" class="scroll-to-top">
+        <i class="fas fa-chevron-up"></i>
+    </a>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="js/main.js"></script>
+    <script>
+        // Smooth scroll for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                if (this.getAttribute('href') === '#') return;
+                
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Scroll to top button functionality
+        const scrollToTopButton = document.querySelector('.scroll-to-top');
+        
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                scrollToTopButton.classList.add('active');
+            } else {
+                scrollToTopButton.classList.remove('active');
+            }
+        });
+
+        scrollToTopButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    </script>
+</body>
+</html> 

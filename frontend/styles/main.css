@@ -1,0 +1,140 @@
+:root {
+    --maroon: #800000;
+    --gold: #FFB81C;
+    --dark-maroon: #600000;
+    --light-gold: #FFD700;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    background-color: white;
+}
+
+/* Navbar Styles */
+.navbar {
+    background-color: var(--maroon);
+    padding: 1rem 0;
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--gold) !important;
+}
+
+.navbar-brand i {
+    color: var(--gold);
+    margin-right: 0.5rem;
+}
+
+.nav-link {
+    color: white !important;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+    color: var(--gold) !important;
+}
+
+/* Hero Section */
+.hero-section {
+    background-color: white;
+    color: var(--maroon);
+    padding: 4rem 0;
+    min-height: calc(100vh - 76px);
+    display: flex;
+    align-items: center;
+    border-bottom: 4px solid var(--maroon);
+}
+
+.text-gold {
+    color: var(--gold);
+}
+
+.btn-primary {
+    background-color: var(--maroon);
+    border-color: var(--maroon);
+    color: white;
+    font-weight: bold;
+}
+
+.btn-primary:hover {
+    background-color: var(--dark-maroon);
+    border-color: var(--dark-maroon);
+    color: white;
+}
+
+.btn-outline-light {
+    color: var(--maroon);
+    border-color: var(--maroon);
+}
+
+.btn-outline-light:hover {
+    background-color: var(--gold);
+    border-color: var(--gold);
+    color: var(--maroon);
+}
+
+/* Features Section */
+.features-section {
+    background-color: #f8f9fa;
+    padding: 5rem 0;
+}
+
+.feature-card {
+    text-align: center;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+}
+
+.feature-icon {
+    font-size: 2.5rem;
+    color: var(--maroon);
+    margin-bottom: 1.5rem;
+}
+
+.feature-card h3 {
+    color: var(--maroon);
+    margin-bottom: 1rem;
+}
+
+/* Footer */
+.footer {
+    background-color: var(--maroon);
+    color: white;
+}
+
+.footer a {
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer a:hover {
+    color: var(--gold) !important;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .hero-section {
+        text-align: center;
+        padding: 2rem 0;
+    }
+    
+    .hero-section img {
+        margin-top: 2rem;
+    }
+    
+    .feature-card {
+        margin-bottom: 2rem;
+    }
+} 
