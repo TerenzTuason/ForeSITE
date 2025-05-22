@@ -296,48 +296,20 @@
             <div class="progress-indicator">
                 <div class="d-flex justify-content-between align-items-center">
                     <span>Course Progress</span>
-                    <span>13%</span>
+                    <span id="progress-percentage">0%</span>
                 </div>
                 <div class="progress">
-                    <div class="progress-bar" role="progressbar" style="width: 13%" aria-valuenow="13" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
             </div>
 
-            <ul class="module-list">
-                <!-- Module 1 -->
-                <li class="module-item">
-                    <div class="module-header active">
-                        <i class="fas fa-book"></i>
-                        Module 1: Introduction to Futures Thinking
-                    </div>
-                    <ul class="lesson-list">
-                        <li class="lesson-item active">
-                            <i class="fas fa-play-circle"></i>
-                            Welcome Video
-                        </li>
-                        <li class="lesson-item">
-                            <i class="fas fa-file-alt"></i>
-                            What is Futures Thinking?
-                        </li>
-                        <li class="lesson-item">
-                            <i class="fas fa-question-circle"></i>
-                            Knowledge Check
-                        </li>
-                    </ul>
+            <ul class="module-list" id="module-list">
+                <!-- Modules will be dynamically loaded here -->
+                <li class="loading-placeholder text-center p-4">
+                    <i class="fas fa-spinner fa-spin me-2"></i> Loading modules...
                 </li>
-
-                <!-- Module 2 (Locked) -->
-                <li class="module-item">
-                    <div class="module-header locked">
-                        <i class="fas fa-lock"></i>
-                        Module 2: Futures Process Design
-                    </div>
-                </li>
-
-                <!-- Add more modules here -->
             </ul>
         </div>
-
         <!-- Main Content -->
         <div class="main-content">
             <div class="content-container">
@@ -381,14 +353,17 @@
                     }
                 });
             });
-        });
-
-        // Toggle sidebar on mobile
-        document.querySelector('.toggle-sidebar').addEventListener('click', function() {
-            document.querySelector('.sidebar').classList.toggle('show');
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
+            
+            // Get URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const courseId = urlParams.get('id');
+            
+            if (!courseId) {
+                console.error('No course ID provided');
+                window.location.href = 'course-details.html';
+                return;
+            }
+            
             // Get user data from session storage
             const userData = JSON.parse(sessionStorage.getItem('user'));
             if (!userData) {
@@ -405,9 +380,266 @@
                     window.location.href = '../login.html';
                 });
             }
-
-            // Rest of your code
+            
+            // Fetch course data
+            fetchCourseData(courseId);
         });
+
+        // Toggle sidebar on mobile
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleSidebar = document.querySelector('.toggle-sidebar');
+            if (toggleSidebar) {
+                toggleSidebar.addEventListener('click', function() {
+                    document.querySelector('.sidebar').classList.toggle('show');
+                });
+            }
+        });
+        
+        function fetchCourseData(courseId) {
+            fetch(`http://127.0.0.1:8000/api/v1/courses/${courseId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const course = data.data;
+                    
+                    // Update progress indicator
+                    updateProgressIndicator(course);
+                    
+                    // Load modules
+                    loadModules(course.structure);
+                    
+                    // Load initial content (first lesson of first module)
+                    if (course.structure && course.structure.length > 0) {
+                        // Set content title
+                        const firstModule = course.structure[0];
+                        if (firstModule.lessons && firstModule.lessons.length > 0) {
+                            const firstLesson = firstModule.lessons[0];
+                            document.querySelector('.content-title').textContent = firstLesson.title || 'Welcome to Futures Thinking';
+                            // Here you would load the actual content based on the lesson type
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching course details:', error);
+                    document.querySelector('#module-list').innerHTML = `
+                        <div class="alert alert-danger">
+                            Error loading course modules. Please try again later.
+                        </div>
+                    `;
+                });
+        }
+        
+        function updateProgressIndicator(course) {
+            // For now, we'll use a placeholder progress value
+            // In a real application, this would be calculated based on user progress
+            const progress = 0; // placeholder value
+            
+            const progressText = document.querySelector('#progress-percentage');
+            const progressBar = document.querySelector('.progress-bar');
+            
+            if (progressText) progressText.textContent = `${progress}%`;
+            if (progressBar) {
+                progressBar.style.width = `${progress}%`;
+                progressBar.setAttribute('aria-valuenow', progress);
+            }
+        }
+        
+        function loadModules(modules) {
+            const moduleList = document.querySelector('#module-list');
+            if (!moduleList) return;
+            
+            if (!modules || modules.length === 0) {
+                moduleList.innerHTML = `
+                    <div class="alert alert-info">
+                        No modules found for this course.
+                    </div>
+                `;
+                return;
+            }
+            
+            let moduleHtml = '';
+            
+            modules.forEach((module, index) => {
+                const isActive = index === 0;
+                const isLocked = index > 0;
+                
+                let moduleClass = 'module-item';
+                let headerClass = 'module-header';
+                let icon = 'fas fa-book';
+                
+                if (isActive) headerClass += ' active';
+                if (isLocked) {
+                    headerClass += ' locked';
+                    icon = 'fas fa-lock';
+                }
+                
+                moduleHtml += `
+                    <li class="${moduleClass}" data-module-id="${module.module_id || index + 1}">
+                        <div class="${headerClass}">
+                            <i class="${icon}"></i>
+                            Module ${module.module}: ${module.title}
+                        </div>
+                `;
+                
+                // Add lessons if this is the first (active) module
+                if (isActive && module.lessons && module.lessons.length > 0) {
+                    moduleHtml += `<ul class="lesson-list">`;
+                    
+                    module.lessons.forEach((lesson, lessonIndex) => {
+                        const isLessonActive = lessonIndex === 0;
+                        let lessonClass = 'lesson-item';
+                        if (isLessonActive) lessonClass += ' active';
+                        
+                        // Determine icon based on content type
+                        let lessonIcon = 'fas fa-file-alt';
+                        if (lesson.type === 'video') lessonIcon = 'fas fa-play-circle';
+                        else if (lesson.type === 'quiz') lessonIcon = 'fas fa-question-circle';
+                        
+                        moduleHtml += `
+                            <li class="${lessonClass}" data-lesson-id="${lesson.lesson_id || lessonIndex + 1}">
+                                <i class="${lessonIcon}"></i>
+                                ${lesson.title}
+                            </li>
+                        `;
+                    });
+                    
+                    moduleHtml += `</ul>`;
+                }
+                
+                // If no lessons array or it's not the active module, we'll create placeholder lessons
+                if (isActive && (!module.lessons || module.lessons.length === 0)) {
+                    moduleHtml += `
+                        <ul class="lesson-list">
+                            <li class="lesson-item active">
+                                <i class="fas fa-play-circle"></i>
+                                Welcome Video
+                            </li>
+                            <li class="lesson-item">
+                                <i class="fas fa-file-alt"></i>
+                                What is ${module.title}?
+                            </li>
+                            <li class="lesson-item">
+                                <i class="fas fa-question-circle"></i>
+                                Knowledge Check
+                            </li>
+                        </ul>
+                    `;
+                }
+                
+                moduleHtml += `</li>`;
+            });
+            
+            moduleList.innerHTML = moduleHtml;
+            
+            // Add event listeners to modules and lessons
+            addModuleEventListeners();
+        }
+        
+        function addModuleEventListeners() {
+            // Module headers click event
+            document.querySelectorAll('.module-header:not(.locked)').forEach(header => {
+                header.addEventListener('click', function() {
+                    // Toggle active state
+                    document.querySelectorAll('.module-header').forEach(h => h.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Toggle lesson list visibility if needed
+                    // Depending on your design, you might want to show/hide lessons
+                });
+            });
+            
+            // Lesson items click event
+            document.querySelectorAll('.lesson-item').forEach(lesson => {
+                lesson.addEventListener('click', function() {
+                    // Set active lesson
+                    document.querySelectorAll('.lesson-item').forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Update content based on selected lesson
+                    const lessonTitle = this.textContent.trim();
+                    document.querySelector('.content-title').textContent = lessonTitle;
+                    
+                    // Here you would load the actual content based on the lesson type
+                    // This is placeholder logic - in a real app, you'd fetch the lesson content
+                    if (this.querySelector('i').classList.contains('fa-play-circle')) {
+                        // Video content
+                        document.querySelector('.content-body').innerHTML = `
+                            <div class="video-content">
+                                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #000;"></div>
+                            </div>
+                        `;
+                    } else if (this.querySelector('i').classList.contains('fa-file-alt')) {
+                        // Text content
+                        document.querySelector('.content-body').innerHTML = `
+                            <div class="text-content">
+                                <h3>Learning objectives</h3>
+                                <ul>
+                                    <li>Understand the fundamentals of ${lessonTitle}</li>
+                                    <li>Apply key concepts to real-world scenarios</li>
+                                    <li>Develop analytical skills in future thinking</li>
+                                </ul>
+                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi. 
+                                Sed vel risus ac libero pellentesque feugiat. Praesent sed justo vel eros 
+                                dignissim pharetra in vel tortor.</p>
+                            </div>
+                        `;
+                    } else if (this.querySelector('i').classList.contains('fa-question-circle')) {
+                        // Quiz content
+                        document.querySelector('.content-body').innerHTML = `
+                            <div class="quiz-content">
+                                <div class="quiz-question">
+                                    <h4>Question 1</h4>
+                                    <p>What is the primary purpose of futures thinking?</p>
+                                    <ul class="quiz-options">
+                                        <li class="quiz-option">To predict the exact future with certainty</li>
+                                        <li class="quiz-option">To explore possible futures and prepare for them</li>
+                                        <li class="quiz-option">To create a single preferred future</li>
+                                        <li class="quiz-option">To analyze only historical trends</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    // Update navigation buttons
+                    updateNavigationButtons(this);
+                });
+            });
+        }
+        
+        function updateNavigationButtons(currentLesson) {
+            const backButton = document.querySelector('.btn-back');
+            const continueButton = document.querySelector('.btn-continue');
+            
+            // Get all visible lessons
+            const lessons = Array.from(document.querySelectorAll('.lesson-item'));
+            const currentIndex = lessons.indexOf(currentLesson);
+            
+            // Enable/disable back button
+            if (currentIndex <= 0) {
+                backButton.disabled = true;
+            } else {
+                backButton.disabled = false;
+                backButton.onclick = function() {
+                    lessons[currentIndex - 1].click();
+                };
+            }
+            
+            // Enable/disable continue button
+            if (currentIndex >= lessons.length - 1) {
+                continueButton.textContent = 'Complete Module';
+                continueButton.innerHTML = 'Complete Module <i class="fas fa-check"></i>';
+                continueButton.onclick = function() {
+                    // Logic for completing the module
+                    alert('Module completed! Next module will be unlocked.');
+                };
+            } else {
+                continueButton.textContent = 'Continue';
+                continueButton.innerHTML = 'Continue <i class="fas fa-arrow-right"></i>';
+                continueButton.onclick = function() {
+                    lessons[currentIndex + 1].click();
+                };
+            }
+        }
     </script>
 </body>
 </html> 
