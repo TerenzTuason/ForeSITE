@@ -400,6 +400,34 @@
                             <i class="fas fa-video"></i>
                             <span>Horizon Scanning Video</span>
                         </li>
+                        <li class="lesson-item" id="screen-2-2">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Horizon Scanning</span>
+                        </li>
+                        <li class="lesson-item" id="screen-2-2-1">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Why Use Horizon Scanning?</span>
+                        </li>
+                        <li class="lesson-item" id="screen-2-2-2">
+                            <i class="fas fa-file-alt"></i>
+                            <span>How to do Horizon Scanning?</span>
+                        </li>
+                        <li class="lesson-item" id="video-2-3">
+                            <i class="fas fa-video"></i>
+                            <span>Trends Identification Video</span>
+                        </li>
+                        <li class="lesson-item" id="screen-2-3">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Trends Identification and Analysis</span>
+                        </li>
+                        <li class="lesson-item" id="screen-2-3-1">
+                            <i class="fas fa-file-alt"></i>
+                            <span>How to do Futures Wheel Analysis?</span>
+                        </li>
+                        <li class="lesson-item" id="knowledge-check-2">
+                            <i class="fas fa-question-circle"></i>
+                            <span>Knowledge Check</span>
+                        </li>
                     </ul>
                 </li>
                 <li class="module-item">
@@ -560,6 +588,33 @@
                         }
                     }
                 }
+                
+                if (e.target.id === 'trends-identification-video') {
+                    const video = e.target;
+                    const statusSpan = document.getElementById('video-status-trends');
+                    
+                    // Remove any existing event listeners
+                    video.removeEventListener('ended', handleTrendsVideoEnd);
+                    video.removeEventListener('timeupdate', updateVideoStatus);
+                    
+                    // Add event listeners
+                    video.addEventListener('ended', handleTrendsVideoEnd);
+                    
+                    // Add timeupdate event to show progress
+                    video.addEventListener('timeupdate', function() {
+                        updateVideoStatus(video, statusSpan);
+                    });
+                    
+                    // Update initial status
+                    if (statusSpan) {
+                        if (completedLessons['video-2-3']) {
+                            statusSpan.textContent = 'Completed';
+                            statusSpan.className = 'text-success';
+                        } else {
+                            statusSpan.textContent = 'Not started';
+                        }
+                    }
+                }
             });
         }
         
@@ -652,7 +707,31 @@
             // Mark video as completed
             completedLessons['video-2-2'] = true;
             
-            // This is the last lesson in Module 2
+            // Make the next lesson accessible
+            const nextLesson = getNextLessonInSequence('video-2-2');
+            if (nextLesson) {
+                console.log('Making accessible:', nextLesson);
+                accessibleLessons[nextLesson] = true;
+            }
+            
+            // Update UI
+            updateLessonAccessibility();
+            updateNavigationButtons();
+        }
+        
+        // Handler for Module 2 Trends Identification video completion
+        function handleTrendsVideoEnd() {
+            console.log('Trends Identification video ended');
+            // Mark video as completed
+            completedLessons['video-2-3'] = true;
+            
+            // Make the next lesson accessible
+            const nextLesson = getNextLessonInSequence('video-2-3');
+            if (nextLesson) {
+                console.log('Making accessible:', nextLesson);
+                accessibleLessons[nextLesson] = true;
+            }
+            
             // Update UI
             updateLessonAccessibility();
             updateNavigationButtons();
@@ -759,7 +838,7 @@
                 moduleEndIndex = lessonSequence.indexOf('knowledge-check');
             } else if (moduleNumber === 2) {
                 moduleStartIndex = lessonSequence.indexOf('video-2-1');
-                moduleEndIndex = lessonSequence.indexOf('video-2-2');
+                moduleEndIndex = lessonSequence.indexOf('knowledge-check-2');
             }
             
             // Validate that we're actually at the end of this module
@@ -772,7 +851,7 @@
             // Only show completion if we're at the end of the module
             // This prevents showing completion when navigating within a module
             const isAtModuleEnd = (moduleNumber === 1 && activeId === 'knowledge-check') || 
-                                (moduleNumber === 2 && activeId === 'video-2-2');
+                                (moduleNumber === 2 && activeId === 'knowledge-check-2');
             
             if (!isAtModuleEnd) {
                 console.log(`Not at the end of module ${moduleNumber}, skipping completion modal`);
@@ -893,11 +972,12 @@
                 }
                 
                 // If we're on a video lesson, check if it's been watched
-                if (activeId === 'video-intro' || activeId === 'video-2-1' || activeId === 'video-2-2') {
+                if (activeId === 'video-intro' || activeId === 'video-2-1' || activeId === 'video-2-2' || activeId === 'video-2-3') {
                     let videoId;
                     if (activeId === 'video-intro') videoId = 'intro-video';
                     else if (activeId === 'video-2-1') videoId = 'driver-mapping-video';
                     else if (activeId === 'video-2-2') videoId = 'horizon-scanning-video';
+                    else if (activeId === 'video-2-3') videoId = 'trends-identification-video';
                     
                     const video = document.getElementById(videoId);
                     
@@ -913,7 +993,7 @@
                     // Last lesson of Module 1
                     completeModule(1);
                     return;
-                } else if (activeId === 'video-2-2') {
+                } else if (activeId === 'knowledge-check-2') {
                     // Last lesson of Module 2
                     completeModule(2);
                     return;
@@ -950,7 +1030,7 @@
                     
                     // Only complete the module if we're at the appropriate last lesson of a module
                     const isAtModuleEnd = (currentIdModule === 1 && activeId === 'knowledge-check') || 
-                                       (currentIdModule === 2 && activeId === 'video-2-2');
+                                       (currentIdModule === 2 && activeId === 'knowledge-check-2');
                     
                     // If we're at the end of a module AND transitioning, show completion modal
                     if (isModuleTransition && isAtModuleEnd) {
@@ -1001,7 +1081,14 @@
             'screen-2-1': false,
             'screen-2-1-1': false,
             'screen-2-1-2': false,
-            'video-2-2': false
+            'video-2-2': false,
+            'screen-2-2': false,
+            'screen-2-2-1': false,
+            'screen-2-2-2': false,
+            'video-2-3': false,
+            'screen-2-3': false,
+            'screen-2-3-1': false,
+            'knowledge-check-2': false
         };
         
         // Separate tracking for completed lessons
@@ -1019,7 +1106,14 @@
             'screen-2-1': false,
             'screen-2-1-1': false,
             'screen-2-1-2': false,
-            'video-2-2': false
+            'video-2-2': false,
+            'screen-2-2': false,
+            'screen-2-2-1': false,
+            'screen-2-2-2': false,
+            'video-2-3': false,
+            'screen-2-3': false,
+            'screen-2-3-1': false,
+            'knowledge-check-2': false
         };
         
         // Define the sequence of lessons
@@ -1037,7 +1131,14 @@
             'screen-2-1',
             'screen-2-1-1',
             'screen-2-1-2',
-            'video-2-2'
+            'video-2-2',
+            'screen-2-2',
+            'screen-2-2-1',
+            'screen-2-2-2',
+            'video-2-3',
+            'screen-2-3',
+            'screen-2-3-1',
+            'knowledge-check-2'
         ];
         
         function setupLessonHandlers() {
@@ -1542,6 +1643,236 @@
                             <small><i class="fas fa-clock"></i> Video completion status: <span id="video-status-horizon">Not started</span></small>
                         </div>
                     `;
+                    break;
+                
+                case "screen-2-2":
+                    contentTitle = "Horizon Scanning";
+                    contentHTML = `
+                        <div class="text-content">
+                            <h3>Horizon Scanning</h3>
+                            <h5>Horizon scanning is a foresight process focused on identifying and collating early warning signs of change, or emerging signals that may have significant impacts when they develop.</h5>
+                            <div class="mt-4">
+                                <ul>
+                                    <li>Scanning for signals of change
+                                        <ul>
+                                            <li>Actively looking for early clues about what might happen in the future. We're searching for potential problems, new chances, and things that are likely to develop.</li>
+                                        </ul>
+                                    </li>
+                                    <li>What is a 'Signal'?
+                                        <ul>
+                                            <li>It's the very first hint of a new event, a local trend, or an innovative idea from an organization.</li>
+                                            <li>These signals have the power to cause big changes or even completely transform things.</li>
+                                            <li>They can grow and spread, affecting larger areas or even entire regions.</li>
+                                        </ul>
+                                    </li>
+                                    <li>What is a 'Weak Signal'?
+                                        <ul>
+                                            <li>This is a clue that's really hard to notice or very subtle.</li>
+                                            <li>The information we have about it is often incomplete or messy.</li>
+                                            <li>We're not sure how it will develop in the future.</li>
+                                            <li>Even though they are faint and uncertain, weak signals are important to notice and keep an eye on because they can turn into strong, clear trends later on.</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                                <div class="text-center mt-4 mb-4">
+                                    <img src="../assets/images/2.2_Emerging_Issue_Analysis.png" alt="Emerging Issue Analysis" class="img-fluid" style="max-width: 100%; height: auto;">
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case "screen-2-2-1":
+                    contentTitle = "Why Use Horizon Scanning?";
+                    contentHTML = `
+                        <div class="text-content">
+                            <h3>Why Use Horizon Scanning?</h3>
+                            <h5>Discover how Horizon Scanning helps you spot future risks and opportunities early, preparing you for what's ahead.</h5>
+                            <div class="mt-4">
+                                <p>Horizon Scanning is a vital tool because it helps us to:</p>
+                                <ul>
+                                    <li>It allows us to systematically look for potential problems, exciting new chances, and uncertainties that could affect our current plans or future direction.</li>
+                                    <li>It serves as a baseline analysis for our planning and program design. By continuously watching for identified risks and signals, it acts like an 'early warning system' to alert us to changes.</li>
+                                    <li>It helps us find specific ways to strengthen our risk analysis and weave future insights from scanning into our existing processes, making them more robust.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case "screen-2-2-2":
+                    contentTitle = "How to do Horizon Scanning?";
+                    contentHTML = `
+                        <div class="text-content">
+                            <h3>How to do Horizon Scanning?</h3>
+                            <h5>Horizon Scanning helps you spot early signs of future changes so you can prepare. Think of it as looking ahead for clues!</h5>
+                            <div class="mt-4">
+                                <p>The 5 Steps:</p>
+                                <ul>
+                                    <li>Collect Signals
+                                        <ul>
+                                            <li>Look for tiny hints of change in news, social media, research, etc. (using categories like Social, Tech, Economic, Environment, Political, Values). Note down what it is, where it's from, and its possible impact.</li>
+                                        </ul>
+                                    </li>
+                                    <li>Collate Signals
+                                        <ul>
+                                            <li>Gather all your collected signals into one organized place, like a simple list or spreadsheet.</li>
+                                        </ul>
+                                    </li>
+                                    <li>Interpret Signals
+                                        <ul>
+                                            <li>Figure out what your signals mean. Use simple ratings (like 1-5) for how likely they are and how big their impact could be, then visualize them to see patterns.</li>
+                                        </ul>
+                                    </li>
+                                    <li>Make Sense of Signals
+                                        <ul>
+                                            <li>Discuss how these signals might change things in the future. This helps you make better decisions today, without trying to predict exactly what will happen.</li>
+                                        </ul>
+                                    </li>
+                                    <li>Integrate Insights
+                                        <ul>
+                                            <li>Use what you've learned from the signals to improve your current plans and strategies, making them more ready for the future.</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case "video-2-3":
+                    contentTitle = "Trends Identification Video";
+                    contentHTML = `
+                        <div class="video-container">
+                            <video controls class="w-100" id="trends-identification-video">
+                                <source src="../assets/videos/2.3_Trends_Identification_and_Analysis.mp4" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                        <div class="alert alert-info mt-3">
+                            <i class="fas fa-info-circle"></i> <strong>Important:</strong> You must watch the entire video before the "Continue" button will be enabled.
+                        </div>
+                        <div class="video-progress-indicator mt-2 text-muted">
+                            <small><i class="fas fa-clock"></i> Video completion status: <span id="video-status-trends">Not started</span></small>
+                        </div>
+                    `;
+                    break;
+                    
+                case "screen-2-3":
+                    contentTitle = "Trends Identification and Analysis";
+                    contentHTML = `
+                        <div class="text-content">
+                            <h3>Trends Identification and Analysis</h3>
+                            <h5>Understanding the cascading impacts of change using structured brainstorming and visualization.</h5>
+                            <div class="mt-4">
+                                <ul>
+                                    <li>The Futures Wheel (also called the Implications Wheel) is a simple but powerful way to think about the future.</li>
+                                    <li>It helps us map out all the possible effects that a major change or event could have.</li>
+                                    <li>Think of it like dropping a pebble in a pond:
+                                        <ul>
+                                            <li>The first ripple is the direct impact.</li>
+                                            <li>Then, those ripples create new, smaller ripples, which are the indirect impacts (or 'second and third-order effects').</li>
+                                        </ul>
+                                    </li>
+                                    <li>This tool helps us see how one initial change "seed of change" can set off a chain reaction of consequences, both good and bad, that keep going and going.</li>
+                                </ul>
+                                <div class="text-center mt-4 mb-4">
+                                    <img src="../assets/images/2.3_Implications_Analysis_Considerations.png" alt="Implications Analysis Considerations" class="img-fluid" style="max-width: 100%; height: auto;">
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case "screen-2-3-1":
+                    contentTitle = "How to do Futures Wheel Analysis?";
+                    contentHTML = `
+                        <div class="text-content">
+                            <h3>How to do Futures Wheel Analysis?</h3>
+                            <h5>Explore the ripple effects of a change! The Futures Wheel helps you map out all the possible consequences of a trend or event.</h5>
+                            <div class="mt-4">
+                                <ul>
+                                    <li>Choose Your Change
+                                        <ul>
+                                            <li>Pick the main trend, issue, or event you want to explore (this goes in the middle).</li>
+                                        </ul>
+                                    </li>
+                                    <li>First Impacts
+                                        <ul>
+                                            <li>What are the direct consequences? Write these in a circle around your change.</li>
+                                        </ul>
+                                    </li>
+                                    <li>Second Impacts
+                                        <ul>
+                                            <li>For each direct impact, what else happens because of it? Add these to an outer circle.</li>
+                                        </ul>
+                                    </li>
+                                    <li>Keep Expanding
+                                        <ul>
+                                            <li>Continue thinking about impacts of impacts for as long as it's useful.</li>
+                                        </ul>
+                                    </li>
+                                    <li>Think Strategy
+                                        <ul>
+                                            <li>What do all these potential ripples mean for your plans or decisions?</li>
+                                        </ul>
+                                    </li>
+                                    <li>Share & Learn
+                                        <ul>
+                                            <li>Discuss your findings with others to see different perspectives.</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case "knowledge-check-2":
+                    contentTitle = "Knowledge Check";
+                    contentHTML = `
+                        <div class="quiz-content">
+                            <div class="quiz-question">
+                                <h4>Question 1</h4>
+                                <p>What is the primary purpose of Horizon Scanning?</p>
+                                <ul class="quiz-options">
+                                    <li class="quiz-option" onclick="selectAnswer(this, 'question2', 1)">To predict future events with certainty</li>
+                                    <li class="quiz-option" onclick="selectAnswer(this, 'question2', 2)">To identify early warning signs of change and emerging signals</li>
+                                    <li class="quiz-option" onclick="selectAnswer(this, 'question2', 3)">To analyze only historical data</li>
+                                    <li class="quiz-option" onclick="selectAnswer(this, 'question2', 4)">To create detailed plans for the next fiscal year</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Add the selectAnswer function if it doesn't exist yet
+                    if (typeof window.selectAnswer !== 'function') {
+                        window.selectAnswer = function(element, questionId, answerId) {
+                            // Clear previous selections
+                            const options = document.querySelectorAll('.quiz-option');
+                            options.forEach(option => {
+                                option.classList.remove('selected');
+                                option.classList.remove('correct');
+                                option.classList.remove('incorrect');
+                            });
+                            
+                            // Mark this answer as selected
+                            element.classList.add('selected');
+                            
+                            // Check if answer is correct (answer 2 is correct for both questions)
+                            if ((questionId === 'question1' && answerId === 2) ||
+                                (questionId === 'question2' && answerId === 2)) {
+                                element.classList.add('correct');
+                                // Enable the complete module button
+                                const continueButton = document.querySelector('.btn-continue');
+                                if (continueButton) {
+                                    continueButton.disabled = false;
+                                }
+                            } else {
+                                element.classList.add('incorrect');
+                            }
+                        };
+                    }
                     break;
                     
                 default:
