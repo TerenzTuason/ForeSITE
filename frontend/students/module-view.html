@@ -104,6 +104,23 @@
             color: #6c757d;
             cursor: not-allowed;
         }
+        
+        .module-header.completed {
+            background: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+        }
+        
+        .badge {
+            font-size: 0.75em;
+            padding: 0.35em 0.65em;
+            border-radius: 0.25rem;
+        }
+        
+        .bg-success {
+            background-color: #28a745 !important;
+            color: white;
+        }
 
         .lesson-list {
             list-style: none;
@@ -264,6 +281,22 @@
         .quiz-option:hover {
             background: #f8f9fa;
         }
+        
+        .quiz-option.selected {
+            border-width: 2px;
+        }
+        
+        .quiz-option.correct {
+            background-color: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        
+        .quiz-option.incorrect {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
 
         @media (max-width: 992px) {
             .sidebar {
@@ -344,8 +377,30 @@
                 <li class="module-item">
                     <div class="module-header locked">
                         <i class="fas fa-lock"></i>
-                        Module 2: Futures Process Design
+                        Module 2: Futures Process Design (Locked)
                     </div>
+                    <ul class="lesson-list" style="display: none;">
+                        <li class="lesson-item" id="video-2-1">
+                            <i class="fas fa-video"></i>
+                            <span>Driver Mapping Video</span>
+                        </li>
+                        <li class="lesson-item" id="screen-2-1">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Driver Mapping</span>
+                        </li>
+                        <li class="lesson-item" id="screen-2-1-1">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Why Use Driver Mapping?</span>
+                        </li>
+                        <li class="lesson-item" id="screen-2-1-2">
+                            <i class="fas fa-file-alt"></i>
+                            <span>How to do Driver Mapping?</span>
+                        </li>
+                        <li class="lesson-item" id="video-2-2">
+                            <i class="fas fa-video"></i>
+                            <span>Horizon Scanning Video</span>
+                        </li>
+                    </ul>
                 </li>
                 <li class="module-item">
                     <div class="module-header locked">
@@ -393,49 +448,215 @@
             // Load navbar
             $("#navbar-placeholder").load("../components/navbar.html", function() {
                 // After loading navbar, set active link
-                const navLinks = document.querySelectorAll('.nav-link');
-                navLinks.forEach(link => {
-                    if (link.getAttribute('href') === 'course-details.html') {
-                        link.classList.add('active');
-                    }
-                });
-            });
-            // Check if user is logged in
-            const userData = JSON.parse(sessionStorage.getItem('user'));
-            if (!userData) {
-                window.location.href = '../login.html';
-                return;
-            }
-
-            // Add logout functionality
-            $(document).on('click', '.btn-logout', function(e) {
-                e.preventDefault();
-                sessionStorage.removeItem('user');
-                window.location.href = '../login.html';
+                $("#nav-module").addClass("active");
             });
             
-            // Set up video completion handler for the intro video
-            const introVideo = document.getElementById('intro-video');
-            if (introVideo) {
-                introVideo.addEventListener('ended', function() {
-                    // When video ends, mark current video as completed
-                    completedLessons['video-intro'] = true;
-                    
-                    // Make the next screen accessible
-                    accessibleLessons['screen-1-1'] = true;
-                    
-                    // Update the UI
-                    updateLessonAccessibility();
-                    updateNavigationButtons();
-                });
-            }
+            // Initialize
+            setupModuleHandlers();
+            updateLessonAccessibility();
+            updateNavigationButtons();
+            
+            // Initially hide Module 2 and 3 lesson lists as they are locked
+            document.querySelectorAll('.module-item:not(:first-child) .lesson-list').forEach(list => {
+                list.style.display = 'none';
+            });
+            
+            // Handle simulated logout
+            $("#logout-btn").click(function() {
+                window.location.href = '../login.html';
+            });
             
             // Add click handlers for navigation buttons
             setupNavigation();
             
             // Add click handlers to lesson items
             setupLessonHandlers();
+            
+            // Setup video event handlers for video completion
+            setupVideoEventHandlers();
         });
+        
+        // Function to set up video event handlers
+        function setupVideoEventHandlers() {
+            // Add event listener to Module 1 intro video when the video element exists
+            document.addEventListener('DOMNodeInserted', function(e) {
+                if (e.target.id === 'intro-video') {
+                    const video = e.target;
+                    const statusSpan = document.getElementById('video-status-intro');
+                    
+                    // Remove any existing event listeners
+                    video.removeEventListener('ended', handleIntroVideoEnd);
+                    video.removeEventListener('timeupdate', updateVideoStatus);
+                    
+                    // Add event listeners
+                    video.addEventListener('ended', handleIntroVideoEnd);
+                    
+                    // Add timeupdate event to show progress
+                    video.addEventListener('timeupdate', function() {
+                        updateVideoStatus(video, statusSpan);
+                    });
+                    
+                    // Update initial status
+                    if (statusSpan) {
+                        if (completedLessons['video-intro']) {
+                            statusSpan.textContent = 'Completed';
+                            statusSpan.className = 'text-success';
+                        } else {
+                            statusSpan.textContent = 'Not started';
+                        }
+                    }
+                }
+                
+                if (e.target.id === 'driver-mapping-video') {
+                    const video = e.target;
+                    const statusSpan = document.getElementById('video-status-driver');
+                    
+                    // Remove any existing event listeners
+                    video.removeEventListener('ended', handleDriverMappingVideoEnd);
+                    video.removeEventListener('timeupdate', updateVideoStatus);
+                    
+                    // Add event listeners
+                    video.addEventListener('ended', handleDriverMappingVideoEnd);
+                    
+                    // Add timeupdate event to show progress
+                    video.addEventListener('timeupdate', function() {
+                        updateVideoStatus(video, statusSpan);
+                    });
+                    
+                    // Update initial status
+                    if (statusSpan) {
+                        if (completedLessons['video-2-1']) {
+                            statusSpan.textContent = 'Completed';
+                            statusSpan.className = 'text-success';
+                        } else {
+                            statusSpan.textContent = 'Not started';
+                        }
+                    }
+                }
+                
+                if (e.target.id === 'horizon-scanning-video') {
+                    const video = e.target;
+                    const statusSpan = document.getElementById('video-status-horizon');
+                    
+                    // Remove any existing event listeners
+                    video.removeEventListener('ended', handleHorizonScanningVideoEnd);
+                    video.removeEventListener('timeupdate', updateVideoStatus);
+                    
+                    // Add event listeners
+                    video.addEventListener('ended', handleHorizonScanningVideoEnd);
+                    
+                    // Add timeupdate event to show progress
+                    video.addEventListener('timeupdate', function() {
+                        updateVideoStatus(video, statusSpan);
+                    });
+                    
+                    // Update initial status
+                    if (statusSpan) {
+                        if (completedLessons['video-2-2']) {
+                            statusSpan.textContent = 'Completed';
+                            statusSpan.className = 'text-success';
+                        } else {
+                            statusSpan.textContent = 'Not started';
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Function to update video status
+        function updateVideoStatus(video, statusElement) {
+            if (!video || !statusElement) return;
+            
+            const duration = video.duration;
+            const currentTime = video.currentTime;
+            
+            if (duration > 0) {
+                // Calculate percentage
+                const percent = Math.floor((currentTime / duration) * 100);
+                
+                if (video.ended) {
+                    statusElement.textContent = 'Completed';
+                    statusElement.className = 'text-success';
+                } else if (percent === 0) {
+                    statusElement.textContent = 'Not started';
+                    statusElement.className = '';
+                } else {
+                    statusElement.textContent = `In progress (${percent}%)`;
+                    statusElement.className = 'text-primary';
+                }
+            }
+        }
+        
+        // Helper function to get the next lesson ID in sequence
+        function getNextLessonInSequence(currentLessonId) {
+            const currentIndex = lessonSequence.indexOf(currentLessonId);
+            if (currentIndex >= 0 && currentIndex < lessonSequence.length - 1) {
+                return lessonSequence[currentIndex + 1];
+            }
+            return null;
+        }
+        
+        // Handler for Module 1 intro video completion
+        function handleIntroVideoEnd() {
+            console.log('Intro video ended');
+            // Mark video as completed
+            completedLessons['video-intro'] = true;
+            
+            // ONLY make the immediate next lesson accessible
+            const nextLesson = getNextLessonInSequence('video-intro');
+            if (nextLesson) {
+                console.log('Making accessible:', nextLesson);
+                accessibleLessons[nextLesson] = true;
+                
+                // Ensure other lessons remain locked
+                for (const lesson in accessibleLessons) {
+                    if (lesson !== 'video-intro' && lesson !== nextLesson) {
+                        accessibleLessons[lesson] = completedLessons[lesson];
+                    }
+                }
+            }
+            
+            // Update UI
+            updateLessonAccessibility();
+            updateNavigationButtons();
+        }
+        
+        // Handler for Module 2 Driver Mapping video completion
+        function handleDriverMappingVideoEnd() {
+            console.log('Driver Mapping video ended');
+            // Mark video as completed
+            completedLessons['video-2-1'] = true;
+            
+            // ONLY make the immediate next lesson accessible
+            const nextLesson = getNextLessonInSequence('video-2-1');
+            if (nextLesson) {
+                console.log('Making accessible:', nextLesson);
+                accessibleLessons[nextLesson] = true;
+                
+                // Ensure other lessons remain locked
+                for (const lesson in accessibleLessons) {
+                    if (!completedLessons[lesson] && lesson !== 'video-2-1' && lesson !== nextLesson) {
+                        accessibleLessons[lesson] = false;
+                    }
+                }
+            }
+            
+            // Update UI
+            updateLessonAccessibility();
+            updateNavigationButtons();
+        }
+        
+        // Handler for Module 2 Horizon Scanning video completion
+        function handleHorizonScanningVideoEnd() {
+            console.log('Horizon Scanning video ended');
+            // Mark video as completed
+            completedLessons['video-2-2'] = true;
+            
+            // This is the last lesson in Module 2
+            // Update UI
+            updateLessonAccessibility();
+            updateNavigationButtons();
+        }
         
         // Add modal HTML to the page
         function addModalHTML() {
@@ -465,11 +686,175 @@
         }
         
         // Show modal with a specific message
-        function showModal(message) {
+        function showModal(message, callback = null) {
             addModalHTML();
             document.getElementById('modal-message').textContent = message;
-            const modal = new bootstrap.Modal(document.getElementById('videoRequiredModal'));
+            const modalElement = document.getElementById('videoRequiredModal');
+            
+            // Remove any existing backdrops before showing new modal
+            const existingBackdrops = document.querySelectorAll('.modal-backdrop');
+            existingBackdrops.forEach(backdrop => backdrop.remove());
+            
+            // Ensure the document body doesn't have modal-open class
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+            
+            const modal = new bootstrap.Modal(modalElement);
+            
+            // Set up event listener for modal hidden event
+            if (callback) {
+                modalElement.addEventListener('hidden.bs.modal', function(e) {
+                    // Execute the callback
+                    callback();
+                    
+                    // Additional cleanup
+                    setTimeout(() => {
+                        const remainingBackdrops = document.querySelectorAll('.modal-backdrop');
+                        remainingBackdrops.forEach(backdrop => backdrop.remove());
+                        document.body.classList.remove('modal-open');
+                        document.body.style.overflow = '';
+                        document.body.style.paddingRight = '';
+                    }, 300);
+                }, { once: true });
+            } else {
+                // Just do cleanup if no callback
+                modalElement.addEventListener('hidden.bs.modal', function() {
+                    setTimeout(() => {
+                        const remainingBackdrops = document.querySelectorAll('.modal-backdrop');
+                        remainingBackdrops.forEach(backdrop => backdrop.remove());
+                        document.body.classList.remove('modal-open');
+                        document.body.style.overflow = '';
+                        document.body.style.paddingRight = '';
+                    }, 300);
+                }, { once: true });
+            }
+            
             modal.show();
+        }
+        
+        // Global tracker to prevent duplicate module completion modals
+        let moduleCompletionShown = {
+            1: false,
+            2: false,
+            3: false
+        };
+        
+        function completeModule(moduleNumber) {
+            console.log(`Completing module ${moduleNumber}`);
+            
+            // Check if we've already shown the completion modal for this module
+            if (moduleCompletionShown[moduleNumber]) {
+                console.log(`Module ${moduleNumber} completion already shown, skipping modal`);
+                return;
+            }
+            
+            // Get module-specific lesson IDs
+            let moduleStartIndex = 0;
+            let moduleEndIndex = 0;
+            
+            // Find index ranges for the specified module
+            if (moduleNumber === 1) {
+                moduleStartIndex = 0; // 'video-intro'
+                moduleEndIndex = lessonSequence.indexOf('knowledge-check');
+            } else if (moduleNumber === 2) {
+                moduleStartIndex = lessonSequence.indexOf('video-2-1');
+                moduleEndIndex = lessonSequence.indexOf('video-2-2');
+            }
+            
+            // Validate that we're actually at the end of this module
+            const activeLesson = document.querySelector('.lesson-item.active');
+            if (!activeLesson) return;
+            
+            const activeId = activeLesson.id;
+            const activeIndex = lessonSequence.indexOf(activeId);
+            
+            // Only show completion if we're at the end of the module
+            // This prevents showing completion when navigating within a module
+            const isAtModuleEnd = (moduleNumber === 1 && activeId === 'knowledge-check') || 
+                                (moduleNumber === 2 && activeId === 'video-2-2');
+            
+            if (!isAtModuleEnd) {
+                console.log(`Not at the end of module ${moduleNumber}, skipping completion modal`);
+                return;
+            }
+            
+            // Mark this module as having shown its completion modal
+            moduleCompletionShown[moduleNumber] = true;
+            
+            // Mark all lessons in this module as completed
+            for (let i = moduleStartIndex; i <= moduleEndIndex; i++) {
+                const lessonId = lessonSequence[i];
+                completedLessons[lessonId] = true;
+            }
+            
+            // Unlock the next module
+            const nextModuleNumber = moduleNumber + 1;
+            const nextModuleItem = document.querySelector(`.module-item:nth-child(${nextModuleNumber})`);
+            
+            if (nextModuleItem) {
+                // Update module styling
+                const moduleHeader = nextModuleItem.querySelector('.module-header');
+                moduleHeader.classList.remove('locked');
+                
+                // Set appropriate title based on module number
+                let moduleTitle = "Futures Process Design";
+                if (nextModuleNumber === 3) {
+                    moduleTitle = "Pathways for Business Needs";
+                }
+                
+                moduleHeader.innerHTML = `<i class="fas fa-book"></i> Module ${nextModuleNumber}: ${moduleTitle}`;
+                
+                // Show the lessons list
+                const lessonsList = nextModuleItem.querySelector('.lesson-list');
+                if (lessonsList) {
+                    lessonsList.style.display = 'block';
+                }
+                
+                // Make the first lesson of the next module accessible
+                let firstLessonOfNextModule = null;
+                if (nextModuleNumber === 2) {
+                    firstLessonOfNextModule = 'video-2-1';
+                } else if (nextModuleNumber === 3) {
+                    // For future implementation
+                    // firstLessonOfNextModule = 'video-3-1'; 
+                }
+                
+                if (firstLessonOfNextModule) {
+                    accessibleLessons[firstLessonOfNextModule] = true;
+                }
+                
+                // Show congratulations message - with correct module number
+                showModal(`Congratulations! You've completed Module ${moduleNumber}. Module ${nextModuleNumber} is now unlocked.`, function() {
+                    // After modal is closed, mark module as completed in the UI
+                    updateModuleCompletionStatus(moduleNumber);
+                    
+                    // Optional: Automatically navigate to the next module's first lesson
+                    if (firstLessonOfNextModule) {
+                        document.getElementById(firstLessonOfNextModule).click();
+                    }
+                });
+            } else {
+                // Last module completed
+                showModal(`Congratulations! You've completed Module ${moduleNumber} and the entire course!`);
+            }
+            
+            // Update the UI
+            updateLessonAccessibility();
+            updateNavigationButtons();
+        }
+        
+        function updateModuleCompletionStatus(moduleNumber) {
+            // Add visual indication that the module is completed
+            const completedModule = document.querySelector(`.module-item:nth-child(${moduleNumber})`);
+            if (completedModule) {
+                const moduleHeader = completedModule.querySelector('.module-header');
+                moduleHeader.classList.add('completed');
+                
+                // Add completion icon or indicator if desired
+                const moduleTitle = moduleHeader.textContent;
+                moduleHeader.innerHTML = `<i class="fas fa-check-circle text-success"></i> ${moduleTitle} <span class="badge bg-success ms-2">Completed</span>`;
+            }
         }
         
         function setupNavigation() {
@@ -478,6 +863,8 @@
             
             backButton.addEventListener('click', function() {
                 const activeLesson = document.querySelector('.lesson-item.active');
+                if (!activeLesson) return;
+                
                 const activeId = activeLesson.id;
                 const activeIndex = lessonSequence.indexOf(activeId);
                 
@@ -488,26 +875,110 @@
             });
             
             continueButton.addEventListener('click', function() {
+                // First, get the current active lesson
                 const activeLesson = document.querySelector('.lesson-item.active');
-                const activeId = activeLesson.id;
+                if (!activeLesson) {
+                    console.error('No active lesson found');
+                    return;
+                }
                 
-                // If on video and video not finished, show modal
-                if (activeId === 'video-intro') {
-                    const video = document.getElementById('intro-video');
-                    if (video && video.currentTime < video.duration) {
+                const activeId = activeLesson.id;
+                console.log('Current active lesson:', activeId);
+                
+                // Find its position in the sequence
+                const activeIndex = lessonSequence.indexOf(activeId);
+                if (activeIndex === -1) {
+                    console.error('Active lesson not found in sequence');
+                    return;
+                }
+                
+                // If we're on a video lesson, check if it's been watched
+                if (activeId === 'video-intro' || activeId === 'video-2-1' || activeId === 'video-2-2') {
+                    let videoId;
+                    if (activeId === 'video-intro') videoId = 'intro-video';
+                    else if (activeId === 'video-2-1') videoId = 'driver-mapping-video';
+                    else if (activeId === 'video-2-2') videoId = 'horizon-scanning-video';
+                    
+                    const video = document.getElementById(videoId);
+                    
+                    // If video exists and hasn't been completed
+                    if (video && !video.ended && !completedLessons[activeId]) {
                         showModal('Please finish watching the video before continuing.');
                         return;
                     }
                 }
                 
-                const activeIndex = lessonSequence.indexOf(activeId);
+                // Special handling for the last lesson of each module ONLY
+                if (activeId === 'knowledge-check') {
+                    // Last lesson of Module 1
+                    completeModule(1);
+                    return;
+                } else if (activeId === 'video-2-2') {
+                    // Last lesson of Module 2
+                    completeModule(2);
+                    return;
+                }
+                
+                // Otherwise proceed to the next lesson in sequence
                 if (activeIndex < lessonSequence.length - 1) {
+                    // Get the IMMEDIATE next lesson ID
                     const nextId = lessonSequence[activeIndex + 1];
-                    if (accessibleLessons[nextId]) {
-                        document.getElementById(nextId).click();
-                    } else {
-                        showModal('Please complete the current lesson before continuing.');
+                    console.log('Next lesson should be:', nextId);
+                    
+                    // Determine which modules these lessons belong to
+                    let currentIdModule = 1;
+                    let nextIdModule = 1;
+                    
+                    // Module 1 ranges from video-intro to knowledge-check
+                    // Module 2 ranges from video-2-1 to video-2-2
+                    // Module 3 would start after video-2-2
+                    
+                    if (activeId.startsWith('video-2') || activeId.startsWith('screen-2')) {
+                        currentIdModule = 2;
+                    } else if (activeId.startsWith('video-3') || activeId.startsWith('screen-3')) {
+                        currentIdModule = 3;
                     }
+                    
+                    if (nextId.startsWith('video-2') || nextId.startsWith('screen-2')) {
+                        nextIdModule = 2;
+                    } else if (nextId.startsWith('video-3') || nextId.startsWith('screen-3')) {
+                        nextIdModule = 3;
+                    }
+                    
+                    // Check if this is a module transition
+                    const isModuleTransition = nextIdModule !== currentIdModule;
+                    
+                    // Only complete the module if we're at the appropriate last lesson of a module
+                    const isAtModuleEnd = (currentIdModule === 1 && activeId === 'knowledge-check') || 
+                                       (currentIdModule === 2 && activeId === 'video-2-2');
+                    
+                    // If we're at the end of a module AND transitioning, show completion modal
+                    if (isModuleTransition && isAtModuleEnd) {
+                        console.log('Completing Module', currentIdModule, 'before transitioning to Module', nextIdModule);
+                        completeModule(currentIdModule);
+                        return;
+                    }
+                    
+                    // Mark current lesson as completed
+                    completedLessons[activeId] = true;
+                    
+                    // Make next lesson accessible
+                    accessibleLessons[nextId] = true;
+                    
+                    // Update UI
+                    updateLessonAccessibility();
+                    
+                    // Explicitly find and click the next lesson element
+                    const nextLessonElement = document.getElementById(nextId);
+                    if (nextLessonElement) {
+                        console.log('Navigating to:', nextId);
+                        nextLessonElement.click();
+                    } else {
+                        console.error('Next lesson element not found:', nextId);
+                        showModal('Navigation error: Could not find the next lesson.');
+                    }
+                } else {
+                    console.log('At the end of the sequence');
                 }
             });
             
@@ -517,35 +988,56 @@
         
         // Track which lessons are accessible and which are completed
         let accessibleLessons = {
+            // Module 1
             'video-intro': true, // Start with video accessible
             'screen-1-1': false,
             'screen-1-2': false,
             'screen-1-3': false,
             'screen-1-4': false,
             'screen-1-5': false,
-            'knowledge-check': false
+            'knowledge-check': false,
+            // Module 2
+            'video-2-1': false,
+            'screen-2-1': false,
+            'screen-2-1-1': false,
+            'screen-2-1-2': false,
+            'video-2-2': false
         };
         
         // Separate tracking for completed lessons
         let completedLessons = {
+            // Module 1
             'video-intro': false,
             'screen-1-1': false,
             'screen-1-2': false,
             'screen-1-3': false,
             'screen-1-4': false,
             'screen-1-5': false,
-            'knowledge-check': false
+            'knowledge-check': false,
+            // Module 2
+            'video-2-1': false,
+            'screen-2-1': false,
+            'screen-2-1-1': false,
+            'screen-2-1-2': false,
+            'video-2-2': false
         };
         
         // Define the sequence of lessons
         const lessonSequence = [
+            // Module 1
             'video-intro',
             'screen-1-1',
             'screen-1-2',
             'screen-1-3',
             'screen-1-4',
             'screen-1-5',
-            'knowledge-check'
+            'knowledge-check',
+            // Module 2
+            'video-2-1',
+            'screen-2-1',
+            'screen-2-1-1',
+            'screen-2-1-2',
+            'video-2-2'
         ];
         
         function setupLessonHandlers() {
@@ -558,10 +1050,27 @@
                 item.addEventListener('click', function() {
                     const lessonId = this.id;
                     
+                    // Find the current active lesson and its index
+                    const activeLesson = document.querySelector('.lesson-item.active');
+                    const activeId = activeLesson ? activeLesson.id : null;
+                    const activeIndex = activeId ? lessonSequence.indexOf(activeId) : -1;
+                    const clickedIndex = lessonSequence.indexOf(lessonId);
+                    
+                    // Check if this is a valid next lesson (must be the immediate next or previous one)
+                    const isNextLesson = clickedIndex === activeIndex + 1;
+                    const isPreviousLesson = clickedIndex === activeIndex - 1;
+                    const isCurrentLesson = clickedIndex === activeIndex;
+                    
+                    // Only allow clicking on the current, immediate next, or previous lesson
+                    if (!isCurrentLesson && !isNextLesson && !isPreviousLesson && !completedLessons[lessonId]) {
+                        showModal('Please follow the lessons in sequence. You can only navigate to adjacent lessons.');
+                        return;
+                    }
+                    
                     // Check if this lesson is accessible
                     if (!isLessonAccessible(lessonId)) {
                         // Show a notification that they need to complete previous lessons first
-                        alert('Please complete the previous lessons in sequence before accessing this one.');
+                        showModal('Please complete the previous lessons in sequence before accessing this one.');
                         return;
                     }
                     
@@ -575,11 +1084,17 @@
                     // Mark the current lesson as completed
                     completedLessons[lessonId] = true;
                     
-                    // Update the next lesson to be accessible
+                    // Update the next lesson to be accessible - ONLY the immediate next lesson
                     const currentIndex = lessonSequence.indexOf(lessonId);
                     if (currentIndex < lessonSequence.length - 1) {
+                        // Only make the immediate next lesson accessible
                         const nextLessonId = lessonSequence[currentIndex + 1];
                         accessibleLessons[nextLessonId] = true;
+                        
+                        // Explicitly lock all lessons after the next one
+                        for (let i = currentIndex + 2; i < lessonSequence.length; i++) {
+                            accessibleLessons[lessonSequence[i]] = false;
+                        }
                     }
                     
                     // Update lesson styling based on completion status
@@ -593,6 +1108,56 @@
         
         function isLessonAccessible(lessonId) {
             return accessibleLessons[lessonId];
+        }
+        
+        function setupModuleHandlers() {
+            const moduleHeaders = document.querySelectorAll('.module-header');
+            moduleHeaders.forEach((header, index) => {
+                header.addEventListener('click', function() {
+                    const moduleItem = this.parentNode;
+                    const lessonsList = moduleItem.querySelector('.lesson-list');
+                    
+                    // For first module, we can always toggle
+                    if (index === 0) {
+                        lessonsList.style.display = lessonsList.style.display === 'none' ? 'block' : 'none';
+                        return;
+                    }
+                    
+                    // For module 2, we need to check if module 1 is completed
+                    if (index === 1) {
+                        // Check if Module 1 is completed (knowledge-check is completed)
+                        const isModule1Completed = completedLessons['knowledge-check'];
+                        
+                        if (isModule1Completed) {
+                            // If module is completed, we can toggle
+                            this.classList.remove('locked');
+                            lessonsList.style.display = lessonsList.style.display === 'none' ? 'block' : 'none';
+                            
+                            // Make first lesson of module 2 accessible
+                            accessibleLessons['video-2-1'] = true;
+                            updateLessonAccessibility();
+                        } else {
+                            // If module is not completed, show message
+                            showModal('Please complete Module 1 first before accessing Module 2.');
+                        }
+                        return;
+                    }
+                    
+                    // For module 3 and beyond, check if previous module is completed
+                    if (index >= 2) {
+                        const isModule2Completed = completedLessons['video-2-2'];
+                        
+                        if (isModule2Completed) {
+                            // If module is completed, we can toggle
+                            this.classList.remove('locked');
+                            lessonsList.style.display = lessonsList.style.display === 'none' ? 'block' : 'none';
+                        } else {
+                            // If module is not completed, show message
+                            showModal(`Please complete Module ${index} first before accessing Module ${index + 1}.`);
+                        }
+                    }
+                });
+            });
         }
         
         function updateLessonAccessibility() {
@@ -648,24 +1213,13 @@
                                 Your browser does not support the video tag.
                             </video>
                         </div>
+                        <div class="alert alert-info mt-3">
+                            <i class="fas fa-info-circle"></i> <strong>Important:</strong> You must watch the entire video before the "Continue" button will be enabled.
+                        </div>
+                        <div class="video-progress-indicator mt-2 text-muted">
+                            <small><i class="fas fa-clock"></i> Video completion status: <span id="video-status-intro">Not started</span></small>
+                        </div>
                     `;
-                    // Re-attach the event listener for the video
-                    setTimeout(() => {
-                        const introVideo = document.getElementById('intro-video');
-                        if (introVideo) {
-                            introVideo.addEventListener('ended', function() {
-                                // When video ends, mark current video as completed
-                                completedLessons['video-intro'] = true;
-                                
-                                // Make the next screen accessible
-                                accessibleLessons['screen-1-1'] = true;
-                                
-                                // Update the UI
-                                updateLessonAccessibility();
-                                updateNavigationButtons();
-                            });
-                        }
-                    }, 100);
                     break;
                     
                 case "screen-1-1":
@@ -820,12 +1374,172 @@
                                 <h4>Question 1</h4>
                                 <p>What is the primary purpose of futures thinking?</p>
                                 <ul class="quiz-options">
-                                    <li class="quiz-option">To predict the exact future with certainty</li>
-                                    <li class="quiz-option">To explore possible futures and prepare for them</li>
-                                    <li class="quiz-option">To create a single preferred future</li>
-                                    <li class="quiz-option">To analyze only historical trends</li>
+                                    <li class="quiz-option" onclick="selectAnswer(this, 'question1', 1)">To predict the exact future with certainty</li>
+                                    <li class="quiz-option" onclick="selectAnswer(this, 'question1', 2)">To explore possible futures and prepare for them</li>
+                                    <li class="quiz-option" onclick="selectAnswer(this, 'question1', 3)">To create a single preferred future</li>
+                                    <li class="quiz-option" onclick="selectAnswer(this, 'question1', 4)">To analyze only historical trends</li>
                                 </ul>
                             </div>
+                        </div>
+                    `;
+                    
+                    // Add the selectAnswer function if it doesn't exist yet
+                    if (typeof window.selectAnswer !== 'function') {
+                        window.selectAnswer = function(element, questionId, answerId) {
+                            // Clear previous selections
+                            const options = document.querySelectorAll('.quiz-option');
+                            options.forEach(option => {
+                                option.classList.remove('selected');
+                                option.classList.remove('correct');
+                                option.classList.remove('incorrect');
+                            });
+                            
+                            // Mark this answer as selected
+                            element.classList.add('selected');
+                            
+                            // Check if answer is correct (answer 2 is correct for question 1)
+                            if (questionId === 'question1' && answerId === 2) {
+                                element.classList.add('correct');
+                                // Enable the complete module button
+                                const continueButton = document.querySelector('.btn-continue');
+                                if (continueButton) {
+                                    continueButton.disabled = false;
+                                }
+                            } else {
+                                element.classList.add('incorrect');
+                            }
+                        };
+                    }
+                    break;
+                    
+                // Module 2 Content
+                case "video-2-1":
+                    contentTitle = "Driver Mapping Video";
+                    contentHTML = `
+                        <div class="video-container">
+                            <video controls class="w-100" id="driver-mapping-video">
+                                <source src="../assets/videos/2.1_Driver_Mapping.mp4" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                        <div class="alert alert-info mt-3">
+                            <i class="fas fa-info-circle"></i> <strong>Important:</strong> You must watch the entire video before the "Continue" button will be enabled.
+                        </div>
+                        <div class="video-progress-indicator mt-2 text-muted">
+                            <small><i class="fas fa-clock"></i> Video completion status: <span id="video-status-driver">Not started</span></small>
+                        </div>
+                    `;
+                    // Add video completion event listener
+                    setTimeout(() => {
+                        const video = document.getElementById('driver-mapping-video');
+                        if (video) {
+                            video.addEventListener('ended', function() {
+                                completedLessons['video-2-1'] = true;
+                                accessibleLessons['screen-2-1'] = true;
+                                updateLessonAccessibility();
+                                updateNavigationButtons();
+                            });
+                        }
+                    }, 100);
+                    break;
+                    
+                case "screen-2-1":
+                    contentTitle = "Driver Mapping";
+                    contentHTML = `
+                        <div class="text-content">
+                            <h3>Driver Mapping</h3>
+                            <h5>Drivers are influential forces of changes that are currently shaping or have the capacity to shape or transform a system. Driver mapping is one of the most important tools in foresight. It helps to identify the most influential forces of change in a system.</h5>
+                            <div class="mt-4">
+                                <p>To find these drivers, we often use tools like the STEEP or PESTLE frameworks. Think of these frameworks as ways to get a 'big picture' view of everything influencing a situation. They help us explore many different types of drivers by sorting them into categories:</p>
+                                <ul>
+                                    <li>STEEP looks at Social, Technological, Economic, Ecological (or Environmental), and Political drivers.</li>
+                                    <li>PESTLE includes all of those, plus an extra category for Legal drivers.</li>
+                                </ul>
+                                <div class="text-center mt-4 mb-4">
+                                    <img src="../assets/images/2.1_PESTLE.png" alt="PESTLE Framework" class="img-fluid" style="max-width: 100%; height: auto;">
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case "screen-2-1-1":
+                    contentTitle = "Why Use Driver Mapping?";
+                    contentHTML = `
+                        <div class="text-content">
+                            <h3>Why Use Driver Mapping?</h3>
+                            <h5>Understanding the core reasons for identifying and analyzing key forces of change.</h5>
+                            <div class="mt-4">
+                                <p>When we use Drive Mapping, we're aiming to achieve a few important things:</p>
+                                <ul>
+                                    <li>Our first goal is to pinpoint all the major forces (we call them 'drivers') that are truly shaping the system or topic we're exploring. This helps us see the full picture of what's influencing the future.</li>
+                                    <li>Next, from all those identified drivers, we figure out which ones are the most critical or influential. This helps us focus our efforts on the 'game-changers' that will have the biggest impact.</li>
+                                    <li>Finally, this core set of important drivers becomes the essential starting point for all our deeper futures analysis. They are the key ingredients we use to explore different possible futures and build scenarios.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case "screen-2-1-2":
+                    contentTitle = "How to do Driver Mapping?";
+                    contentHTML = `
+                        <div class="text-content">
+                            <h3>How to do Driver Mapping?</h3>
+                            <h5>Drive Mapping is a practical exercise to figure out what forces are really shaping your topic of interest. Think of it like a detective's checklist to understand the big picture!</h5>
+                            <div class="mt-4">
+                                <p>How to Drive Mapping:</p>
+                                <ul>
+                                    <li>Define Your Focus
+                                        <ul>
+                                            <li>Clearly state your topic, boundaries, and time frame.</li>
+                                        </ul>
+                                    </li>
+                                    <li>Choose Your Framework
+                                        <ul>
+                                            <li>Pick a lens like STEEP or PESTLE to guide your thinking.</li>
+                                        </ul>
+                                    </li>
+                                    <li>Brainstorm Drivers
+                                        <ul>
+                                            <li>List all possible influences you can think of.</li>
+                                        </ul>
+                                    </li>
+                                    <li>Organize & Refine
+                                        <ul>
+                                            <li>Group similar drivers, remove duplicates, and tidy up your list.</li>
+                                        </ul>
+                                    </li>
+                                    <li>Filter External Drivers
+                                        <ul>
+                                            <li>Separate out drivers you can't influence, focusing on what you can act on.</li>
+                                        </ul>
+                                    </li>
+                                    <li>Finalize Your List
+                                        <ul>
+                                            <li>Ensure you have a balanced number of critical drivers – not too many, not too few.</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case "video-2-2":
+                    contentTitle = "Horizon Scanning Video";
+                    contentHTML = `
+                        <div class="video-container">
+                            <video controls class="w-100" id="horizon-scanning-video">
+                                <source src="../assets/videos/2.2_Horizon_Scanning.mp4" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                        <div class="alert alert-info mt-3">
+                            <i class="fas fa-info-circle"></i> <strong>Important:</strong> You must watch the entire video before the "Continue" button will be enabled.
+                        </div>
+                        <div class="video-progress-indicator mt-2 text-muted">
+                            <small><i class="fas fa-clock"></i> Video completion status: <span id="video-status-horizon">Not started</span></small>
                         </div>
                     `;
                     break;
@@ -858,26 +1572,122 @@
             // Enable/disable continue button based on sequence
             const hasNext = activeIndex < lessonSequence.length - 1;
             
-            if (!hasNext) {
-                // Last lesson in sequence
+            // Determine which module this lesson belongs to
+            let currentModule = 1;
+            if (activeId.startsWith('video-2') || activeId.startsWith('screen-2')) {
+                currentModule = 2;
+            }
+            
+            // Get the module boundaries
+            const module1StartIndex = 0;
+            const module1EndIndex = lessonSequence.indexOf('knowledge-check');
+            const module2StartIndex = lessonSequence.indexOf('video-2-1');
+            const module2EndIndex = lessonSequence.indexOf('video-2-2');
+            
+            // Get the last lesson index for the current module
+            let lastLessonIndexForModule;
+            if (currentModule === 1) {
+                lastLessonIndexForModule = module1EndIndex;
+            } else if (currentModule === 2) {
+                lastLessonIndexForModule = module2EndIndex;
+            }
+            
+            // Check if this is the last lesson in the module
+            const isLastLessonInModule = activeIndex === lastLessonIndexForModule;
+            
+            // Determine which module range this lesson belongs to
+            const isInModule1 = activeIndex >= module1StartIndex && activeIndex <= module1EndIndex;
+            const isInModule2 = activeIndex >= module2StartIndex && activeIndex <= module2EndIndex;
+            
+            // Special handling for Knowledge Check - it should complete Module 1
+            if (activeId === 'knowledge-check') {
+                // Last lesson of Module 1
+                continueButton.innerHTML = 'Complete Module <i class="fas fa-check"></i>';
+                continueButton.disabled = true; // Disabled until the correct answer is selected
+                continueButton.onclick = function() {
+                    completeModule(1); // Complete Module 1 and unlock Module 2
+                };
+            } else if (activeId === 'video-2-2') {
+                // Last lesson of Module 2
                 continueButton.innerHTML = 'Complete Module <i class="fas fa-check"></i>';
                 continueButton.disabled = false;
+                
+                continueButton.onclick = function() {
+                    completeModule(2); // Complete Module 2
+                };
+            } else if (isLastLessonInModule && currentModule === 1) {
+                // Fallback for Module 1 completion (should not typically be reached)
+                continueButton.innerHTML = 'Complete Module <i class="fas fa-check"></i>';
+                continueButton.disabled = false;
+                
+                continueButton.onclick = function() {
+                    completeModule(1);
+                };
             } else {
-                // More lessons to go
+                // More lessons to go in the current module
                 continueButton.innerHTML = 'Continue <i class="fas fa-arrow-right"></i>';
                 
                 const nextId = lessonSequence[activeIndex + 1];
                 const nextIsAccessible = accessibleLessons[nextId];
                 
-                // If on video and video not complete, disable continue button
-                if (activeId === 'video-intro') {
-                    const video = document.getElementById('intro-video');
-                    if (video && !video.ended && video.currentTime < video.duration) {
-                        continueButton.disabled = true;
+                // IMPORTANT: DON'T set onclick handler here - it's overriding the one in setupNavigation
+                // This was causing the skipping issue by setting multiple click handlers
+                // We want to use the single handler defined in setupNavigation()
+                
+                // Handle video elements
+                if (activeId === 'video-intro' || activeId === 'video-2-1' || activeId === 'video-2-2') {
+                    let videoId;
+                    if (activeId === 'video-intro') videoId = 'intro-video';
+                    else if (activeId === 'video-2-1') videoId = 'driver-mapping-video';
+                    else if (activeId === 'video-2-2') videoId = 'horizon-scanning-video';
+                    
+                    const video = document.getElementById(videoId);
+                    
+                    if (video) {
+                        // Check if the lesson is already completed
+                        if (completedLessons[activeId]) {
+                            // If already completed, enable the continue button
+                            continueButton.disabled = false;
+                            return;
+                        }
+                        
+                        // If video has been watched previously (in the same session), enable continue
+                        if (video.currentTime > 0 && video.ended) {
+                            // Video has been watched, enable continue
+                            completedLessons[activeId] = true;
+                            
+                            // Make the next lesson accessible
+                            if (nextId) {
+                                accessibleLessons[nextId] = true;
+                            }
+                            
+                            continueButton.disabled = false;
+                            updateLessonAccessibility();
+                        } else {
+                            // Video hasn't been watched, add event listener for completion
+                            video.addEventListener('ended', function() {
+                                // Mark video as completed
+                                completedLessons[activeId] = true;
+                                
+                                // Make the next lesson accessible
+                                if (nextId) {
+                                    accessibleLessons[nextId] = true;
+                                }
+                                
+                                // Update UI
+                                updateLessonAccessibility();
+                                continueButton.disabled = false;
+                            });
+                            
+                            // If video is not complete, disable continue button
+                            continueButton.disabled = !(video.ended || completedLessons[activeId]);
+                        }
                     } else {
+                        // Video element not found, fall back to default behavior
                         continueButton.disabled = !nextIsAccessible;
                     }
                 } else {
+                    // Not a video lesson, use default accessibility check
                     continueButton.disabled = !nextIsAccessible;
                 }
             }
