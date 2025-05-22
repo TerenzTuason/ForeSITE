@@ -54,14 +54,6 @@ class Course extends Model
     }
 
     /**
-     * Get the modules for the course.
-     */
-    public function modules(): HasMany
-    {
-        return $this->hasMany(Module::class, 'course_id', 'course_id');
-    }
-
-    /**
      * Get the enrollments for the course.
      */
     public function enrollments(): HasMany

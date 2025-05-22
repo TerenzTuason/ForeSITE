@@ -52,7 +52,7 @@ class CourseController extends Controller
      */
     public function show(string $id): JsonResponse
     {
-        $course = Course::with(['learningStyle', 'modules'])->find($id);
+        $course = Course::with(['learningStyle'])->find($id);
         
         if (!$course) {
             return response()->json(['error' => 'Course not found'], Response::HTTP_NOT_FOUND);

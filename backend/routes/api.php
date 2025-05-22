@@ -92,7 +92,7 @@ Route::prefix('v1')->group(function () {
     Route::get('users/{user}/enrollments', [UserController::class, 'getEnrollments']);
     
     // Modules
-    Route::apiResource('courses.modules', ModuleController::class)->shallow();
+    // Route::apiResource('courses.modules', ModuleController::class)->shallow();
     
     // Module Content
     Route::apiResource('modules.contents', ModuleContentController::class)->shallow();

@@ -98,48 +98,34 @@ CREATE TABLE enrollments (
     UNIQUE KEY unique_enrollment (user_id, course_id)
 );
 
--- Modules table
-CREATE TABLE modules (
-    module_id INT PRIMARY KEY AUTO_INCREMENT,
-    course_id INT NOT NULL,
-    title VARCHAR(100) NOT NULL,
-    description TEXT,
-    sequence_order INT NOT NULL,
-    prerequisite_module_id INT NULL,
-    passing_score INT DEFAULT 75,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (course_id) REFERENCES courses(course_id),
-    FOREIGN KEY (prerequisite_module_id) REFERENCES modules(module_id)
-);
-
--- Module content table
-CREATE TABLE module_contents (
-    content_id INT PRIMARY KEY AUTO_INCREMENT,
-    module_id INT NOT NULL,
-    content_type ENUM('text', 'video', 'quiz', 'assignment', 'discussion') NOT NULL,
-    content_title VARCHAR(100) NOT NULL,
-    content_data TEXT NOT NULL,
-    learning_style_id INT NULL,
-    sequence_order INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (module_id) REFERENCES modules(module_id),
-    FOREIGN KEY (learning_style_id) REFERENCES learning_styles(style_id)
-);
-
 -- Student progress in modules
 CREATE TABLE module_progress (
     progress_id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
-    module_id INT NOT NULL,
+    course_id INT NOT NULL,
+    module_number INT NOT NULL,
+    module_title TEXT NOT NULL,
+    module_focus TEXT NOT NULL,
     status ENUM('not_started', 'in_progress', 'completed') DEFAULT 'not_started',
     progress_percentage INT DEFAULT 0,
     started_at TIMESTAMP NULL,
     completed_at TIMESTAMP NULL,
+    time_spent_minutes INT DEFAULT 0,
+    score INT NULL,
     FOREIGN KEY (user_id) REFERENCES users(user_id),
-    FOREIGN KEY (module_id) REFERENCES modules(module_id),
-    UNIQUE KEY unique_progress (user_id, module_id)
+    FOREIGN KEY (course_id) REFERENCES courses(course_id),
+    UNIQUE KEY unique_progress (user_id, course_id)
+);
+
+-- Module content table (for each module)
+CREATE TABLE module_contents (
+    content_id INT PRIMARY KEY AUTO_INCREMENT,
+    module_progress_id INT NOT NULL,
+    content_type ENUM('text', 'video', 'quiz', 'assignment', 'discussion') NOT NULL,
+    content_title VARCHAR(100) NOT NULL,
+    content_data TEXT NOT NULL,
+    sequence_order INT NOT NULL,
+    FOREIGN KEY (module_progress_id) REFERENCES module_progress(progress_id)
 );
 
 -- Certificates table
@@ -165,7 +151,7 @@ CREATE TABLE feedback (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (faculty_id) REFERENCES users(user_id),
     FOREIGN KEY (student_id) REFERENCES users(user_id),
-    FOREIGN KEY (module_id) REFERENCES modules(module_id)
+    FOREIGN KEY (module_id) REFERENCES module_progress(progress_id)
 );
 
 -- System log for monitoring and auditing
@@ -220,41 +206,6 @@ INSERT INTO courses (name, description, objectives, structure, learning_style_id
       "module": 3,
       "title": "Pathways for Business and Policy Needs",
       "focus": "Selecting and sequencing tools for policy and business goals using structured foresight pathways"
-    },
-    {
-      "module": 4,
-      "title": "Gathering Strategic Intelligence",
-      "focus": "Horizon Scanning, 7 Questions, and expert interviews to collect actionable future insights"
-    },
-    {
-      "module": 5,
-      "title": "Exploring the Dynamics of Change",
-      "focus": "Applying PESTLE-based driver mapping and Axes of Uncertainty for systems-focused foresight"
-    },
-    {
-      "module": 6,
-      "title": "Scenarios, Visioning, and Future Descriptions",
-      "focus": "Scenario matrix construction, visioning exercises, and strategic use of SWOT for future contexts"
-    },
-    {
-      "module": 7,
-      "title": "Developing & Testing Policy and Strategy",
-      "focus": "Policy Stress-Testing, Backcasting, and Roadmapping for robust, testable decision paths"
-    },
-    {
-      "module": 8,
-      "title": "Strategic Planning with Narrative Thinking",
-      "focus": "Integrating future-focused storytelling with design thinking and stakeholder co-creation"
-    },
-    {
-      "module": 9,
-      "title": "Evaluating Tools for Impact and Adaptability",
-      "focus": "SWOT analysis and iterative review of foresight tools for continuous improvement and relevance"
-    },
-    {
-      "module": 10,
-      "title": "Capstone: Real-World Foresight Application",
-      "focus": "Final synthesis project applying course tools to a live issue, such as climate policy, AI regulation, or smart cities"
     }
   ]',
   1
@@ -285,31 +236,6 @@ INSERT INTO courses (name, description, objectives, structure, learning_style_id
       "module": 3,
       "title": "Pathways to Meet Business Needs",
       "focus": "Matching foresight pathways to strategic goals through comparative analysis"
-    },
-    {
-      "module": 4,
-      "title": "Gathering Intelligence About the Future",
-      "focus": "Horizon Scanning, 7 Questions, Delphi Method — methods for rigorous evidence collection"
-    },
-    {
-      "module": 5,
-      "title": "Exploring the Dynamics of Change",
-      "focus": "Driver Mapping and Axes of Uncertainty using systems thinking frameworks (e.g., PESTLE)"
-    },
-    {
-      "module": 6,
-      "title": "Describing Future Scenarios",
-      "focus": "Scenario building, Visioning, and SWOT for structured foresight narratives"
-    },
-    {
-      "module": 7,
-      "title": "Developing & Testing Strategy",
-      "focus": "Strategy tools: Policy Stress-Testing, Backcasting, and Roadmapping for robust planning"
-    },
-    {
-      "module": 8,
-      "title": "Evaluating Futures Tools",
-      "focus": "Post-analysis of tool effectiveness across process, outcomes, and policy impact"
     }
   ]',
   2
@@ -340,31 +266,6 @@ INSERT INTO courses (name, description, objectives, structure, learning_style_id
       "module": 3,
       "title": "Pathways to Meet Business Needs",
       "focus": "Matching foresight pathways to strategic goals through comparative analysis"
-    },
-    {
-      "module": 4,
-      "title": "Gathering Intelligence About the Future",
-      "focus": "Horizon Scanning, 7 Questions, Delphi Method — methods for rigorous evidence collection"
-    },
-    {
-      "module": 5,
-      "title": "Exploring the Dynamics of Change",
-      "focus": "Driver Mapping and Axes of Uncertainty using systems thinking frameworks (e.g., PESTLE)"
-    },
-    {
-      "module": 6,
-      "title": "Describing Future Scenarios",
-      "focus": "Scenario building, Visioning, and SWOT for structured foresight narratives"
-    },
-    {
-      "module": 7,
-      "title": "Developing & Testing Strategy",
-      "focus": "Strategy tools: Policy Stress-Testing, Backcasting, and Roadmapping for robust planning"
-    },
-    {
-      "module": 8,
-      "title": "Evaluating Futures Tools",
-      "focus": "Post-analysis of tool effectiveness across process, outcomes, and policy impact"
     }
   ]',
   3
@@ -396,31 +297,6 @@ INSERT INTO courses (name, description, objectives, structure, learning_style_id
       "module": 3,
       "title": "Pathways for Business Needs",
       "focus": "Understanding and comparing seven strategic foresight pathways"
-    },
-    {
-      "module": 4,
-      "title": "Tools for Gathering Intelligence",
-      "focus": "Horizon Scanning, Delphi, 7 Questions, and Issues Paper use and alignment"
-    },
-    {
-      "module": 5,
-      "title": "Exploring the Dynamics of Change",
-      "focus": "Driver Mapping and Axes of Uncertainty for systems-focused foresight"
-    },
-    {
-      "module": 6,
-      "title": "Describing Future Possibilities",
-      "focus": "Scenario creation, Visioning preferred futures, and comparing narrative paths"
-    },
-    {
-      "module": 7,
-      "title": "Developing & Testing Strategy",
-      "focus": "Backcasting, Policy Stress-Testing, and Wind-Tunneling"
-    },
-    {
-      "module": 8,
-      "title": "Evaluating Foresight Tools",
-      "focus": "Post-use reflection on effectiveness, engagement, and strategic alignment"
     }
   ]',
   4
