@@ -304,9 +304,54 @@
             </div>
 
             <ul class="module-list" id="module-list">
-                <!-- Modules will be dynamically loaded here -->
-                <li class="loading-placeholder text-center p-4">
-                    <i class="fas fa-spinner fa-spin me-2"></i> Loading modules...
+                <!-- Hardcoded module structure -->
+                <li class="module-item active">
+                    <div class="module-header active">
+                        <i class="fas fa-book"></i>
+                        Module 1: Introduction to Futures Thinking
+                    </div>
+                    <ul class="lesson-list">
+                        <li class="lesson-item active" id="video-intro">
+                            <i class="fas fa-video"></i>
+                            <span>Welcome Video</span>
+                        </li>
+                        <li class="lesson-item" id="screen-1-1">
+                            <i class="fas fa-file-alt"></i>
+                            <span>What is Futures Thinking?</span>
+                        </li>
+                        <li class="lesson-item" id="screen-1-2">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Looking Ahead: The Three Horizons Model</span>
+                        </li>
+                        <li class="lesson-item" id="screen-1-3">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Identifying Change Drivers</span>
+                        </li>
+                        <li class="lesson-item" id="screen-1-4">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Identifying Weak Signals</span>
+                        </li>
+                        <li class="lesson-item" id="screen-1-5">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Linking Futures Thinking to the Policy Cycle</span>
+                        </li>
+                        <li class="lesson-item" id="knowledge-check">
+                            <i class="fas fa-question-circle"></i>
+                            <span>Knowledge Check</span>
+                        </li>
+                    </ul>
+                </li>
+                <li class="module-item">
+                    <div class="module-header locked">
+                        <i class="fas fa-lock"></i>
+                        Module 2: Futures Process Design
+                    </div>
+                </li>
+                <li class="module-item">
+                    <div class="module-header locked">
+                        <i class="fas fa-lock"></i>
+                        Module 3: Pathways for Business Needs
+                    </div>
                 </li>
             </ul>
         </div>
@@ -318,10 +363,12 @@
                 </div>
                 
                 <div class="content-body">
-                    <!-- Example of video content -->
-                    <div class="video-content">
-                        <!-- Placeholder for video -->
-                        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #000;"></div>
+                    <!-- Video content for the first screen -->
+                    <div class="video-container">
+                        <video controls class="w-100" id="intro-video">
+                            <source src="../assets/videos/1_Introduction_to_Futures_Thinking.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
                     </div>
                 </div>
 
@@ -353,18 +400,7 @@
                     }
                 });
             });
-            
-            // Get URL parameters
-            const urlParams = new URLSearchParams(window.location.search);
-            const courseId = urlParams.get('id');
-            
-            if (!courseId) {
-                console.error('No course ID provided');
-                window.location.href = 'course-details.html';
-                return;
-            }
-            
-            // Get user data from session storage
+            // Check if user is logged in
             const userData = JSON.parse(sessionStorage.getItem('user'));
             if (!userData) {
                 window.location.href = '../login.html';
@@ -372,274 +408,480 @@
             }
 
             // Add logout functionality
-            const logoutBtn = document.querySelector('.btn-logout');
-            if (logoutBtn) {
-                logoutBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    sessionStorage.removeItem('user');
-                    window.location.href = '../login.html';
+            $(document).on('click', '.btn-logout', function(e) {
+                e.preventDefault();
+                sessionStorage.removeItem('user');
+                window.location.href = '../login.html';
+            });
+            
+            // Set up video completion handler for the intro video
+            const introVideo = document.getElementById('intro-video');
+            if (introVideo) {
+                introVideo.addEventListener('ended', function() {
+                    // When video ends, mark current video as completed
+                    completedLessons['video-intro'] = true;
+                    
+                    // Make the next screen accessible
+                    accessibleLessons['screen-1-1'] = true;
+                    
+                    // Update the UI
+                    updateLessonAccessibility();
+                    updateNavigationButtons();
                 });
             }
             
-            // Fetch course data
-            fetchCourseData(courseId);
-        });
-
-        // Toggle sidebar on mobile
-        document.addEventListener('DOMContentLoaded', function() {
-            const toggleSidebar = document.querySelector('.toggle-sidebar');
-            if (toggleSidebar) {
-                toggleSidebar.addEventListener('click', function() {
-                    document.querySelector('.sidebar').classList.toggle('show');
-                });
-            }
+            // Add click handlers for navigation buttons
+            setupNavigation();
+            
+            // Add click handlers to lesson items
+            setupLessonHandlers();
         });
         
-        function fetchCourseData(courseId) {
-            fetch(`http://127.0.0.1:8000/api/v1/courses/${courseId}`)
-                .then(response => response.json())
-                .then(data => {
-                    const course = data.data;
-                    
-                    // Update progress indicator
-                    updateProgressIndicator(course);
-                    
-                    // Load modules
-                    loadModules(course.structure);
-                    
-                    // Load initial content (first lesson of first module)
-                    if (course.structure && course.structure.length > 0) {
-                        // Set content title
-                        const firstModule = course.structure[0];
-                        if (firstModule.lessons && firstModule.lessons.length > 0) {
-                            const firstLesson = firstModule.lessons[0];
-                            document.querySelector('.content-title').textContent = firstLesson.title || 'Welcome to Futures Thinking';
-                            // Here you would load the actual content based on the lesson type
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching course details:', error);
-                    document.querySelector('#module-list').innerHTML = `
-                        <div class="alert alert-danger">
-                            Error loading course modules. Please try again later.
+        // Add modal HTML to the page
+        function addModalHTML() {
+            const modalHTML = `
+                <div class="modal fade" id="videoRequiredModal" tabindex="-1" aria-labelledby="videoRequiredModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="videoRequiredModalLabel">Action Required</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p id="modal-message">Please finish watching the video before continuing.</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                            </div>
                         </div>
-                    `;
-                });
-        }
-        
-        function updateProgressIndicator(course) {
-            // For now, we'll use a placeholder progress value
-            // In a real application, this would be calculated based on user progress
-            const progress = 0; // placeholder value
-            
-            const progressText = document.querySelector('#progress-percentage');
-            const progressBar = document.querySelector('.progress-bar');
-            
-            if (progressText) progressText.textContent = `${progress}%`;
-            if (progressBar) {
-                progressBar.style.width = `${progress}%`;
-                progressBar.setAttribute('aria-valuenow', progress);
-            }
-        }
-        
-        function loadModules(modules) {
-            const moduleList = document.querySelector('#module-list');
-            if (!moduleList) return;
-            
-            if (!modules || modules.length === 0) {
-                moduleList.innerHTML = `
-                    <div class="alert alert-info">
-                        No modules found for this course.
                     </div>
-                `;
-                return;
+                </div>
+            `;
+            
+            // Append modal to body if it doesn't exist
+            if (!document.getElementById('videoRequiredModal')) {
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
             }
-            
-            let moduleHtml = '';
-            
-            modules.forEach((module, index) => {
-                const isActive = index === 0;
-                const isLocked = index > 0;
-                
-                let moduleClass = 'module-item';
-                let headerClass = 'module-header';
-                let icon = 'fas fa-book';
-                
-                if (isActive) headerClass += ' active';
-                if (isLocked) {
-                    headerClass += ' locked';
-                    icon = 'fas fa-lock';
-                }
-                
-                moduleHtml += `
-                    <li class="${moduleClass}" data-module-id="${module.module_id || index + 1}">
-                        <div class="${headerClass}">
-                            <i class="${icon}"></i>
-                            Module ${module.module}: ${module.title}
-                        </div>
-                `;
-                
-                // Add lessons if this is the first (active) module
-                if (isActive && module.lessons && module.lessons.length > 0) {
-                    moduleHtml += `<ul class="lesson-list">`;
-                    
-                    module.lessons.forEach((lesson, lessonIndex) => {
-                        const isLessonActive = lessonIndex === 0;
-                        let lessonClass = 'lesson-item';
-                        if (isLessonActive) lessonClass += ' active';
-                        
-                        // Determine icon based on content type
-                        let lessonIcon = 'fas fa-file-alt';
-                        if (lesson.type === 'video') lessonIcon = 'fas fa-play-circle';
-                        else if (lesson.type === 'quiz') lessonIcon = 'fas fa-question-circle';
-                        
-                        moduleHtml += `
-                            <li class="${lessonClass}" data-lesson-id="${lesson.lesson_id || lessonIndex + 1}">
-                                <i class="${lessonIcon}"></i>
-                                ${lesson.title}
-                            </li>
-                        `;
-                    });
-                    
-                    moduleHtml += `</ul>`;
-                }
-                
-                // If no lessons array or it's not the active module, we'll create placeholder lessons
-                if (isActive && (!module.lessons || module.lessons.length === 0)) {
-                    moduleHtml += `
-                        <ul class="lesson-list">
-                            <li class="lesson-item active">
-                                <i class="fas fa-play-circle"></i>
-                                Welcome Video
-                            </li>
-                            <li class="lesson-item">
-                                <i class="fas fa-file-alt"></i>
-                                What is ${module.title}?
-                            </li>
-                            <li class="lesson-item">
-                                <i class="fas fa-question-circle"></i>
-                                Knowledge Check
-                            </li>
-                        </ul>
-                    `;
-                }
-                
-                moduleHtml += `</li>`;
-            });
-            
-            moduleList.innerHTML = moduleHtml;
-            
-            // Add event listeners to modules and lessons
-            addModuleEventListeners();
         }
         
-        function addModuleEventListeners() {
-            // Module headers click event
-            document.querySelectorAll('.module-header:not(.locked)').forEach(header => {
-                header.addEventListener('click', function() {
-                    // Toggle active state
-                    document.querySelectorAll('.module-header').forEach(h => h.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    // Toggle lesson list visibility if needed
-                    // Depending on your design, you might want to show/hide lessons
-                });
-            });
-            
-            // Lesson items click event
-            document.querySelectorAll('.lesson-item').forEach(lesson => {
-                lesson.addEventListener('click', function() {
-                    // Set active lesson
-                    document.querySelectorAll('.lesson-item').forEach(l => l.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    // Update content based on selected lesson
-                    const lessonTitle = this.textContent.trim();
-                    document.querySelector('.content-title').textContent = lessonTitle;
-                    
-                    // Here you would load the actual content based on the lesson type
-                    // This is placeholder logic - in a real app, you'd fetch the lesson content
-                    if (this.querySelector('i').classList.contains('fa-play-circle')) {
-                        // Video content
-                        document.querySelector('.content-body').innerHTML = `
-                            <div class="video-content">
-                                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #000;"></div>
-                            </div>
-                        `;
-                    } else if (this.querySelector('i').classList.contains('fa-file-alt')) {
-                        // Text content
-                        document.querySelector('.content-body').innerHTML = `
-                            <div class="text-content">
-                                <h3>Learning objectives</h3>
-                                <ul>
-                                    <li>Understand the fundamentals of ${lessonTitle}</li>
-                                    <li>Apply key concepts to real-world scenarios</li>
-                                    <li>Develop analytical skills in future thinking</li>
-                                </ul>
-                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi. 
-                                Sed vel risus ac libero pellentesque feugiat. Praesent sed justo vel eros 
-                                dignissim pharetra in vel tortor.</p>
-                            </div>
-                        `;
-                    } else if (this.querySelector('i').classList.contains('fa-question-circle')) {
-                        // Quiz content
-                        document.querySelector('.content-body').innerHTML = `
-                            <div class="quiz-content">
-                                <div class="quiz-question">
-                                    <h4>Question 1</h4>
-                                    <p>What is the primary purpose of futures thinking?</p>
-                                    <ul class="quiz-options">
-                                        <li class="quiz-option">To predict the exact future with certainty</li>
-                                        <li class="quiz-option">To explore possible futures and prepare for them</li>
-                                        <li class="quiz-option">To create a single preferred future</li>
-                                        <li class="quiz-option">To analyze only historical trends</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        `;
-                    }
-                    
-                    // Update navigation buttons
-                    updateNavigationButtons(this);
-                });
-            });
+        // Show modal with a specific message
+        function showModal(message) {
+            addModalHTML();
+            document.getElementById('modal-message').textContent = message;
+            const modal = new bootstrap.Modal(document.getElementById('videoRequiredModal'));
+            modal.show();
         }
         
-        function updateNavigationButtons(currentLesson) {
+        function setupNavigation() {
             const backButton = document.querySelector('.btn-back');
             const continueButton = document.querySelector('.btn-continue');
             
-            // Get all visible lessons
-            const lessons = Array.from(document.querySelectorAll('.lesson-item'));
-            const currentIndex = lessons.indexOf(currentLesson);
+            backButton.addEventListener('click', function() {
+                const activeLesson = document.querySelector('.lesson-item.active');
+                const activeId = activeLesson.id;
+                const activeIndex = lessonSequence.indexOf(activeId);
+                
+                if (activeIndex > 0) {
+                    const prevId = lessonSequence[activeIndex - 1];
+                    document.getElementById(prevId).click();
+                }
+            });
             
-            // Enable/disable back button
-            if (currentIndex <= 0) {
-                backButton.disabled = true;
-            } else {
-                backButton.disabled = false;
-                backButton.onclick = function() {
-                    lessons[currentIndex - 1].click();
-                };
+            continueButton.addEventListener('click', function() {
+                const activeLesson = document.querySelector('.lesson-item.active');
+                const activeId = activeLesson.id;
+                
+                // If on video and video not finished, show modal
+                if (activeId === 'video-intro') {
+                    const video = document.getElementById('intro-video');
+                    if (video && video.currentTime < video.duration) {
+                        showModal('Please finish watching the video before continuing.');
+                        return;
+                    }
+                }
+                
+                const activeIndex = lessonSequence.indexOf(activeId);
+                if (activeIndex < lessonSequence.length - 1) {
+                    const nextId = lessonSequence[activeIndex + 1];
+                    if (accessibleLessons[nextId]) {
+                        document.getElementById(nextId).click();
+                    } else {
+                        showModal('Please complete the current lesson before continuing.');
+                    }
+                }
+            });
+            
+            // Initialize navigation buttons
+            updateNavigationButtons();
+        }
+        
+        // Track which lessons are accessible and which are completed
+        let accessibleLessons = {
+            'video-intro': true, // Start with video accessible
+            'screen-1-1': false,
+            'screen-1-2': false,
+            'screen-1-3': false,
+            'screen-1-4': false,
+            'screen-1-5': false,
+            'knowledge-check': false
+        };
+        
+        // Separate tracking for completed lessons
+        let completedLessons = {
+            'video-intro': false,
+            'screen-1-1': false,
+            'screen-1-2': false,
+            'screen-1-3': false,
+            'screen-1-4': false,
+            'screen-1-5': false,
+            'knowledge-check': false
+        };
+        
+        // Define the sequence of lessons
+        const lessonSequence = [
+            'video-intro',
+            'screen-1-1',
+            'screen-1-2',
+            'screen-1-3',
+            'screen-1-4',
+            'screen-1-5',
+            'knowledge-check'
+        ];
+        
+        function setupLessonHandlers() {
+            const lessonItems = document.querySelectorAll('.lesson-item');
+            
+            // First, apply the locked styling to all lessons except the first
+            updateLessonAccessibility();
+            
+            lessonItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const lessonId = this.id;
+                    
+                    // Check if this lesson is accessible
+                    if (!isLessonAccessible(lessonId)) {
+                        // Show a notification that they need to complete previous lessons first
+                        alert('Please complete the previous lessons in sequence before accessing this one.');
+                        return;
+                    }
+                    
+                    // Set this lesson as active
+                    lessonItems.forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Update content based on the clicked item's ID
+                    updateContent(lessonId);
+                    
+                    // Mark the current lesson as completed
+                    completedLessons[lessonId] = true;
+                    
+                    // Update the next lesson to be accessible
+                    const currentIndex = lessonSequence.indexOf(lessonId);
+                    if (currentIndex < lessonSequence.length - 1) {
+                        const nextLessonId = lessonSequence[currentIndex + 1];
+                        accessibleLessons[nextLessonId] = true;
+                    }
+                    
+                    // Update lesson styling based on completion status
+                    updateLessonAccessibility();
+                    
+                    // Update navigation buttons
+                    updateNavigationButtons();
+                });
+            });
+        }
+        
+        function isLessonAccessible(lessonId) {
+            return accessibleLessons[lessonId];
+        }
+        
+        function updateLessonAccessibility() {
+            const lessonItems = document.querySelectorAll('.lesson-item');
+            const currentActive = document.querySelector('.lesson-item.active');
+            
+            lessonItems.forEach(item => {
+                const lessonId = item.id;
+                
+                // Handle accessibility (unlocking/locking)
+                if (accessibleLessons[lessonId]) {
+                    // This lesson is accessible
+                    item.classList.remove('locked');
+                    item.style.opacity = '1';
+                    item.style.cursor = 'pointer';
+                } else {
+                    // This lesson is locked
+                    item.classList.add('locked');
+                    item.style.opacity = '0.5';
+                    item.style.cursor = 'not-allowed';
+                }
+                
+                // Handle completion (checkmarks) - only for completed lessons
+                if (completedLessons[lessonId] && item !== currentActive) {
+                    // It's a completed lesson and not the active one - add a check mark
+                    const icon = item.querySelector('i');
+                    if (icon && !icon.classList.contains('fa-check-circle')) {
+                        const originalClass = icon.className;
+                        item.setAttribute('data-original-icon', originalClass);
+                        icon.className = 'fas fa-check-circle text-success';
+                    }
+                } else if (!completedLessons[lessonId] && item.hasAttribute('data-original-icon')) {
+                    // It's not completed, restore original icon
+                    const icon = item.querySelector('i');
+                    const originalClass = item.getAttribute('data-original-icon');
+                    icon.className = originalClass;
+                }
+            });
+        }
+        
+        function updateContent(screenId) {
+            // Update the content title
+            let contentTitle = "";
+            let contentHTML = "";
+            
+            switch(screenId) {
+                case "video-intro":
+                    contentTitle = "Welcome to Futures Thinking";
+                    contentHTML = `
+                        <div class="video-container">
+                            <video controls class="w-100" id="intro-video">
+                                <source src="../assets/videos/1_Introduction_to_Futures_Thinking.mp4" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                    `;
+                    // Re-attach the event listener for the video
+                    setTimeout(() => {
+                        const introVideo = document.getElementById('intro-video');
+                        if (introVideo) {
+                            introVideo.addEventListener('ended', function() {
+                                // When video ends, mark current video as completed
+                                completedLessons['video-intro'] = true;
+                                
+                                // Make the next screen accessible
+                                accessibleLessons['screen-1-1'] = true;
+                                
+                                // Update the UI
+                                updateLessonAccessibility();
+                                updateNavigationButtons();
+                            });
+                        }
+                    }, 100);
+                    break;
+                    
+                case "screen-1-1":
+                    contentTitle = "What is Futures Thinking?";
+                    contentHTML = `
+                        <div class="text-content">
+                            <h3>What is Futures Thinking?</h3>
+                            <h5>A strategic mindset to explore change and build resilient policy</h5>
+                            <div class="mt-4">
+                                <ul>
+                                    <li>Futures Thinking helps identify long-term issues and uncertainties in a policy area.</li>
+                                    <li>It does not predict the future — it helps prepare for different possibilities.</li>
+                                    <li>Supports resilient policy design using tools like:
+                                        <ul>
+                                            <li>Scenario planning</li>
+                                            <li>Change driver analysis</li>
+                                            <li>Strategic workshops</li>
+                                        </ul>
+                                    </li>
+                                    <li>It is flexible — it can be adapted for quick brainstorming or in-depth strategy development.</li>
+                                    <li>Helps teams:
+                                        <ul>
+                                            <li>Understand trends</li>
+                                            <li>Make better-informed decisions</li>
+                                            <li>Mobilize stakeholder action</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case "screen-1-2":
+                    contentTitle = "Looking Ahead: The Three Horizons Model";
+                    contentHTML = `
+                        <div class="text-content">
+                            <h3>Looking Ahead: The Three Horizons Model</h3>
+                            <h5>A tool for thinking across short, medium, and long-term futures.</h5>
+                            <div class="mt-4">
+                                <div class="text-center mb-4">
+                                    <img src="../assets/images/1.2_The_Three_Horizons_Model.png" alt="Three Horizons Model" class="img-fluid" style="max-width: 100%; height: auto;">
+                                </div>
+                                <ul>
+                                    <li>The Three Horizons Framework breaks change into three phases:
+                                        <ul>
+                                            <li>Horizon 1 (H1): Present systems and issues we manage today</li>
+                                            <li>Horizon 2 (H2): Emerging changes and innovations disrupting the current system</li>
+                                            <li>Horizon 3 (H3): Long-term transformations and future possibilities</li>
+                                        </ul>
+                                    </li>
+                                    <li>Policymakers must:
+                                        <ul>
+                                            <li>Respond to current needs (H1)</li>
+                                            <li>Prepare for near-term shifts (H2)</li>
+                                            <li>Explore long-term visions (H3)</li>
+                                        </ul>
+                                    </li>
+                                    <li>Futures tools focus most on H2 and H3, helping policymakers stay ahead of change.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case "screen-1-3":
+                    contentTitle = "Identifying Change Drivers";
+                    contentHTML = `
+                        <div class="text-content">
+                            <h3>Identifying Change Drivers</h3>
+                            <h5>Understanding what shapes the future.</h5>
+                            <div class="mt-4">
+                                <ul>
+                                    <li>Change drivers are trends or forces influencing how the future develops.</li>
+                                    <li>Often categorized using PESTLE:
+                                        <ul>
+                                            <li>Political</li>
+                                            <li>Economic</li>
+                                            <li>Social</li>
+                                            <li>Technological</li>
+                                            <li>Legal</li>
+                                            <li>Environmental</li>
+                                        </ul>
+                                    </li>
+                                    <li>Look beyond current events—important drivers often emerge outside the usual policy space.</li>
+                                    <li>Tip: It's better to collect too many drivers than miss a critical one.</li>
+                                    <li>Driver identification is the foundation of most futures work.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case "screen-1-4":
+                    contentTitle = "Identifying Weak Signals";
+                    contentHTML = `
+                        <div class="text-content">
+                            <h3>Identifying Weak Signals</h3>
+                            <h5>Spotting early signs of future change.</h5>
+                            <div class="mt-4">
+                                <ul>
+                                    <li>Weak signals are early hints of significant future changes.</li>
+                                    <li>They are often unclear, rare, or not well understood yet.</li>
+                                    <li>Horizon Scanning helps identify these subtle trends.</li>
+                                    <li>Even if there's no solid data, trust your intuition — a weak signal might grow into a major shift.</li>
+                                    <li>Example: An unusual news article today could indicate a big future trend tomorrow.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case "screen-1-5":
+                    contentTitle = "Linking Futures Thinking to the Policy Cycle";
+                    contentHTML = `
+                        <div class="text-content">
+                            <h3>Linking Futures Thinking to the Policy Cycle</h3>
+                            <h5>Where foresight fits in policymaking.</h5>
+                            <div class="mt-4">
+                                <div class="text-center mb-4">
+                                    <img src="../assets/images/1.5_Illustrative_Policy_Cycle.png" alt="Illustrative Policy Cycle" class="img-fluid" style="max-width: 100%; height: auto;">
+                                </div>
+                                <ul>
+                                    <li>The policy cycle typically includes:
+                                        <ul>
+                                            <li>Formulation (where Futures Thinking is most valuable)</li>
+                                            <li>Implementation</li>
+                                            <li>Monitoring</li>
+                                            <li>Evaluation</li>
+                                            <li>Modification</li>
+                                        </ul>
+                                    </li>
+                                    <li>Futures Thinking supports early-stage strategy by:
+                                        <ul>
+                                            <li>Providing fresh insight and long-term perspective</li>
+                                            <li>Highlighting uncertainties and trade-offs</li>
+                                        </ul>
+                                    </li>
+                                    <li>Key to impact: Involve policy teams and decision-makers early in the futures process.</li>
+                                    <li>Use futures work to bridge long-term visioning with real policy goals.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case "knowledge-check":
+                    contentTitle = "Knowledge Check";
+                    contentHTML = `
+                        <div class="quiz-content">
+                            <div class="quiz-question">
+                                <h4>Question 1</h4>
+                                <p>What is the primary purpose of futures thinking?</p>
+                                <ul class="quiz-options">
+                                    <li class="quiz-option">To predict the exact future with certainty</li>
+                                    <li class="quiz-option">To explore possible futures and prepare for them</li>
+                                    <li class="quiz-option">To create a single preferred future</li>
+                                    <li class="quiz-option">To analyze only historical trends</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                default:
+                    contentTitle = "Welcome to Futures Thinking";
+                    contentHTML = `<p>Please select a lesson from the sidebar.</p>`;
             }
             
-            // Enable/disable continue button
-            if (currentIndex >= lessons.length - 1) {
-                continueButton.textContent = 'Complete Module';
+            // Update the content
+            document.querySelector('.content-title').textContent = contentTitle;
+            document.querySelector('.content-body').innerHTML = contentHTML;
+        }
+        
+        function updateNavigationButtons() {
+            const backButton = document.querySelector('.btn-back');
+            const continueButton = document.querySelector('.btn-continue');
+            
+            // Get active lesson
+            const activeLesson = document.querySelector('.lesson-item.active');
+            if (!activeLesson) return;
+            
+            const activeId = activeLesson.id;
+            const activeIndex = lessonSequence.indexOf(activeId);
+            
+            // Enable/disable back button based on sequence
+            const hasPrevious = activeIndex > 0;
+            backButton.disabled = !hasPrevious;
+            
+            // Enable/disable continue button based on sequence
+            const hasNext = activeIndex < lessonSequence.length - 1;
+            
+            if (!hasNext) {
+                // Last lesson in sequence
                 continueButton.innerHTML = 'Complete Module <i class="fas fa-check"></i>';
-                continueButton.onclick = function() {
-                    // Logic for completing the module
-                    alert('Module completed! Next module will be unlocked.');
-                };
+                continueButton.disabled = false;
             } else {
-                continueButton.textContent = 'Continue';
+                // More lessons to go
                 continueButton.innerHTML = 'Continue <i class="fas fa-arrow-right"></i>';
-                continueButton.onclick = function() {
-                    lessons[currentIndex + 1].click();
-                };
+                
+                const nextId = lessonSequence[activeIndex + 1];
+                const nextIsAccessible = accessibleLessons[nextId];
+                
+                // If on video and video not complete, disable continue button
+                if (activeId === 'video-intro') {
+                    const video = document.getElementById('intro-video');
+                    if (video && !video.ended && video.currentTime < video.duration) {
+                        continueButton.disabled = true;
+                    } else {
+                        continueButton.disabled = !nextIsAccessible;
+                    }
+                } else {
+                    continueButton.disabled = !nextIsAccessible;
+                }
             }
         }
     </script>
 </body>
-</html> 
+</html>
