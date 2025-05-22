@@ -51,12 +51,7 @@
    DB_PASSWORD=
    ```
 
-6. Create Laravel required tables (sessions, etc.):
-   ```bash
-   php artisan migrate
-   ```
-
-7. Start the Laravel development server:
+6. Start the Laravel development server:
    ```bash
    php artisan serve
    ```
