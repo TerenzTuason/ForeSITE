@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\StudentProfileController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ModuleController;
 use App\Http\Controllers\Api\ModuleContentController;
+use App\Http\Controllers\Api\ModuleProgressController;
 use App\Http\Controllers\Api\FeedbackController;
 use App\Http\Controllers\Api\CertificateController;
 use App\Http\Controllers\Api\EnrollmentController;
@@ -94,8 +95,14 @@ Route::prefix('v1')->group(function () {
     // Modules
     // Route::apiResource('courses.modules', ModuleController::class)->shallow();
     
+    // Module Progress
+    Route::apiResource('module-progress', ModuleProgressController::class);
+    Route::get('users/{user}/module-progress', [ModuleProgressController::class, 'getProgressByUser']);
+    Route::get('courses/{course}/module-progress', [ModuleProgressController::class, 'getProgressByCourse']);
+    
     // Module Content
     Route::apiResource('modules.contents', ModuleContentController::class)->shallow();
+    Route::apiResource('module-progress.contents', ModuleContentController::class)->shallow();
     
     // Certificates
     Route::apiResource('certificates', CertificateController::class);

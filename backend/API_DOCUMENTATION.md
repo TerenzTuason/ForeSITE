@@ -98,28 +98,39 @@ The API provides CRUD (Create, Read, Update, Delete) operations for the main ent
 - **PUT /api/v1/modules/{id}**: Update a module
 - **DELETE /api/v1/modules/{id}**: Delete a module
 
-### 9. Module Contents (`module_contents` table)
+### 9. Module Progress (`module_progress` table)
+- **GET /api/v1/module-progress**: List all module progress entries
+- **GET /api/v1/module-progress/{id}**: Get specific module progress
+- **POST /api/v1/module-progress**: Create a new module progress (supports single or bulk insert)
+- **PUT /api/v1/module-progress/{id}**: Update a module progress
+- **DELETE /api/v1/module-progress/{id}**: Delete a module progress
+- **GET /api/v1/users/{user}/module-progress**: Get all module progress entries for a specific user
+- **GET /api/v1/courses/{course}/module-progress**: Get all module progress entries for a specific course
+
+### 10. Module Contents (`module_contents` table)
 - **GET /api/v1/modules/{module}/contents**: List all content for a module
+- **GET /api/v1/module-progress/{moduleId}/contents**: List all content for a module progress
 - **GET /api/v1/contents/{id}**: Get specific content
-- **POST /api/v1/modules/{module}/contents**: Create new content
+- **POST /api/v1/modules/{module}/contents**: Create new content for a module
+- **POST /api/v1/module-progress/{moduleId}/contents**: Create new content for a module progress
 - **PUT /api/v1/contents/{id}**: Update content
 - **DELETE /api/v1/contents/{id}**: Delete content
 
-### 10. Certificates (`certificates` table)
+### 11. Certificates (`certificates` table)
 - **GET /api/v1/certificates**: List all certificates
 - **GET /api/v1/certificates/{id}**: Get specific certificate
 - **POST /api/v1/certificates**: Create a new certificate
 - **PUT /api/v1/certificates/{id}**: Update a certificate
 - **DELETE /api/v1/certificates/{id}**: Delete a certificate
 
-### 11. Feedback (`feedback` table)
+### 12. Feedback (`feedback` table)
 - **GET /api/v1/feedback**: List all feedback
 - **GET /api/v1/feedback/{id}**: Get specific feedback
 - **POST /api/v1/feedback**: Create a new feedback
 - **PUT /api/v1/feedback/{id}**: Update a feedback
 - **DELETE /api/v1/feedback/{id}**: Delete a feedback
 
-### 12. Enrollments (`enrollments` table)
+### 13. Enrollments (`enrollments` table)
 - **POST /api/v1/enrollments**: Create a new enrollment
   ```json
   {
@@ -183,4 +194,66 @@ Before using the API, make sure you:
 1. Authentication and Authorization
 2. Rate Limiting
 3. Pagination for large result sets
-4. Advanced filtering and searching 
+4. Advanced filtering and searching
+
+## Module Progress API Examples
+
+### Create a Single Module Progress Entry
+```json
+// POST /api/v1/module-progress
+{
+  "user_id": 1,
+  "course_id": 1,
+  "module_number": 1,
+  "module_title": "Introduction to Futures Thinking",
+  "module_focus": "Use of drivers, scenarios, and the Three Horizons model",
+  "status": "not_started",
+  "progress_percentage": 0,
+  "started_at": null,
+  "completed_at": null,
+  "time_spent_minutes": 0,
+  "score": null
+}
+```
+
+### Create Multiple Module Progress Entries
+```json
+// POST /api/v1/module-progress
+{
+  "data": [
+    {
+      "user_id": 1,
+      "course_id": 1,
+      "module_number": 1,
+      "module_title": "Introduction to Futures Thinking",
+      "module_focus": "Use of drivers, scenarios, and the Three Horizons model",
+      "status": "not_started",
+      "progress_percentage": 0,
+      "time_spent_minutes": 0
+    },
+    {
+      "user_id": 1,
+      "course_id": 1,
+      "module_number": 2,
+      "module_title": "Futures Process Design",
+      "module_focus": "Building projects with clear aims",
+      "status": "not_started",
+      "progress_percentage": 0,
+      "time_spent_minutes": 0
+    }
+  ]
+}
+```
+
+## Module Content API Examples
+
+### Create a Module Content Entry
+```json
+// POST /api/v1/module-progress/{moduleId}/contents
+{
+  "content_type": "text",
+  "content_title": "Introduction to the Module",
+  "content_data": "This is the content text for the introduction...",
+  "sequence_order": 1
+}
+```
