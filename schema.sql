@@ -105,7 +105,7 @@ CREATE TABLE module_progress (
     course_id INT NOT NULL,
     module_number INT NOT NULL,
     module_title TEXT NOT NULL,
-    module_focus TEXT NOT NULL,
+    module_focus TEXT NULL,
     status ENUM('not_started', 'in_progress', 'completed') DEFAULT 'not_started',
     progress_percentage INT DEFAULT 0,
     started_at TIMESTAMP NULL,
@@ -113,8 +113,7 @@ CREATE TABLE module_progress (
     time_spent_minutes INT DEFAULT 0,
     score INT NULL,
     FOREIGN KEY (user_id) REFERENCES users(user_id),
-    FOREIGN KEY (course_id) REFERENCES courses(course_id),
-    UNIQUE KEY unique_progress (user_id, course_id)
+    FOREIGN KEY (course_id) REFERENCES courses(course_id)
 );
 
 -- Module content table (for each module)
@@ -136,8 +135,7 @@ CREATE TABLE certificates (
     issue_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     certificate_url VARCHAR(255),
     FOREIGN KEY (user_id) REFERENCES users(user_id),
-    FOREIGN KEY (course_id) REFERENCES courses(course_id),
-    UNIQUE KEY unique_certificate (user_id, course_id)
+    FOREIGN KEY (course_id) REFERENCES courses(course_id)
 );
 
 -- Faculty feedback table

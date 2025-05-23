@@ -558,7 +558,7 @@
                                 console.log('Enrollment data being sent:', enrollmentData);
 
                                 // Send enrollment request
-                                const response = await fetch('http://127.0.0.1:8000/api/v1/enrollments', {
+                                const enrollResponse = await fetch('http://127.0.0.1:8000/api/v1/enrollments', {
                                     method: 'POST',
                                     headers: {
                                         'Content-Type': 'application/json'
@@ -566,11 +566,59 @@
                                     body: JSON.stringify(enrollmentData)
                                 });
 
-                                if (!response.ok) {
+                                if (!enrollResponse.ok) {
                                     throw new Error('Enrollment failed');
                                 }
 
-                                const result = await response.json();
+                                // Create module progress data with fixed structure
+                                const moduleProgressData = {
+                                    data: [
+                                        {
+                                            user_id: userData.user_id,
+                                            course_id: course.course_id,
+                                            module_number: 1,
+                                            module_title: "Introduction to Futures Thinking",
+                                            status: "not_started",
+                                            progress_percentage: 0,
+                                            time_spent_minutes: 0
+                                        },
+                                        {
+                                            user_id: userData.user_id,
+                                            course_id: course.course_id,
+                                            module_number: 2,
+                                            module_title: "Futures Process Design",
+                                            status: "not_started",
+                                            progress_percentage: 0,
+                                            time_spent_minutes: 0
+                                        },
+                                        {
+                                            user_id: userData.user_id,
+                                            course_id: course.course_id,
+                                            module_number: 3,
+                                            module_title: "Pathways for Business Needs",
+                                            status: "not_started",
+                                            progress_percentage: 0,
+                                            time_spent_minutes: 0
+                                        }
+                                    ]
+                                };
+                                
+                                console.log('Module progress data being sent:', moduleProgressData);
+                                
+                                // Send module progress request
+                                const moduleProgressResponse = await fetch('http://127.0.0.1:8000/api/v1/module-progress', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify(moduleProgressData)
+                                });
+                                
+                                if (!moduleProgressResponse.ok) {
+                                    console.warn('Module progress creation failed, but enrollment succeeded');
+                                }
+
+                                const enrollResult = await enrollResponse.json();
                                 alert('Successfully enrolled in the course!');
                                 window.location.href = `course-details.html?id=${course.course_id}`;
                             } catch (error) {
