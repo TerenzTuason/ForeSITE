@@ -37,13 +37,11 @@ class LessonScreen extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'course_id',
-        'course_module_number',
         'screen_number',
         'screen_title',
         'screen_description',
         'screen_content',
-        'screen_url',
+        'screen_url'
     ];
 
     /**
@@ -55,11 +53,5 @@ class LessonScreen extends Model
         'screen_content' => 'array',
     ];
 
-    /**
-     * Get the course that owns the lesson screen.
-     */
-    public function course(): BelongsTo
-    {
-        return $this->belongsTo(Course::class, 'course_id', 'course_id');
-    }
+    // Removed course relationship as there's no direct foreign key anymore
 }
