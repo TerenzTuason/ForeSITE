@@ -314,4 +314,34 @@ INSERT INTO courses (name, description, objectives, structure, learning_style_id
 
 -- Insert admin user (password should be properly hashed in production)
 INSERT INTO users (role_id, email, password, first_name, last_name) VALUES
-(3, 'admin@foresite.com', '$2y$10$nHipa0I9/v/SEy4HrI6mxOnBJ.a4kXnhgxyMC.2WaJnELzpikNiUi', 'System', 'Administrator'); 
+(3, 'admin@foresite.com', '$2y$10$nHipa0I9/v/SEy4HrI6mxOnBJ.a4kXnhgxyMC.2WaJnELzpikNiUi', 'System', 'Administrator');
+
+-- Chat functionality tables
+-- Chat rooms table for learning style specific chat rooms
+CREATE TABLE chat_rooms (
+    room_id INT PRIMARY KEY AUTO_INCREMENT,
+    learning_style_id INT NOT NULL,
+    room_name VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (learning_style_id) REFERENCES learning_styles(style_id)
+);
+
+-- Chat messages table for storing chat messages
+CREATE TABLE chat_messages (
+    message_id INT PRIMARY KEY AUTO_INCREMENT,
+    room_id INT NOT NULL,
+    user_id INT NOT NULL,
+    message TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (room_id) REFERENCES chat_rooms(room_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+-- Initialize default chat rooms for each learning style
+INSERT INTO chat_rooms (learning_style_id, room_name) VALUES
+(1, 'Activist Learning Chat'),
+(2, 'Reflector Learning Chat'),
+(3, 'Theorist Learning Chat'),
+(4, 'Pragmatist Learning Chat');

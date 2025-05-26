@@ -120,6 +120,9 @@
         .message {
             margin-bottom: 1rem;
             max-width: 80%;
+            width: fit-content;
+            display: flex;
+            flex-direction: column;
         }
 
         .message.sent {
@@ -130,6 +133,10 @@
             padding: 1rem;
             border-radius: var(--border-radius);
             position: relative;
+            max-width: 100%;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
         }
 
         .message.received .message-content {
@@ -265,6 +272,10 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Global variables
+        let currentRoomId = null;
+        let currentLearningStyleId = null;
+        
         // Load navbar
         $(document).ready(function() {
             $("#navbar-placeholder").load("../components/navbar.html", function() {
@@ -279,6 +290,9 @@
 
             // Initialize chat
             initializeChat();
+            
+            // Setup message form submission
+            setupMessageForm();
         });
 
         function initializeChat() {
@@ -293,87 +307,120 @@
             fetch(`http://127.0.0.1:8000/api/v1/users/${userData.user_id}/assessment-results`)
                 .then(response => response.json())
                 .then(data => {
+                    console.log('Assessment results:', data);
                     if (data.data && data.data.length > 0) {
-                        const learningStyle = data.data[0].result.learning_style;
+                        // Get the result data which contains learning style information
+                        const resultData = data.data[0].result;
+                        console.log('Result data:', resultData);
+                        
+                        // Extract learning style name
+                        const learningStyle = resultData.learning_style;
+                        
+                        // Get learning style ID - handle different possible formats
+                        if (resultData.learning_style_id) {
+                            // If learning_style_id exists directly
+                            currentLearningStyleId = resultData.learning_style_id;
+                        } else if (learningStyle) {
+                            // Map learning style name to ID if needed
+                            // This mapping should match your database
+                            const styleMapping = {
+                                'activist': 1,
+                                'reflector': 2,
+                                'theorist': 3,
+                                'pragmatist': 4
+                            };
+                            
+                            const styleLower = learningStyle.toLowerCase();
+                            currentLearningStyleId = styleMapping[styleLower];
+                            
+                            if (!currentLearningStyleId) {
+                                console.error('Could not map learning style to ID:', learningStyle);
+                                // Default to ID 4 (pragmatist) as a fallback based on the chat header
+                                currentLearningStyleId = 4;
+                            }
+                        } else {
+                            // Fallback to ID 4 (pragmatist) as a last resort
+                            currentLearningStyleId = 4;
+                            console.warn('No learning style found, defaulting to pragmatist (ID: 4)');
+                        }
+                        
+                        console.log(`Using learning style: ${learningStyle} (ID: ${currentLearningStyleId})`);
+                        
                         // Display learning style in all uppercase
-                        const styleUpperCase = learningStyle.toUpperCase();
+                        const styleUpperCase = learningStyle ? learningStyle.toUpperCase() : 'PRAGMATIST';
                         document.querySelector('.chat-header h2').textContent = `${styleUpperCase} Learning Style Chat`;
                         document.querySelector('.chat-header p').textContent = `Connect and discuss with other ${styleUpperCase} learners`;
                         
-                        // Load users with the same learning style
-                        loadLearningStyleUsers();
-                        
-                        // Load sample messages
-                        loadMessages();
+                        // Get or create chat room for this learning style
+                        getChatRoom(currentLearningStyleId);
+                    } else {
+                        console.error('No assessment results found');
+                        // Default to pragmatist as fallback
+                        currentLearningStyleId = 4; // Pragmatist
+                        getChatRoom(currentLearningStyleId);
                     }
                 })
-                .catch(error => console.error('Error fetching learning style:', error));
+                .catch(error => {
+                    console.error('Error fetching learning style:', error);
+                    // Default to pragmatist as fallback in case of error
+                    currentLearningStyleId = 4; // Pragmatist
+                    getChatRoom(currentLearningStyleId);
+                });
         }
 
-        function loadLearningStyleUsers() {
+        function getChatRoom(learningStyleId) {
+            console.log(`Getting chat room for learning style ID: ${learningStyleId}`);
+            // Get or create a chat room for this learning style
+            fetch(`http://127.0.0.1:8000/api/v1/chat/room/learning-style/${learningStyleId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.data) {
+                        const chatRoom = data.data;
+                        // Store room ID in global variable
+                        currentRoomId = chatRoom.room_id;
+                        console.log(`Chat room set to ID: ${currentRoomId}`);
+                        
+                        // Load users with the same learning style
+                        loadLearningStyleUsers(learningStyleId);
+                        
+                        // Load real messages from the database
+                        loadChatMessages(currentRoomId);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error getting chat room:', error);
+                    alert('Error connecting to the chat service. Please try again later.');
+                });
+        }
+        
+        function loadLearningStyleUsers(learningStyleId) {
             // Get user data from session storage
             const userData = JSON.parse(sessionStorage.getItem('user'));
             const currentUserId = userData.user_id;
             
-            // Get the user's learning style from the header (now in uppercase)
-            const learningStyle = document.querySelector('.chat-header h2').textContent.split(' ')[0];
-            // Need the original case version for API comparison
-            const learningStyleOrigCase = learningStyle.charAt(0).toUpperCase() + learningStyle.slice(1).toLowerCase();
-            
-            // Fetch all users from the API
-            fetch('http://127.0.0.1:8000/api/v1/users')
+            // Fetch users with the same learning style using the new API endpoint
+            fetch(`http://127.0.0.1:8000/api/v1/chat/users/learning-style/${learningStyleId}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.data && data.data.length > 0) {
                         const usersList = document.querySelector('.online-users-list');
                         usersList.innerHTML = ''; // Clear existing list
                         
-                        // Add a counter to track how many users we've processed
-                        let processedUsers = 0;
-                        let usersWithSameStyle = 0;
-                        
-                        // Process each user
+                        // Display other users
                         data.data.forEach(user => {
                             // Skip current user as we'll add them separately
                             if (user.user_id === currentUserId) {
-                                processedUsers++;
                                 return;
                             }
                             
-                            // Fetch each user's assessment results to check their learning style
-                            fetch(`http://127.0.0.1:8000/api/v1/users/${user.user_id}/assessment-results`)
-                                .then(response => response.json())
-                                .then(assessmentData => {
-                                    processedUsers++;
-                                    
-                                    // Check if the user has assessment results and the same learning style (case-insensitive)
-                                    if (assessmentData.data && 
-                                        assessmentData.data.length > 0 && 
-                                        assessmentData.data[0].result && 
-                                        assessmentData.data[0].result.learning_style.toUpperCase() === learningStyle) {
-                                        
-                                        usersWithSameStyle++;
-                                        
-                                        // Create and add user element
-                                        const userElement = document.createElement('div');
-                                        userElement.className = 'user-item';
-                                        
-                                                userElement.innerHTML = `
-                                            <div class="circle-indicator"></div>
-                                            <span>${user.first_name} ${user.last_name}</span>
-                                        `;
-                                        usersList.appendChild(userElement);
-                                    }
-                                    
-                                    // If we've processed all users and no matches found, show a message
-                                    if (processedUsers === data.data.length && usersWithSameStyle === 0) {
-                                        const emptyMessage = document.createElement('div');
-                                        emptyMessage.className = 'text-muted';
-                                        emptyMessage.textContent = 'No other users with the same learning style found.';
-                                        usersList.appendChild(emptyMessage);
-                                    }
-                                })
-                                .catch(error => console.error(`Error fetching assessment for user ${user.user_id}:`, error));
+                            // Create and add user element
+                            const userElement = document.createElement('div');
+                            userElement.className = 'user-item';
+                            userElement.innerHTML = `
+                                <div class="circle-indicator"></div>
+                                <span>${user.first_name} ${user.last_name}</span>
+                            `;
+                            usersList.appendChild(userElement);
                         });
                         
                         // Add the current user to the list
@@ -384,196 +431,265 @@
                             <span>You (${userData.first_name} ${userData.last_name})</span>
                         `;
                         usersList.appendChild(currentUserElement);
+                        
+                        // If no other users found (only current user)
+                        if (data.data.length === 1 && data.data[0].user_id === currentUserId) {
+                            const emptyMessage = document.createElement('div');
+                            emptyMessage.className = 'text-muted';
+                            emptyMessage.textContent = 'No other users with the same learning style found.';
+                            usersList.appendChild(emptyMessage);
+                        }
+                    } else {
+                        // No users found with this learning style
+                        const usersList = document.querySelector('.online-users-list');
+                        usersList.innerHTML = ''; // Clear existing list
+                        
+                        // Add the current user to the list
+                        const currentUserElement = document.createElement('div');
+                        currentUserElement.className = 'user-item';
+                        currentUserElement.innerHTML = `
+                            <div class="circle-indicator"></div>
+                            <span>You (${userData.first_name} ${userData.last_name})</span>
+                        `;
+                        usersList.appendChild(currentUserElement);
+                        
+                        const emptyMessage = document.createElement('div');
+                        emptyMessage.className = 'text-muted';
+                        emptyMessage.textContent = 'No other users with the same learning style found.';
+                        usersList.appendChild(emptyMessage);
                     }
                 })
                 .catch(error => console.error('Error fetching users:', error));
         }
 
-        function loadMessages() {
-            // Get user's learning style (now in uppercase)
-            const learningStyleUpper = document.querySelector('.chat-header h2').textContent.split(' ')[0];
-            // Convert to first letter uppercase for switch statement to match cases
-            const learningStyle = learningStyleUpper.charAt(0).toUpperCase() + learningStyleUpper.slice(1).toLowerCase();
-            
-            // Create learning style specific sample messages
-            let sampleMessages = [];
-            
-            switch(learningStyle) {
-                case 'Activist':
-                    sampleMessages = [
-                        { sender: "Emma Chen", message: "Hey everyone! I just tried the hands-on exercise from Module 2. Anyone else?", time: "10:00 AM", sent: false },
-                        { sender: "David Lee", message: "Yes! I loved the practical approach. Can't wait to apply it to my project.", time: "10:01 AM", sent: false },
-                        { sender: "You", message: "I'm with you both! Learning by doing works so much better for me than just reading theory.", time: "10:02 AM", sent: true }
-                    ];
-                    break;
+        function loadChatMessages(roomId) {
+            // Fetch messages for this chat room from the API
+            fetch(`http://127.0.0.1:8000/api/v1/chat/messages/${roomId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const messagesContainer = document.querySelector('.chat-messages');
+                    messagesContainer.innerHTML = ''; // Clear existing messages
                     
-                case 'Reflector':
-                    sampleMessages = [
-                        { sender: "Maya Singh", message: "I've been thinking about the case studies from last week's module. Really insightful.", time: "10:00 AM", sent: false },
-                        { sender: "Thomas Wu", message: "I like how they give us time to observe and think about different perspectives before forming conclusions.", time: "10:01 AM", sent: false },
-                        { sender: "You", message: "Agreed. I appreciate having the space to process information before having to participate actively.", time: "10:02 AM", sent: true }
-                    ];
-                    break;
+                    // Get current user ID
+                    const userData = JSON.parse(sessionStorage.getItem('user'));
+                    const currentUserId = userData.user_id;
                     
-                case 'Theorist':
-                    sampleMessages = [
-                        { sender: "Sophia Park", message: "Has anyone mapped out the conceptual framework from Module 3? I'm trying to integrate it with earlier models.", time: "10:00 AM", sent: false },
-                        { sender: "Robert Kim", message: "Yes, I've been analyzing the logical connections between all the modules. It's fascinating how everything connects.", time: "10:01 AM", sent: false },
-                        { sender: "You", message: "I've been doing the same! The systematic approach really helps me understand the underlying principles.", time: "10:02 AM", sent: true }
-                    ];
-                    break;
+                    if (data.data && data.data.length > 0) {
+                        // Display real messages from the database
+                        data.data.forEach(msg => {
+                            const isSentByCurrentUser = msg.user_id === currentUserId;
+                            const messageElement = document.createElement('div');
+                            messageElement.className = `message ${isSentByCurrentUser ? 'sent' : 'received'}`;
+                            
+                            // Format timestamp
+                            const messageDate = new Date(msg.created_at);
+                            const formattedTime = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                            
+                            messageElement.innerHTML = `
+                                <div class="message-header">
+                                    ${isSentByCurrentUser ? '' : `<strong>${msg.user.first_name} ${msg.user.last_name}</strong>`}
+                                    <span class="message-time">${formattedTime}</span>
+                                </div>
+                                <div class="message-content">
+                                    ${msg.message}
+                                </div>
+                            `;
+                            messagesContainer.appendChild(messageElement);
+                        });
+                    } else {
+                        // If no messages, show default welcome message
+                        const learningStyle = document.querySelector('.chat-header h2').textContent.split(' ')[0];
+                        
+                        // Create a welcome message based on learning style
+                        let welcomeMessage = "Welcome to the learning style chat! Start a conversation with others who share your learning style.";
+                        
+                        const messageElement = document.createElement('div');
+                        messageElement.className = 'message received';
+                        messageElement.innerHTML = `
+                            <div class="message-header">
+                                <strong>ForeSITE System</strong>
+                                <span class="message-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                            </div>
+                            <div class="message-content">
+                                ${welcomeMessage}
+                            </div>
+                        `;
+                        messagesContainer.appendChild(messageElement);
+                    }
                     
-                case 'Pragmatist':
-                    sampleMessages = [
-                        { sender: "Jennifer Tran", message: "Does anyone have practical tips for implementing the Module 2 techniques in a real-world setting?", time: "10:00 AM", sent: false },
-                        { sender: "Marcus Wong", message: "I've adapted the framework for my team at work - happy to share what worked and what didn't if anyone's interested.", time: "10:01 AM", sent: false },
-                        { sender: "You", message: "I'd definitely like to hear that! I'm always looking for the most efficient way to apply what we're learning.", time: "10:02 AM", sent: true }
-                    ];
-                    break;
-                    
-                default:
-                    sampleMessages = [
-                        { sender: "John Smith", message: "Hello everyone! How's your learning journey going?", time: "10:00 AM", sent: false },
-                        { sender: "Alice Johnson", message: "Hi! It's going great. I'm finding the concepts really interesting.", time: "10:01 AM", sent: false },
-                        { sender: "You", message: "Same here! This approach really helps me understand better.", time: "10:02 AM", sent: true }
-                    ];
-            }
-
-            // Display the messages
-            const messagesContainer = document.querySelector('.chat-messages');
-            messagesContainer.innerHTML = ''; // Clear existing messages
-            
-            sampleMessages.forEach(msg => {
-                const messageElement = document.createElement('div');
-                messageElement.className = `message ${msg.sent ? 'sent' : 'received'}`;
-                messageElement.innerHTML = `
-                    <div class="message-header">
-                        ${msg.sent ? '' : `<strong>${msg.sender}</strong>`}
-                        <span class="message-time">${msg.time}</span>
-                    </div>
-                    <div class="message-content">
-                        ${msg.message}
-                    </div>
-                `;
-                messagesContainer.appendChild(messageElement);
-            });
-
-            // Scroll to bottom
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    // Scroll to bottom
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                })
+                .catch(error => console.error('Error fetching chat messages:', error));
         }
 
-        // Handle new message submission
-        document.getElementById('message-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const input = document.getElementById('message-input');
-            const message = input.value.trim();
+        function setupMessageForm() {
+            // Handle new message submission
+            document.getElementById('message-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const input = document.getElementById('message-input');
+                const message = input.value.trim();
+                    
+                if (message) {
+                    // Get user data and use global chat room ID
+                    const userData = JSON.parse(sessionStorage.getItem('user'));
+                    
+                    if (!currentRoomId) {
+                        console.warn('No chat room ID found, attempting to retrieve it');
+                        
+                        if (currentLearningStyleId) {
+                            console.log(`Using learning style ID ${currentLearningStyleId} to determine chat room`);
+                            // Retrieve or create the chat room first
+                            fetch(`http://127.0.0.1:8000/api/v1/chat/room/learning-style/${currentLearningStyleId}`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.data && data.data.room_id) {
+                                        console.log('Retrieved chat room:', data.data);
+                                        currentRoomId = data.data.room_id;
+                                        // Now that we have the room ID, proceed with sending the message
+                                        sendMessageToApi(userData, currentRoomId, message);
+                                    } else {
+                                        console.error('Failed to get chat room for style ID:', currentLearningStyleId);
+                                        alert('Unable to send message: Could not determine chat room. Please refresh the page and try again.');
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error getting chat room:', error);
+                                    alert('Error connecting to chat service. Please try again later.');
+                                });
+                            return; // Exit early as we're handling the send in the callback
+                        } else {
+                            console.error('No learning style ID available');
+                            alert('Unable to determine your learning style. Please refresh the page and try again.');
+                            return;
+                        }
+                    }
+                    
+                    // If we have a room ID, proceed with sending
+                    console.log(`Sending message to room ID: ${currentRoomId}`);
+                    sendMessageToApi(userData, currentRoomId, message);
+                }
+            });
+            
+            function sendMessageToApi(userData, roomId, message) {
+                // This function handles the actual API call to send the message
+                // Add a loading indicator or disable the send button
+                const sendButton = document.querySelector('.btn-send');
+                sendButton.disabled = true;
+                sendButton.innerHTML = 'Sending... <i class="fas fa-spinner fa-spin"></i>';
                 
-            if (message) {
-                // Get user data
-                const userData = JSON.parse(sessionStorage.getItem('user'));
-                const currentUserName = `${userData.first_name} ${userData.last_name}`;
-                
-                // Add message to chat
+                // Add message to UI immediately (optimistic UI update)
                 const messagesContainer = document.querySelector('.chat-messages');
-                const messageElement = document.createElement('div');
-                messageElement.className = 'message sent';
-                messageElement.innerHTML = `
+                const tempMessageElement = document.createElement('div');
+                tempMessageElement.className = 'message sent';
+                tempMessageElement.style.opacity = '0.7'; // Indicate it's pending
+                
+                const formattedTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
+                tempMessageElement.innerHTML = `
                     <div class="message-header">
-                        <span class="message-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                        <span class="message-time">${formattedTime}</span>
                     </div>
                     <div class="message-content">
                         ${message}
                     </div>
                 `;
-                messagesContainer.appendChild(messageElement);
+                messagesContainer.appendChild(tempMessageElement);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
                 
-                // Simulate a response after a short delay (in a real app, this would be replaced by actual chat functionality)
-                const learningStyleUpper = document.querySelector('.chat-header h2').textContent.split(' ')[0];
-                // Convert to first letter uppercase for switch statement to match cases
-                const learningStyle = learningStyleUpper.charAt(0).toUpperCase() + learningStyleUpper.slice(1).toLowerCase();
-                setTimeout(() => {
-                    // Generate a random response appropriate to the learning style
-                    let responses;
-                    switch(learningStyle) {
-                        case 'Activist':
-                            responses = [
-                                "That's a great hands-on approach!",
-                                "Have you tried applying that in a real scenario?",
-                                "I like your energy! Let's try that out in our next session."
-                            ];
-                            break;
-                        case 'Reflector':
-                            responses = [
-                                "That's an interesting perspective. I need some time to think about it.",
-                                "Have you considered looking at it from another angle?",
-                                "I'd like to observe how that works out before drawing conclusions."
-                            ];
-                            break;
-                        case 'Theorist':
-                            responses = [
-                                "How does that fit into the conceptual framework we're studying?",
-                                "I see the logical connection to what we learned in module 2.",
-                                "That's a systematic approach. Have you analyzed all the variables?"
-                            ];
-                            break;
-                        case 'Pragmatist':
-                            responses = [
-                                "How can we apply that practically in our work?",
-                                "That's a useful technique. I've used something similar in my project.",
-                                "Does it work efficiently in real-world situations?"
-                            ];
-                            break;
-                        default:
-                            responses = [
-                                "That's interesting!",
-                                "Thanks for sharing your thoughts.",
-                                "Great point!"
-                            ];
-                    }
-                    
-                    // Get random user from the users list (except 'You')
-                    const users = document.querySelectorAll('.user-item span');
-                    let randomUser = "Learning Partner";
-                    
-                    if (users.length > 1) {
-                        let validUsers = [];
-                        users.forEach(user => {
-                            if (!user.textContent.includes('You')) {
-                                validUsers.push(user.textContent);
-                            }
+                // Clear input if it exists
+                const inputElement = document.getElementById('message-input');
+                if (inputElement) {
+                    inputElement.value = '';
+                }
+                
+                console.log('Sending message to API:', {
+                    room_id: roomId,
+                    user_id: userData.user_id,
+                    message: message
+                });
+                
+                // Send message to API
+                fetch('http://127.0.0.1:8000/api/v1/chat/messages', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        room_id: roomId,
+                        user_id: userData.user_id,
+                        message: message
+                    })
+                })
+                .then(response => {
+                    // Check if response is ok before parsing JSON
+                    if (!response.ok) {
+                        console.error('Server error:', response.status, response.statusText);
+                        return response.text().then(text => {
+                            throw new Error(`Server error: ${response.status} ${response.statusText}\nResponse: ${text}`);
                         });
-                        
-                        if (validUsers.length > 0) {
-                            randomUser = validUsers[Math.floor(Math.random() * validUsers.length)];
-                        }
                     }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Message sent successfully:', data);
                     
-                    // Select a random response
-                    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                    // Remove temporary message
+                    messagesContainer.removeChild(tempMessageElement);
                     
-                    // Create response message
-                    const responseElement = document.createElement('div');
-                    responseElement.className = 'message received';
-                    responseElement.innerHTML = `
+                    // Add confirmed message
+                    const confirmedMessageElement = document.createElement('div');
+                    confirmedMessageElement.className = 'message sent';
+                    
+                    // Format timestamp
+                    const messageDate = new Date(data.data.created_at);
+                    const confirmedTime = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    
+                    confirmedMessageElement.innerHTML = `
                         <div class="message-header">
-                            <strong>${randomUser}</strong>
-                            <span class="message-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                            <span class="message-time">${confirmedTime}</span>
                         </div>
                         <div class="message-content">
-                            ${randomResponse}
+                            ${data.data.message}
                         </div>
                     `;
-                    messagesContainer.appendChild(responseElement);
-                    
-                    // Scroll to bottom
+                    messagesContainer.appendChild(confirmedMessageElement);
                     messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                }, 1500);
-                
-                // Clear input and scroll to bottom
-                input.value = '';
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                })
+                .catch(error => {
+                    console.error('Error sending message:', error);
+                    
+                    // Change temporary message to indicate error
+                    tempMessageElement.style.opacity = '1';
+                    tempMessageElement.querySelector('.message-content').innerHTML += `
+                        <div class="text-danger mt-1" style="font-size: 0.8rem;">
+                            <i class="fas fa-exclamation-triangle"></i> Error sending message
+                        </div>
+                    `;
+                })
+                .finally(() => {
+                    // Re-enable send button
+                    sendButton.disabled = false;
+                    sendButton.innerHTML = 'Send <i class="fas fa-paper-plane"></i>';
+                });
             }
-            });
-        </script>
-    </body>
+        }
+        
+        // Set up polling for new messages every 5 seconds
+        function setupPolling() {
+            setInterval(function() {
+                if (currentRoomId) {
+                    loadChatMessages(currentRoomId);
+                }
+            }, 5000);
+        }
+        
+        // Initialize after DOM is ready
+        $(document).ready(function() {
+            setupPolling();
+        });
+    
+    </script>
+</body>
 </html>

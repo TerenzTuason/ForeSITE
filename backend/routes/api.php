@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\FeedbackController;
 use App\Http\Controllers\Api\CertificateController;
 use App\Http\Controllers\Api\EnrollmentController;
 use App\Http\Controllers\Api\LessonScreenController;
+use App\Http\Controllers\ChatController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -122,4 +123,11 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('lesson-screens', LessonScreenController::class);
     Route::get('courses/{course}/lesson-screens', [LessonScreenController::class, 'getByCourse']);
     Route::get('courses/{course}/modules/{module}/lesson-screens', [LessonScreenController::class, 'getByCourseModule']);
+    
+    // Chat functionality
+    Route::get('chat/room/learning-style/{styleId}', [ChatController::class, 'getChatRoomByLearningStyle']);
+    Route::get('chat/room/user/{userId}', [ChatController::class, 'getUserChatRoom']);
+    Route::get('chat/messages/{roomId}', [ChatController::class, 'getChatMessages']);
+    Route::post('chat/messages', [ChatController::class, 'sendMessage']);
+    Route::get('chat/users/learning-style/{styleId}', [ChatController::class, 'getUsersWithSameLearningStyle']);
 });
