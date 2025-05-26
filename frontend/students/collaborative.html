@@ -25,29 +25,33 @@
         body {
             font-family: 'Poppins', sans-serif;
             background-color: var(--light-gray);
-            min-height: 100vh;
+            min-height: 80vh;
         }
 
         .main-content {
             margin-top: 80px;
-            padding: 2rem 0;
-            height: calc(100vh - 100px);
+            padding: 0;
+            height: calc(100vh - 80px);
+            overflow: hidden; /* Prevent outer scrolling */
         }
 
         .chat-container {
             background: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--card-shadow);
+            border-radius: 0;
             height: 100%;
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            position: relative;
         }
 
         .chat-header {
             background: white;
             padding: 1.5rem;
             border-bottom: 1px solid #dee2e6;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
         .chat-header h2 {
@@ -68,6 +72,9 @@
             padding: 1rem 1.5rem;
             background: white;
             border-bottom: 1px solid #dee2e6;
+            position: sticky;
+            top: 89px; /* Height of the header (adjust as needed) */
+            z-index: 9;
         }
 
         .online-users-list {
@@ -128,10 +135,14 @@
         }
 
         .chat-messages {
-            flex-grow: 1;
+            flex: 1 1 auto;
             padding: 1.5rem;
             overflow-y: auto;
             background: var(--light-gray);
+            max-height: calc(100% - 240px); /* Adjust based on header + users + input heights */
+            padding-bottom: 20px;
+            position: relative;
+            z-index: 1;
         }
 
         .message {
@@ -189,6 +200,10 @@
             padding: 1.5rem;
             background: white;
             border-top: 1px solid #dee2e6;
+            position: sticky;
+            bottom: 0;
+            width: 100%;
+            z-index: 10;
         }
 
         .chat-input form {
@@ -229,7 +244,8 @@
 
         @media (max-width: 768px) {
             .main-content {
-                padding: 1rem;
+                margin-top: 60px;
+                height: calc(100vh - 60px);
             }
 
             .chat-header {
@@ -251,6 +267,10 @@
             .btn-send {
                 padding: 0.75rem 1.5rem;
             }
+            
+            .online-users {
+                top: 69px; /* Adjusted for smaller header */
+            }
         }
     </style>
 </head>
@@ -258,7 +278,7 @@
     <!-- Include Navbar -->
     <div id="navbar-placeholder"></div>
 
-    <div class="container main-content">
+    <div class="container-fluid main-content">
         <div class="chat-container">
             <div class="chat-header">
                 <h2>Theorist Learning Style Chat</h2>
@@ -464,7 +484,7 @@
                                         
                                         // Create and add user element
                                         const userElement = document.createElement('div');
-                                        userElement.className = 'user-item';
+                                        userElement.className = 'user-item current-user';
                                         userElement.innerHTML = `
                                             <div class="circle-indicator"></div>
                                             <span>${user.first_name} ${user.last_name}</span>
@@ -490,7 +510,7 @@
                                         displayedUserIds.add(user.user_id);
                                         
                                         const userElement = document.createElement('div');
-                                        userElement.className = 'user-item';
+                                        userElement.className = 'user-item current-user';
                                         userElement.innerHTML = `
                                             <div class="circle-indicator"></div>
                                             <span>${user.first_name} ${user.last_name}</span>
@@ -528,7 +548,7 @@
                                 
                                 // Create and add user element
                                 const userElement = document.createElement('div');
-                                userElement.className = 'user-item';
+                                userElement.className = 'user-item current-user';
                                 userElement.innerHTML = `
                                     <div class="circle-indicator"></div>
                                     <span>${user.first_name} ${user.last_name}</span>
