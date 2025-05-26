@@ -130,7 +130,16 @@ The API provides CRUD (Create, Read, Update, Delete) operations for the main ent
 - **PUT /api/v1/feedback/{id}**: Update a feedback
 - **DELETE /api/v1/feedback/{id}**: Delete a feedback
 
-### 13. Enrollments (`enrollments` table)
+### 13. Lesson Screens (`lesson_screens` table)
+- **GET /api/v1/lesson-screens**: List all lesson screens
+- **GET /api/v1/lesson-screens/{id}**: Get specific lesson screen
+- **POST /api/v1/lesson-screens**: Create a new lesson screen
+- **PUT /api/v1/lesson-screens/{id}**: Update a lesson screen
+- **DELETE /api/v1/lesson-screens/{id}**: Delete a lesson screen
+- **GET /api/v1/courses/{course}/lesson-screens**: Get all lesson screens for a specific course
+- **GET /api/v1/courses/{course}/modules/{module}/lesson-screens**: Get all lesson screens for a specific course module
+
+### 14. Enrollments (`enrollments` table)
 - **POST /api/v1/enrollments**: Create a new enrollment
   ```json
   {
@@ -255,5 +264,136 @@ Before using the API, make sure you:
   "content_title": "Introduction to the Module",
   "content_data": "This is the content text for the introduction...",
   "sequence_order": 1
+}
+```
+
+## Lesson Screens API Examples
+
+### Create a Lesson Screen
+```json
+// POST /api/v1/lesson-screens
+{
+  "course_id": 1,
+  "course_module_number": 1,
+  "screen_number": 1,
+  "screen_title": "Introduction to Futures Thinking",
+  "screen_description": "Overview of the key concepts",
+  "screen_content": {
+    "content": "This is the introduction content...",
+    "type": "text"
+  },
+  "screen_url": null
+}
+```
+
+### Response Format for Fetching Lesson Screens
+```json
+// GET /api/v1/lesson-screens or GET /api/v1/lesson-screens/{id}
+{
+  "data": {
+    "lesson_screen_id": 1,
+    "course_id": 1,
+    "course_module_number": 1,
+    "screen_number": 1,
+    "screen_title": "Introduction to Futures Thinking",
+    "screen_description": "Overview of the key concepts",
+    "screen_content": {
+      "content": "This is the introduction content...",
+      "type": "text"
+    },
+    "screen_url": null,
+    "course": {
+      "course_id": 1,
+      "name": "Applied Strategic Foresight: Practical Tools for Future-Ready Decision Making",
+      "description": "This course provides a comprehensive overview of strategic foresight tools and techniques...",
+      "objectives": [...],
+      "structure": [...],
+      "learning_style_id": 1,
+      "created_at": "2024-05-25T10:00:00Z"
+    }
+  }
+}
+```
+
+### Get Lesson Screens for a Course Module
+```json
+// GET /api/v1/courses/{courseId}/modules/{moduleNumber}/lesson-screens
+{
+  "data": [
+    {
+      "lesson_screen_id": 1,
+      "course_id": 1,
+      "course_module_number": 1,
+      "screen_number": 1,
+      "screen_title": "Introduction to Futures Thinking",
+      "screen_description": "Overview of the key concepts",
+      "screen_content": {
+        "content": "This is the introduction content...",
+        "type": "text"
+      },
+      "screen_url": null
+    },
+    {
+      "lesson_screen_id": 2,
+      "course_id": 1,
+      "course_module_number": 1,
+      "screen_number": 2,
+      "screen_title": "Key Principles of Strategic Foresight",
+      "screen_description": "Understanding the fundamental principles",
+      "screen_content": {
+        "content": "This is the content about key principles...",
+        "type": "text"
+      },
+      "screen_url": null
+    }
+  ]
+}
+```
+
+### Get All Lesson Screens for a Course
+```json
+// GET /api/v1/courses/{courseId}/lesson-screens
+{
+  "data": [
+    {
+      "lesson_screen_id": 1,
+      "course_id": 1,
+      "course_module_number": 1,
+      "screen_number": 1,
+      "screen_title": "Introduction to Futures Thinking",
+      "screen_description": "Overview of the key concepts",
+      "screen_content": {
+        "content": "This is the introduction content...",
+        "type": "text"
+      },
+      "screen_url": null
+    },
+    {
+      "lesson_screen_id": 2,
+      "course_id": 1,
+      "course_module_number": 1,
+      "screen_number": 2,
+      "screen_title": "Key Principles of Strategic Foresight",
+      "screen_description": "Understanding the fundamental principles",
+      "screen_content": {
+        "content": "This is the content about key principles...",
+        "type": "text"
+      },
+      "screen_url": null
+    },
+    {
+      "lesson_screen_id": 3,
+      "course_id": 1,
+      "course_module_number": 2,
+      "screen_number": 1,
+      "screen_title": "Futures Process Design",
+      "screen_description": "Building projects with clear aims",
+      "screen_content": {
+        "content": "This is the content about process design...",
+        "type": "text"
+      },
+      "screen_url": null
+    }
+  ]
 }
 ```

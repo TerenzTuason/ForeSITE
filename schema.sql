@@ -98,6 +98,18 @@ CREATE TABLE enrollments (
     UNIQUE KEY unique_enrollment (user_id, course_id)
 );
 
+CREATE TABLE lesson_screens (
+    lesson_screen_id INT PRIMARY KEY AUTO_INCREMENT,
+    course_id INT NOT NULL,
+    course_module_number INT NOT NULL,
+    screen_number INT NOT NULL,
+    screen_title TEXT NOT NULL,
+    screen_description TEXT NOT NULL,
+    screen_content JSON NOT NULL,
+    screen_url VARCHAR(255) NULL,
+    FOREIGN KEY (course_id) REFERENCES courses(course_id)
+);
+
 -- Student progress in modules
 CREATE TABLE module_progress (
     progress_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -117,7 +129,7 @@ CREATE TABLE module_progress (
 );
 
 -- Module content table (for each module)
-CREATE TABLE module_contents (
+CREATE TABLE module_contents (  
     content_id INT PRIMARY KEY AUTO_INCREMENT,
     module_progress_id INT NOT NULL,
     content_type ENUM('text', 'video', 'quiz', 'assignment', 'discussion') NOT NULL,

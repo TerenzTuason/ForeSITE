@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\ModuleProgressController;
 use App\Http\Controllers\Api\FeedbackController;
 use App\Http\Controllers\Api\CertificateController;
 use App\Http\Controllers\Api\EnrollmentController;
+use App\Http\Controllers\Api\LessonScreenController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -116,4 +117,9 @@ Route::prefix('v1')->group(function () {
 
     // Enrollments
     Route::post('/enrollments', [EnrollmentController::class, 'store']);
+    
+    // Lesson Screens
+    Route::apiResource('lesson-screens', LessonScreenController::class);
+    Route::get('courses/{course}/lesson-screens', [LessonScreenController::class, 'getByCourse']);
+    Route::get('courses/{course}/modules/{module}/lesson-screens', [LessonScreenController::class, 'getByCourseModule']);
 });
