@@ -77,7 +77,7 @@
             padding-bottom: 0.5rem;
         }
 
-        .online-user {
+        .user-item {
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -87,13 +87,27 @@
             font-size: 0.9rem;
             white-space: nowrap;
             box-shadow: var(--card-shadow);
+            position: relative;
         }
 
-        .online-user .status {
-            width: 8px;
-            height: 8px;
-            background: #28a745;
+        .user-item {
+            background-color: white;
+            border-radius: 50px;
+            padding: 0.5rem 1rem;
+            box-shadow: var(--card-shadow);
+            font-size: 0.9rem;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .circle-indicator {
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
+            background-color: #800000;
+            display: inline-block;
         }
 
         .chat-messages {
@@ -229,7 +243,7 @@
 
             <div class="online-users">
                 <div class="online-users-list">
-                    <!-- Online users will be dynamically added here -->
+                    <!-- Users with the same learning style will be dynamically added here -->
                 </div>
             </div>
 
@@ -281,11 +295,13 @@
                 .then(data => {
                     if (data.data && data.data.length > 0) {
                         const learningStyle = data.data[0].result.learning_style;
-                        document.querySelector('.chat-header h2').textContent = `${learningStyle} Learning Style Chat`;
-                        document.querySelector('.chat-header p').textContent = `Connect and discuss with other ${learningStyle.toLowerCase()} learners`;
+                        // Display learning style in all uppercase
+                        const styleUpperCase = learningStyle.toUpperCase();
+                        document.querySelector('.chat-header h2').textContent = `${styleUpperCase} Learning Style Chat`;
+                        document.querySelector('.chat-header p').textContent = `Connect and discuss with other ${styleUpperCase} learners`;
                         
-                        // Load sample online users
-                        loadOnlineUsers();
+                        // Load users with the same learning style
+                        loadLearningStyleUsers();
                         
                         // Load sample messages
                         loadMessages();
@@ -294,31 +310,139 @@
                 .catch(error => console.error('Error fetching learning style:', error));
         }
 
-        function loadOnlineUsers() {
-            const sampleUsers = [
-                "John Smith", "Alice Johnson", "Bob Wilson", "Sarah Parker", "Mike Thompson"
-            ];
-
-            const usersList = document.querySelector('.online-users-list');
-            sampleUsers.forEach(user => {
-                const userElement = document.createElement('div');
-                userElement.className = 'online-user';
-                userElement.innerHTML = `
-                    <div class="status"></div>
-                    <span>${user}</span>
-                `;
-                usersList.appendChild(userElement);
-            });
+        function loadLearningStyleUsers() {
+            // Get user data from session storage
+            const userData = JSON.parse(sessionStorage.getItem('user'));
+            const currentUserId = userData.user_id;
+            
+            // Get the user's learning style from the header (now in uppercase)
+            const learningStyle = document.querySelector('.chat-header h2').textContent.split(' ')[0];
+            // Need the original case version for API comparison
+            const learningStyleOrigCase = learningStyle.charAt(0).toUpperCase() + learningStyle.slice(1).toLowerCase();
+            
+            // Fetch all users from the API
+            fetch('http://127.0.0.1:8000/api/v1/users')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.data && data.data.length > 0) {
+                        const usersList = document.querySelector('.online-users-list');
+                        usersList.innerHTML = ''; // Clear existing list
+                        
+                        // Add a counter to track how many users we've processed
+                        let processedUsers = 0;
+                        let usersWithSameStyle = 0;
+                        
+                        // Process each user
+                        data.data.forEach(user => {
+                            // Skip current user as we'll add them separately
+                            if (user.user_id === currentUserId) {
+                                processedUsers++;
+                                return;
+                            }
+                            
+                            // Fetch each user's assessment results to check their learning style
+                            fetch(`http://127.0.0.1:8000/api/v1/users/${user.user_id}/assessment-results`)
+                                .then(response => response.json())
+                                .then(assessmentData => {
+                                    processedUsers++;
+                                    
+                                    // Check if the user has assessment results and the same learning style (case-insensitive)
+                                    if (assessmentData.data && 
+                                        assessmentData.data.length > 0 && 
+                                        assessmentData.data[0].result && 
+                                        assessmentData.data[0].result.learning_style.toUpperCase() === learningStyle) {
+                                        
+                                        usersWithSameStyle++;
+                                        
+                                        // Create and add user element
+                                        const userElement = document.createElement('div');
+                                        userElement.className = 'user-item';
+                                        
+                                                userElement.innerHTML = `
+                                            <div class="circle-indicator"></div>
+                                            <span>${user.first_name} ${user.last_name}</span>
+                                        `;
+                                        usersList.appendChild(userElement);
+                                    }
+                                    
+                                    // If we've processed all users and no matches found, show a message
+                                    if (processedUsers === data.data.length && usersWithSameStyle === 0) {
+                                        const emptyMessage = document.createElement('div');
+                                        emptyMessage.className = 'text-muted';
+                                        emptyMessage.textContent = 'No other users with the same learning style found.';
+                                        usersList.appendChild(emptyMessage);
+                                    }
+                                })
+                                .catch(error => console.error(`Error fetching assessment for user ${user.user_id}:`, error));
+                        });
+                        
+                        // Add the current user to the list
+                        const currentUserElement = document.createElement('div');
+                        currentUserElement.className = 'user-item';
+                        currentUserElement.innerHTML = `
+                            <div class="circle-indicator"></div>
+                            <span>You (${userData.first_name} ${userData.last_name})</span>
+                        `;
+                        usersList.appendChild(currentUserElement);
+                    }
+                })
+                .catch(error => console.error('Error fetching users:', error));
         }
 
         function loadMessages() {
-            const sampleMessages = [
-                { sender: "John Smith", message: "Hello everyone! How's your learning journey going?", time: "10:00 AM", sent: false },
-                { sender: "Alice Johnson", message: "Hi John! It's going great. I'm finding the theoretical concepts really interesting.", time: "10:01 AM", sent: false },
-                { sender: "You", message: "Same here! The systematic approach really helps me understand better.", time: "10:02 AM", sent: true }
-            ];
+            // Get user's learning style (now in uppercase)
+            const learningStyleUpper = document.querySelector('.chat-header h2').textContent.split(' ')[0];
+            // Convert to first letter uppercase for switch statement to match cases
+            const learningStyle = learningStyleUpper.charAt(0).toUpperCase() + learningStyleUpper.slice(1).toLowerCase();
+            
+            // Create learning style specific sample messages
+            let sampleMessages = [];
+            
+            switch(learningStyle) {
+                case 'Activist':
+                    sampleMessages = [
+                        { sender: "Emma Chen", message: "Hey everyone! I just tried the hands-on exercise from Module 2. Anyone else?", time: "10:00 AM", sent: false },
+                        { sender: "David Lee", message: "Yes! I loved the practical approach. Can't wait to apply it to my project.", time: "10:01 AM", sent: false },
+                        { sender: "You", message: "I'm with you both! Learning by doing works so much better for me than just reading theory.", time: "10:02 AM", sent: true }
+                    ];
+                    break;
+                    
+                case 'Reflector':
+                    sampleMessages = [
+                        { sender: "Maya Singh", message: "I've been thinking about the case studies from last week's module. Really insightful.", time: "10:00 AM", sent: false },
+                        { sender: "Thomas Wu", message: "I like how they give us time to observe and think about different perspectives before forming conclusions.", time: "10:01 AM", sent: false },
+                        { sender: "You", message: "Agreed. I appreciate having the space to process information before having to participate actively.", time: "10:02 AM", sent: true }
+                    ];
+                    break;
+                    
+                case 'Theorist':
+                    sampleMessages = [
+                        { sender: "Sophia Park", message: "Has anyone mapped out the conceptual framework from Module 3? I'm trying to integrate it with earlier models.", time: "10:00 AM", sent: false },
+                        { sender: "Robert Kim", message: "Yes, I've been analyzing the logical connections between all the modules. It's fascinating how everything connects.", time: "10:01 AM", sent: false },
+                        { sender: "You", message: "I've been doing the same! The systematic approach really helps me understand the underlying principles.", time: "10:02 AM", sent: true }
+                    ];
+                    break;
+                    
+                case 'Pragmatist':
+                    sampleMessages = [
+                        { sender: "Jennifer Tran", message: "Does anyone have practical tips for implementing the Module 2 techniques in a real-world setting?", time: "10:00 AM", sent: false },
+                        { sender: "Marcus Wong", message: "I've adapted the framework for my team at work - happy to share what worked and what didn't if anyone's interested.", time: "10:01 AM", sent: false },
+                        { sender: "You", message: "I'd definitely like to hear that! I'm always looking for the most efficient way to apply what we're learning.", time: "10:02 AM", sent: true }
+                    ];
+                    break;
+                    
+                default:
+                    sampleMessages = [
+                        { sender: "John Smith", message: "Hello everyone! How's your learning journey going?", time: "10:00 AM", sent: false },
+                        { sender: "Alice Johnson", message: "Hi! It's going great. I'm finding the concepts really interesting.", time: "10:01 AM", sent: false },
+                        { sender: "You", message: "Same here! This approach really helps me understand better.", time: "10:02 AM", sent: true }
+                    ];
+            }
 
+            // Display the messages
             const messagesContainer = document.querySelector('.chat-messages');
+            messagesContainer.innerHTML = ''; // Clear existing messages
+            
             sampleMessages.forEach(msg => {
                 const messageElement = document.createElement('div');
                 messageElement.className = `message ${msg.sent ? 'sent' : 'received'}`;
@@ -343,8 +467,12 @@
             e.preventDefault();
             const input = document.getElementById('message-input');
             const message = input.value.trim();
-            
+                
             if (message) {
+                // Get user data
+                const userData = JSON.parse(sessionStorage.getItem('user'));
+                const currentUserName = `${userData.first_name} ${userData.last_name}`;
+                
                 // Add message to chat
                 const messagesContainer = document.querySelector('.chat-messages');
                 const messageElement = document.createElement('div');
@@ -359,11 +487,93 @@
                 `;
                 messagesContainer.appendChild(messageElement);
                 
+                // Simulate a response after a short delay (in a real app, this would be replaced by actual chat functionality)
+                const learningStyleUpper = document.querySelector('.chat-header h2').textContent.split(' ')[0];
+                // Convert to first letter uppercase for switch statement to match cases
+                const learningStyle = learningStyleUpper.charAt(0).toUpperCase() + learningStyleUpper.slice(1).toLowerCase();
+                setTimeout(() => {
+                    // Generate a random response appropriate to the learning style
+                    let responses;
+                    switch(learningStyle) {
+                        case 'Activist':
+                            responses = [
+                                "That's a great hands-on approach!",
+                                "Have you tried applying that in a real scenario?",
+                                "I like your energy! Let's try that out in our next session."
+                            ];
+                            break;
+                        case 'Reflector':
+                            responses = [
+                                "That's an interesting perspective. I need some time to think about it.",
+                                "Have you considered looking at it from another angle?",
+                                "I'd like to observe how that works out before drawing conclusions."
+                            ];
+                            break;
+                        case 'Theorist':
+                            responses = [
+                                "How does that fit into the conceptual framework we're studying?",
+                                "I see the logical connection to what we learned in module 2.",
+                                "That's a systematic approach. Have you analyzed all the variables?"
+                            ];
+                            break;
+                        case 'Pragmatist':
+                            responses = [
+                                "How can we apply that practically in our work?",
+                                "That's a useful technique. I've used something similar in my project.",
+                                "Does it work efficiently in real-world situations?"
+                            ];
+                            break;
+                        default:
+                            responses = [
+                                "That's interesting!",
+                                "Thanks for sharing your thoughts.",
+                                "Great point!"
+                            ];
+                    }
+                    
+                    // Get random user from the users list (except 'You')
+                    const users = document.querySelectorAll('.user-item span');
+                    let randomUser = "Learning Partner";
+                    
+                    if (users.length > 1) {
+                        let validUsers = [];
+                        users.forEach(user => {
+                            if (!user.textContent.includes('You')) {
+                                validUsers.push(user.textContent);
+                            }
+                        });
+                        
+                        if (validUsers.length > 0) {
+                            randomUser = validUsers[Math.floor(Math.random() * validUsers.length)];
+                        }
+                    }
+                    
+                    // Select a random response
+                    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                    
+                    // Create response message
+                    const responseElement = document.createElement('div');
+                    responseElement.className = 'message received';
+                    responseElement.innerHTML = `
+                        <div class="message-header">
+                            <strong>${randomUser}</strong>
+                            <span class="message-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                        </div>
+                        <div class="message-content">
+                            ${randomResponse}
+                        </div>
+                    `;
+                    messagesContainer.appendChild(responseElement);
+                    
+                    // Scroll to bottom
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }, 1500);
+                
                 // Clear input and scroll to bottom
                 input.value = '';
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
             }
-        });
-    </script>
-</body>
-</html> 
+            });
+        </script>
+    </body>
+</html>
