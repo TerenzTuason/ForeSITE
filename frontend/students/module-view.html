@@ -156,8 +156,8 @@
         .content-container {
             background: white;
             border-radius: var(--border-radius);
-            box-shadow: var(--card-shadow);
             overflow: hidden;
+            box-shadow: var(--card-shadow);
         }
 
         .content-header {
@@ -185,15 +185,14 @@
         }
 
         .nav-button {
-            padding: 0.75rem 1.5rem;
+            padding: 0.5rem 1rem;
             border: none;
-            border-radius: 4px;
+            border-radius: var(--border-radius);
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            transition: all 0.3s ease;
-            font-weight: 500;
+            transition: all 0.2s;
         }
 
         .btn-back {
@@ -201,29 +200,31 @@
             color: var(--dark-gray);
         }
 
+        .btn-back:hover {
+            background-color: #e9ecef;
+        }
+
         .btn-continue {
             background-color: var(--maroon);
             color: white;
-        }
-
-        .btn-back:hover {
-            background-color: #e2e6ea;
         }
 
         .btn-continue:hover {
             background-color: #600000;
         }
 
+        .btn-continue[disabled] {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+
         .progress-indicator {
-            padding: 1rem;
-            background: #f8f9fa;
-            border-radius: var(--border-radius);
-            margin-bottom: 1.5rem;
+            margin-top: 2.5rem;
+            margin-bottom: 2rem;
         }
 
         .progress {
-            height: 8px;
-            border-radius: 4px;
+            height: 0.5rem;
             background-color: #e9ecef;
             margin-top: 0.5rem;
         }
@@ -246,13 +247,34 @@
             left: 0;
             width: 100%;
             height: 100%;
-            border: none;
         }
 
         .text-content {
-            font-size: 1.1rem;
-            line-height: 1.8;
             color: var(--dark-gray);
+        }
+
+        .text-content h3 {
+            color: var(--maroon);
+            margin-bottom: 1rem;
+        }
+
+        .text-content h5 {
+            color: #6c757d;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+        }
+
+        .text-content p {
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        .text-content ul {
+            margin-bottom: 1rem;
+        }
+
+        .text-content li {
+            margin-bottom: 0.5rem;
         }
 
         .quiz-content {
@@ -271,19 +293,20 @@
 
         .quiz-option {
             padding: 1rem;
-            border: 1px solid #dee2e6;
+            margin-bottom: 0.75rem;
+            border: 1px solid #ced4da;
             border-radius: var(--border-radius);
-            margin-bottom: 0.5rem;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s;
         }
 
         .quiz-option:hover {
-            background: #f8f9fa;
+            background-color: #f8f9fa;
         }
-        
+
         .quiz-option.selected {
-            border-width: 2px;
+            background-color: #e9ecef;
+            border-color: #ced4da;
         }
         
         .quiz-option.correct {
@@ -329,7 +352,7 @@
             <div class="progress-indicator">
                 <div class="d-flex justify-content-between align-items-center">
                     <span>Course Progress</span>
-                    <span id="progress-percentage">0%</span>
+                    <span class="progress-text">0%</span>
                 </div>
                 <div class="progress">
                     <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
@@ -337,13 +360,14 @@
             </div>
 
             <ul class="module-list" id="module-list">
-                <!-- Hardcoded module structure -->
-                <li class="module-item active">
+                <!-- Module 1 -->
+                <li class="module-item active" id="module-1">
                     <div class="module-header active">
                         <i class="fas fa-book"></i>
-                        Module 1: Introduction to Futures Thinking
+                        <span>Module 1: Introduction to Futures Thinking</span>
                     </div>
-                    <ul class="lesson-list">
+                    <ul class="lesson-list" id="module-1-lessons">
+                        <!-- Module 1 lessons will be loaded dynamically -->
                         <li class="lesson-item active" id="video-intro">
                             <i class="fas fa-video"></i>
                             <span>Welcome Video</span>
@@ -354,7 +378,7 @@
                         </li>
                         <li class="lesson-item" id="screen-1-2">
                             <i class="fas fa-file-alt"></i>
-                            <span>Looking Ahead: The Three Horizons Model</span>
+                            <span>The Three Horizons Model</span>
                         </li>
                         <li class="lesson-item" id="screen-1-3">
                             <i class="fas fa-file-alt"></i>
@@ -366,7 +390,7 @@
                         </li>
                         <li class="lesson-item" id="screen-1-5">
                             <i class="fas fa-file-alt"></i>
-                            <span>Linking Futures Thinking to the Policy Cycle</span>
+                            <span>Linking to the Policy Cycle</span>
                         </li>
                         <li class="lesson-item" id="knowledge-check">
                             <i class="fas fa-question-circle"></i>
@@ -374,12 +398,15 @@
                         </li>
                     </ul>
                 </li>
-                <li class="module-item">
+                
+                <!-- Module 2 -->
+                <li class="module-item" id="module-2">
                     <div class="module-header locked">
-                        <i class="fas fa-lock"></i>
-                        Module 2: Futures Process Design (Locked)
+                        <i class="fas fa-tools"></i>
+                        <span>Module 2: Foresight Tools for Change</span>
                     </div>
-                    <ul class="lesson-list" style="display: none;">
+                    <ul class="lesson-list" style="display: none;" id="module-2-lessons">
+                        <!-- Module 2 lessons will be loaded dynamically -->
                         <li class="lesson-item" id="video-2-1">
                             <i class="fas fa-video"></i>
                             <span>Driver Mapping Video</span>
@@ -418,7 +445,7 @@
                         </li>
                         <li class="lesson-item" id="screen-2-3">
                             <i class="fas fa-file-alt"></i>
-                            <span>Trends Identification and Analysis</span>
+                            <span>Trends Identification</span>
                         </li>
                         <li class="lesson-item" id="screen-2-3-1">
                             <i class="fas fa-file-alt"></i>
@@ -430,12 +457,15 @@
                         </li>
                     </ul>
                 </li>
-                <li class="module-item">
+                
+                <!-- Module 3 -->
+                <li class="module-item" id="module-3">
                     <div class="module-header locked">
-                        <i class="fas fa-lock"></i>
-                        Module 3: Pathways for Business Needs
+                        <i class="fas fa-map-marked-alt"></i>
+                        <span>Module 3: Pathways for Business Needs</span>
                     </div>
-                    <ul class="lesson-list" style="display: none;">
+                    <ul class="lesson-list" style="display: none;" id="module-3-lessons">
+                        <!-- Module 3 lessons will be loaded dynamically -->
                         <li class="lesson-item" id="video-3-1">
                             <i class="fas fa-video"></i>
                             <span>Causal Layered Analysis Video</span>
@@ -446,11 +476,11 @@
                         </li>
                         <li class="lesson-item" id="screen-3-1-1">
                             <i class="fas fa-file-alt"></i>
-                            <span>Why Use Causal Layered Analysis?</span>
+                            <span>Why Use CLA?</span>
                         </li>
                         <li class="lesson-item" id="screen-3-1-2">
                             <i class="fas fa-file-alt"></i>
-                            <span>How to do Causal Layered Analysis?</span>
+                            <span>How to do CLA?</span>
                         </li>
                         <li class="lesson-item" id="video-3-2">
                             <i class="fas fa-video"></i>
@@ -466,7 +496,7 @@
                         </li>
                         <li class="lesson-item" id="screen-3-2-2">
                             <i class="fas fa-file-alt"></i>
-                            <span>How to Use the Futures Triangle?</span>
+                            <span>How to do Futures Triangle?</span>
                         </li>
                         <li class="lesson-item" id="video-3-3">
                             <i class="fas fa-video"></i>
@@ -474,7 +504,7 @@
                         </li>
                         <li class="lesson-item" id="screen-3-3">
                             <i class="fas fa-file-alt"></i>
-                            <span>Scenario</span>
+                            <span>Scenario Planning</span>
                         </li>
                         <li class="lesson-item" id="screen-3-3-1">
                             <i class="fas fa-file-alt"></i>
@@ -482,7 +512,7 @@
                         </li>
                         <li class="lesson-item" id="screen-3-3-2">
                             <i class="fas fa-file-alt"></i>
-                            <span>How to Build Scenarios?</span>
+                            <span>How to do Scenario Planning?</span>
                         </li>
                         <li class="lesson-item" id="knowledge-check-3">
                             <i class="fas fa-question-circle"></i>
@@ -498,22 +528,25 @@
                 <div class="content-header">
                     <h2 class="content-title">Welcome to Futures Thinking</h2>
                 </div>
-                
                 <div class="content-body">
-                    <!-- Video content for the first screen -->
                     <div class="video-container">
                         <video controls class="w-100" id="intro-video">
                             <source src="../assets/videos/1_Introduction_to_Futures_Thinking.mp4" type="video/mp4">
                             Your browser does not support the video tag.
                         </video>
                     </div>
+                    <div class="alert alert-info mt-3">
+                        <i class="fas fa-info-circle"></i> <strong>Important:</strong> You must watch the entire video before the "Continue" button will be enabled.
+                    </div>
+                    <div class="video-progress-indicator mt-2 text-muted">
+                        <small><i class="fas fa-clock"></i> Video completion status: <span id="video-status-intro">Not started</span></small>
+                    </div>
                 </div>
-
                 <div class="content-footer">
                     <button class="nav-button btn-back" disabled>
                         <i class="fas fa-arrow-left"></i> Back
                     </button>
-                    <button class="nav-button btn-continue">
+                    <button class="nav-button btn-continue" disabled>
                         Continue <i class="fas fa-arrow-right"></i>
                     </button>
                 </div>
@@ -527,2176 +560,15 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
+            // Basic UI initialization only
             // Load navbar
-            $("#navbar-placeholder").load("../components/navbar.html", function() {
-                // After loading navbar, set active link
-                $("#nav-module").addClass("active");
+            $("#navbar-placeholder").load("../components/navbar.html");
+            
+            // Toggle module lists
+            $(".module-header").click(function() {
+                $(this).siblings(".lesson-list").slideToggle();
             });
-            
-            // Initialize
-            setupModuleHandlers();
-            updateLessonAccessibility();
-            updateNavigationButtons();
-            
-            // Initially hide Module 2 and 3 lesson lists as they are locked
-            document.querySelectorAll('.module-item:not(:first-child) .lesson-list').forEach(list => {
-                list.style.display = 'none';
-            });
-            
-            // Handle simulated logout
-            $("#logout-btn").click(function() {
-                window.location.href = '../login.html';
-            });
-            
-            // Add click handlers for navigation buttons
-            setupNavigation();
-            
-            // Add click handlers to lesson items
-            setupLessonHandlers();
-            
-            // Setup video event handlers for video completion
-            setupVideoEventHandlers();
         });
-        
-        // Function to set up video event handlers
-        function setupVideoEventHandlers() {
-            // Add event listener to Module 1 intro video when the video element exists
-            document.addEventListener('DOMNodeInserted', function(e) {
-                if (e.target.id === 'intro-video') {
-                    const video = e.target;
-                    const statusSpan = document.getElementById('video-status-intro');
-                    
-                    // Remove any existing event listeners
-                    video.removeEventListener('ended', handleIntroVideoEnd);
-                    video.removeEventListener('timeupdate', updateVideoStatus);
-                    
-                    // Add event listeners
-                    video.addEventListener('ended', handleIntroVideoEnd);
-                    
-                    // Add timeupdate event to show progress
-                    video.addEventListener('timeupdate', function() {
-                        updateVideoStatus(video, statusSpan);
-                    });
-                    
-                    // Update initial status
-                    if (statusSpan) {
-                        if (completedLessons['video-intro']) {
-                            statusSpan.textContent = 'Completed';
-                            statusSpan.className = 'text-success';
-                        } else {
-                            statusSpan.textContent = 'Not started';
-                        }
-                    }
-                }
-                
-                if (e.target.id === 'driver-mapping-video') {
-                    const video = e.target;
-                    const statusSpan = document.getElementById('video-status-driver');
-                    
-                    // Remove any existing event listeners
-                    video.removeEventListener('ended', handleDriverMappingVideoEnd);
-                    video.removeEventListener('timeupdate', updateVideoStatus);
-                    
-                    // Add event listeners
-                    video.addEventListener('ended', handleDriverMappingVideoEnd);
-                    
-                    // Add timeupdate event to show progress
-                    video.addEventListener('timeupdate', function() {
-                        updateVideoStatus(video, statusSpan);
-                    });
-                    
-                    // Update initial status
-                    if (statusSpan) {
-                        if (completedLessons['video-2-1']) {
-                            statusSpan.textContent = 'Completed';
-                            statusSpan.className = 'text-success';
-                        } else {
-                            statusSpan.textContent = 'Not started';
-                        }
-                    }
-                }
-                
-                if (e.target.id === 'horizon-scanning-video') {
-                    const video = e.target;
-                    const statusSpan = document.getElementById('video-status-horizon');
-                    
-                    // Remove any existing event listeners
-                    video.removeEventListener('ended', handleHorizonScanningVideoEnd);
-                    video.removeEventListener('timeupdate', updateVideoStatus);
-                    
-                    // Add event listeners
-                    video.addEventListener('ended', handleHorizonScanningVideoEnd);
-                    
-                    // Add timeupdate event to show progress
-                    video.addEventListener('timeupdate', function() {
-                        updateVideoStatus(video, statusSpan);
-                    });
-                    
-                    // Update initial status
-                    if (statusSpan) {
-                        if (completedLessons['video-2-2']) {
-                            statusSpan.textContent = 'Completed';
-                            statusSpan.className = 'text-success';
-                        } else {
-                            statusSpan.textContent = 'Not started';
-                        }
-                    }
-                }
-                
-                if (e.target.id === 'trends-identification-video') {
-                    const video = e.target;
-                    const statusSpan = document.getElementById('video-status-trends');
-                    
-                    // Remove any existing event listeners
-                    video.removeEventListener('ended', handleTrendsVideoEnd);
-                    video.removeEventListener('timeupdate', updateVideoStatus);
-                    
-                    // Add event listeners
-                    video.addEventListener('ended', handleTrendsVideoEnd);
-                    
-                    // Add timeupdate event to show progress
-                    video.addEventListener('timeupdate', function() {
-                        updateVideoStatus(video, statusSpan);
-                    });
-                    
-                    // Update initial status
-                    if (statusSpan) {
-                        if (completedLessons['video-2-3']) {
-                            statusSpan.textContent = 'Completed';
-                            statusSpan.className = 'text-success';
-                        } else {
-                            statusSpan.textContent = 'Not started';
-                        }
-                    }
-                }
-                
-                // Module 3 videos
-                if (e.target.id === 'causal-layered-analysis-video') {
-                    const video = e.target;
-                    const statusSpan = document.getElementById('video-status-cla');
-                    
-                    // Remove any existing event listeners
-                    video.removeEventListener('ended', handleCLAVideoEnd);
-                    video.removeEventListener('timeupdate', updateVideoStatus);
-                    
-                    // Add event listeners
-                    video.addEventListener('ended', handleCLAVideoEnd);
-                    
-                    // Add timeupdate event to show progress
-                    video.addEventListener('timeupdate', function() {
-                        updateVideoStatus(video, statusSpan);
-                    });
-                    
-                    // Update initial status
-                    if (statusSpan) {
-                        if (completedLessons['video-3-1']) {
-                            statusSpan.textContent = 'Completed';
-                            statusSpan.className = 'text-success';
-                        } else {
-                            statusSpan.textContent = 'Not started';
-                        }
-                    }
-                }
-                
-                if (e.target.id === 'futures-triangle-video') {
-                    const video = e.target;
-                    const statusSpan = document.getElementById('video-status-futures-triangle');
-                    
-                    // Remove any existing event listeners
-                    video.removeEventListener('ended', handleFuturesTriangleVideoEnd);
-                    video.removeEventListener('timeupdate', updateVideoStatus);
-                    
-                    // Add event listeners
-                    video.addEventListener('ended', handleFuturesTriangleVideoEnd);
-                    
-                    // Add timeupdate event to show progress
-                    video.addEventListener('timeupdate', function() {
-                        updateVideoStatus(video, statusSpan);
-                    });
-                    
-                    // Update initial status
-                    if (statusSpan) {
-                        if (completedLessons['video-3-2']) {
-                            statusSpan.textContent = 'Completed';
-                            statusSpan.className = 'text-success';
-                        } else {
-                            statusSpan.textContent = 'Not started';
-                        }
-                    }
-                }
-                
-                if (e.target.id === 'scenario-planning-video') {
-                    const video = e.target;
-                    const statusSpan = document.getElementById('video-status-scenario');
-                    
-                    // Remove any existing event listeners
-                    video.removeEventListener('ended', handleScenarioVideoEnd);
-                    video.removeEventListener('timeupdate', updateVideoStatus);
-                    
-                    // Add event listeners
-                    video.addEventListener('ended', handleScenarioVideoEnd);
-                    
-                    // Add timeupdate event to show progress
-                    video.addEventListener('timeupdate', function() {
-                        updateVideoStatus(video, statusSpan);
-                    });
-                    
-                    // Update initial status
-                    if (statusSpan) {
-                        if (completedLessons['video-3-3']) {
-                            statusSpan.textContent = 'Completed';
-                            statusSpan.className = 'text-success';
-                        } else {
-                            statusSpan.textContent = 'Not started';
-                        }
-                    }
-                }
-            });
-        }
-        
-        // Function to update video status
-        function updateVideoStatus(video, statusElement) {
-            if (!video || !statusElement) return;
-            
-            const duration = video.duration;
-            const currentTime = video.currentTime;
-            
-            if (duration > 0) {
-                // Calculate percentage
-                const percent = Math.floor((currentTime / duration) * 100);
-                
-                if (video.ended) {
-                    statusElement.textContent = 'Completed';
-                    statusElement.className = 'text-success';
-                } else if (percent === 0) {
-                    statusElement.textContent = 'Not started';
-                    statusElement.className = '';
-                } else {
-                    statusElement.textContent = `In progress (${percent}%)`;
-                    statusElement.className = 'text-primary';
-                }
-            }
-        }
-        
-        // Helper function to get the next lesson ID in sequence
-        function getNextLessonInSequence(currentLessonId) {
-            const currentIndex = lessonSequence.indexOf(currentLessonId);
-            if (currentIndex >= 0 && currentIndex < lessonSequence.length - 1) {
-                return lessonSequence[currentIndex + 1];
-            }
-            return null;
-        }
-        
-        // Handler for Module 1 intro video completion
-        function handleIntroVideoEnd() {
-            console.log('Intro video ended');
-            // Mark video as completed
-            completedLessons['video-intro'] = true;
-            
-            // ONLY make the immediate next lesson accessible
-            const nextLesson = getNextLessonInSequence('video-intro');
-            if (nextLesson) {
-                console.log('Making accessible:', nextLesson);
-                accessibleLessons[nextLesson] = true;
-                
-                // Ensure other lessons remain locked
-                for (const lesson in accessibleLessons) {
-                    if (lesson !== 'video-intro' && lesson !== nextLesson) {
-                        accessibleLessons[lesson] = completedLessons[lesson];
-                    }
-                }
-            }
-            
-            // Update UI
-            updateLessonAccessibility();
-            updateNavigationButtons();
-        }
-        
-        // Handler for Module 2 Driver Mapping video completion
-        function handleDriverMappingVideoEnd() {
-            console.log('Driver Mapping video ended');
-            // Mark video as completed
-            completedLessons['video-2-1'] = true;
-            
-            // ONLY make the immediate next lesson accessible
-            const nextLesson = getNextLessonInSequence('video-2-1');
-            if (nextLesson) {
-                console.log('Making accessible:', nextLesson);
-                accessibleLessons[nextLesson] = true;
-                
-                // Ensure other lessons remain locked
-                for (const lesson in accessibleLessons) {
-                    if (!completedLessons[lesson] && lesson !== 'video-2-1' && lesson !== nextLesson) {
-                        accessibleLessons[lesson] = false;
-                    }
-                }
-            }
-            
-            // Update UI
-            updateLessonAccessibility();
-            updateNavigationButtons();
-        }
-        
-        // Handler for Module 2 Horizon Scanning video completion
-        function handleHorizonScanningVideoEnd() {
-            console.log('Horizon Scanning video ended');
-            // Mark video as completed
-            completedLessons['video-2-2'] = true;
-            
-            // Make the next lesson accessible
-            const nextLesson = getNextLessonInSequence('video-2-2');
-            if (nextLesson) {
-                console.log('Making accessible:', nextLesson);
-                accessibleLessons[nextLesson] = true;
-            }
-            
-            // Update UI
-            updateLessonAccessibility();
-            updateNavigationButtons();
-        }
-        
-        // Handler for Module 2 Trends Identification video completion
-        function handleTrendsVideoEnd() {
-            console.log('Trends Identification video ended');
-            // Mark video as completed
-            completedLessons['video-2-3'] = true;
-            
-            // Make the next lesson accessible
-            const nextLesson = getNextLessonInSequence('video-2-3');
-            if (nextLesson) {
-                console.log('Making accessible:', nextLesson);
-                accessibleLessons[nextLesson] = true;
-            }
-            
-            // Update UI
-            updateLessonAccessibility();
-            updateNavigationButtons();
-        }
-        
-        // Handler for Module 3 Causal Layered Analysis video completion
-        function handleCLAVideoEnd() {
-            console.log('Causal Layered Analysis video ended');
-            // Mark video as completed
-            completedLessons['video-3-1'] = true;
-            
-            // Make the next lesson accessible
-            const nextLesson = getNextLessonInSequence('video-3-1');
-            if (nextLesson) {
-                console.log('Making accessible:', nextLesson);
-                accessibleLessons[nextLesson] = true;
-            }
-            
-            // Update UI
-            updateLessonAccessibility();
-            updateNavigationButtons();
-        }
-        
-        // Handler for Module 3 Futures Triangle video completion
-        function handleFuturesTriangleVideoEnd() {
-            console.log('Futures Triangle video ended');
-            // Mark video as completed
-            completedLessons['video-3-2'] = true;
-            
-            // Make the next lesson accessible
-            const nextLesson = getNextLessonInSequence('video-3-2');
-            if (nextLesson) {
-                console.log('Making accessible:', nextLesson);
-                accessibleLessons[nextLesson] = true;
-            }
-            
-            // Update UI
-            updateLessonAccessibility();
-            updateNavigationButtons();
-        }
-        
-        // Handler for Module 3 Scenario Planning video completion
-        function handleScenarioVideoEnd() {
-            console.log('Scenario Planning video ended');
-            // Mark video as completed
-            completedLessons['video-3-3'] = true;
-            
-            // Make the next lesson accessible
-            const nextLesson = getNextLessonInSequence('video-3-3');
-            if (nextLesson) {
-                console.log('Making accessible:', nextLesson);
-                accessibleLessons[nextLesson] = true;
-            }
-            
-            // Update UI
-            updateLessonAccessibility();
-            updateNavigationButtons();
-        }
-        
-        // Add modal HTML to the page
-        function addModalHTML() {
-            const modalHTML = `
-                <div class="modal fade" id="videoRequiredModal" tabindex="-1" aria-labelledby="videoRequiredModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="videoRequiredModalLabel">Action Required</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <p id="modal-message">Please finish watching the video before continuing.</p>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            // Append modal to body if it doesn't exist
-            if (!document.getElementById('videoRequiredModal')) {
-                document.body.insertAdjacentHTML('beforeend', modalHTML);
-            }
-        }
-        
-        // Show modal with a specific message
-        function showModal(message, callback = null) {
-            addModalHTML();
-            document.getElementById('modal-message').textContent = message;
-            const modalElement = document.getElementById('videoRequiredModal');
-            
-            // Remove any existing backdrops before showing new modal
-            const existingBackdrops = document.querySelectorAll('.modal-backdrop');
-            existingBackdrops.forEach(backdrop => backdrop.remove());
-            
-            // Ensure the document body doesn't have modal-open class
-            document.body.classList.remove('modal-open');
-            document.body.style.overflow = '';
-            document.body.style.paddingRight = '';
-            
-            const modal = new bootstrap.Modal(modalElement);
-            
-            // Set up event listener for modal hidden event
-            if (callback) {
-                modalElement.addEventListener('hidden.bs.modal', function(e) {
-                    // Execute the callback
-                    callback();
-                    
-                    // Additional cleanup
-                    setTimeout(() => {
-                        const remainingBackdrops = document.querySelectorAll('.modal-backdrop');
-                        remainingBackdrops.forEach(backdrop => backdrop.remove());
-                        document.body.classList.remove('modal-open');
-                        document.body.style.overflow = '';
-                        document.body.style.paddingRight = '';
-                    }, 300);
-                }, { once: true });
-            } else {
-                // Just do cleanup if no callback
-                modalElement.addEventListener('hidden.bs.modal', function() {
-                    setTimeout(() => {
-                        const remainingBackdrops = document.querySelectorAll('.modal-backdrop');
-                        remainingBackdrops.forEach(backdrop => backdrop.remove());
-                        document.body.classList.remove('modal-open');
-                        document.body.style.overflow = '';
-                        document.body.style.paddingRight = '';
-                    }, 300);
-                }, { once: true });
-            }
-            
-            modal.show();
-        }
-        
-        // Global tracker to prevent duplicate module completion modals
-        let moduleCompletionShown = {
-            1: false,
-            2: false,
-            3: false
-        };
-        
-        function completeModule(moduleNumber) {
-            console.log(`Completing module ${moduleNumber}`);
-            
-            // Check if we've already shown the completion modal for this module
-            if (moduleCompletionShown[moduleNumber]) {
-                console.log(`Module ${moduleNumber} completion already shown, skipping modal`);
-                return;
-            }
-            
-            // Get module-specific lesson IDs
-            let moduleStartIndex = 0;
-            let moduleEndIndex = 0;
-            
-            // Find index ranges for the specified module
-            const activeLesson = document.querySelector('.lesson-item.active');
-            if (!activeLesson) {
-                console.error('No active lesson found');
-                return;
-            }
-            
-            const activeId = activeLesson.id;
-            console.log(`Active lesson is: ${activeId}`);
-            
-            // Only show completion if we're at the end of the module AND we're explicitly calling this
-            // from the Complete Module button click (not from a Continue button click)
-            const isAtModuleEnd = (moduleNumber === 1 && activeId === 'knowledge-check') || 
-                                (moduleNumber === 2 && activeId === 'knowledge-check-2') ||
-                                (moduleNumber === 3 && activeId === 'knowledge-check-3');
-            
-            // Also check that this was called directly from the "Complete Module" button
-            // and not from the Continue button navigation flow
-            if (!isAtModuleEnd) {
-                console.log(`Not at the end of module ${moduleNumber}, skipping completion modal`);
-                return;
-            }
-            
-            // Prevent showing the completion modal multiple times
-            if (moduleCompletionShown[moduleNumber]) {
-                console.log(`Module ${moduleNumber} completion modal already shown`);
-                return;
-            }
-            
-            // Mark module as complete
-            updateModuleCompletionStatus(moduleNumber);
-            
-            // Mark all lessons in the module as completed
-            Object.keys(completedLessons).forEach(lessonId => {
-                // Module 1 lessons
-                if (moduleNumber === 1 && (lessonId === 'video-intro' || lessonId.startsWith('screen-1') || lessonId === 'knowledge-check')) {
-                    completedLessons[lessonId] = true;
-                }
-                // Module 2 lessons
-                else if (moduleNumber === 2 && (lessonId.startsWith('video-2') || lessonId.startsWith('screen-2') || lessonId === 'knowledge-check-2')) {
-                    completedLessons[lessonId] = true;
-                }
-                // Module 3 lessons
-                else if (moduleNumber === 3 && (lessonId.startsWith('video-3') || lessonId.startsWith('screen-3') || lessonId === 'knowledge-check-3')) {
-                    completedLessons[lessonId] = true;
-                }
-            });
-            
-            // If module 1 is completed, unlock module 2
-            if (moduleNumber === 1) {
-                // Unlock Module 2
-                const module2Header = document.querySelector('.module-item:nth-child(2) .module-header');
-                if (module2Header) {
-                    module2Header.classList.remove('locked');
-                    module2Header.innerHTML = '<i class="fas fa-book"></i> Module 2: Futures Process Design';
-                }
-                
-                // Make first lesson of Module 2 accessible
-                accessibleLessons['video-2-1'] = true;
-                
-                // Show completion message
-                showModal(
-                    `<h4>Congratulations!</h4>
-                    <p>You have completed Module 1. Module 2 is now unlocked.</p>
-                    <p>Would you like to continue to Module 2 now?</p>`,
-                    function() {
-                        // Navigate to the first lesson of Module 2
-                        document.getElementById('video-2-1').click();
-                    }
-                );
-            }
-            // If module 2 is completed, unlock module 3
-            else if (moduleNumber === 2) {
-                // Unlock Module 3
-                const module3Header = document.querySelector('.module-item:nth-child(3) .module-header');
-                if (module3Header) {
-                    module3Header.classList.remove('locked');
-                    module3Header.innerHTML = '<i class="fas fa-book"></i> Module 3: Pathways for Business Needs';
-                }
-                
-                // Make first lesson of Module 3 accessible
-                accessibleLessons['video-3-1'] = true;
-                
-                // Show completion message
-                showModal(
-                    `<h4>Congratulations!</h4>
-                    <p>You have completed Module 2. Module 3 is now unlocked.</p>
-                    <p>Would you like to continue to Module 3 now?</p>`,
-                    function() {
-                        // Navigate to the first lesson of Module 3
-                        document.getElementById('video-3-1').click();
-                    }
-                );
-            }
-            // If module 3 is completed, show completion message
-            else if (moduleNumber === 3) {
-                // No further modules to unlock yet
-                showModal(
-                    `<h4>Congratulations!</h4>
-                    <p>You have completed Module 3. You have now finished all available modules!</p>`,
-                    null
-                );
-            }
-            
-            // Mark this modal as shown to prevent duplicates
-            moduleCompletionShown[moduleNumber] = true;
-            
-            // Update UI
-            updateLessonAccessibility();
-            updateNavigationButtons();
-        }
-        
-        function updateModuleCompletionStatus(moduleNumber) {
-            // Add visual indication that the module is completed
-            const completedModule = document.querySelector(`.module-item:nth-child(${moduleNumber})`);
-            if (completedModule) {
-                const moduleHeader = completedModule.querySelector('.module-header');
-                moduleHeader.classList.add('completed');
-                
-                // Add completion icon or indicator if desired
-                const moduleTitle = moduleHeader.textContent;
-                moduleHeader.innerHTML = `<i class="fas fa-check-circle text-success"></i> ${moduleTitle} <span class="badge bg-success ms-2">Completed</span>`;
-            }
-        }
-        
-        function setupNavigation() {
-            const backButton = document.querySelector('.btn-back');
-            const continueButton = document.querySelector('.btn-continue');
-            
-            backButton.addEventListener('click', function() {
-                const activeLesson = document.querySelector('.lesson-item.active');
-                if (!activeLesson) return;
-                
-                const activeId = activeLesson.id;
-                const activeIndex = lessonSequence.indexOf(activeId);
-                
-                if (activeIndex > 0) {
-                    const prevId = lessonSequence[activeIndex - 1];
-                    document.getElementById(prevId).click();
-                }
-            });
-            
-            continueButton.addEventListener('click', function() {
-                // First, get the current active lesson
-                const activeLesson = document.querySelector('.lesson-item.active');
-                if (!activeLesson) {
-                    console.error('No active lesson found');
-                    return;
-                }
-                
-                const activeId = activeLesson.id;
-                console.log('Current active lesson:', activeId);
-                
-                // Find its position in the sequence
-                const activeIndex = lessonSequence.indexOf(activeId);
-                if (activeIndex === -1) {
-                    console.error('Active lesson not found in sequence');
-                    return;
-                }
-                
-                // If we're on a video lesson, check if it's been watched
-                if (activeId === 'video-intro' || activeId === 'video-2-1' || activeId === 'video-2-2' || activeId === 'video-2-3' || 
-                    activeId === 'video-3-1' || activeId === 'video-3-2' || activeId === 'video-3-3') {
-                    let videoId;
-                    if (activeId === 'video-intro') videoId = 'intro-video';
-                    else if (activeId === 'video-2-1') videoId = 'driver-mapping-video';
-                    else if (activeId === 'video-2-2') videoId = 'horizon-scanning-video';
-                    else if (activeId === 'video-2-3') videoId = 'trends-identification-video';
-                    else if (activeId === 'video-3-1') videoId = 'causal-layered-analysis-video';
-                    else if (activeId === 'video-3-2') videoId = 'futures-triangle-video';
-                    else if (activeId === 'video-3-3') videoId = 'scenario-planning-video';
-                    
-                    const video = document.getElementById(videoId);
-                    
-                    // If video exists and hasn't been completed
-                    if (video && !video.ended && !completedLessons[activeId]) {
-                        showModal('Please finish watching the video before continuing.');
-                        return;
-                    }
-                }
-                
-                // Special handling for the last lesson of each module ONLY
-                if (activeId === 'knowledge-check') {
-                    // Last lesson of Module 1
-                    completeModule(1);
-                    return;
-                } else if (activeId === 'knowledge-check-2') {
-                    // Last lesson of Module 2
-                    completeModule(2);
-                    return;
-                }
-                
-                // Otherwise proceed to the next lesson in sequence
-                if (activeIndex < lessonSequence.length - 1) {
-                    // Get the IMMEDIATE next lesson ID
-                    const nextId = lessonSequence[activeIndex + 1];
-                    console.log('Next lesson should be:', nextId);
-                    
-                    // Determine which modules these lessons belong to
-                    let currentIdModule = 1;
-                    let nextIdModule = 1;
-                    
-                    // Module 1 ranges from video-intro to knowledge-check
-                    // Module 2 ranges from video-2-1 to knowledge-check-2
-                    // Module 3 would start after knowledge-check-2
-                    
-                    if (activeId.startsWith('video-2') || activeId.startsWith('screen-2') || activeId === 'knowledge-check-2') {
-                        currentIdModule = 2;
-                    } else if (activeId.startsWith('video-3') || activeId.startsWith('screen-3')) {
-                        currentIdModule = 3;
-                    }
-                    
-                    if (nextId.startsWith('video-2') || nextId.startsWith('screen-2') || nextId === 'knowledge-check-2') {
-                        nextIdModule = 2;
-                    } else if (nextId.startsWith('video-3') || nextId.startsWith('screen-3')) {
-                        nextIdModule = 3;
-                    }
-                    
-                    // We should never automatically transition between modules when using the Continue button
-                    // Module completion should only happen through the "Complete Module" button in knowledge checks
-                    // No automatic module transitions should occur here
-                    
-                    // This was previously causing the module completion to trigger prematurely:
-                    // const isModuleTransition = nextIdModule !== currentIdModule;
-                    // if (isModuleTransition && isAtModuleEnd) { ... }
-                    
-                    // Mark current lesson as completed
-                    completedLessons[activeId] = true;
-                    
-                    // Make next lesson accessible
-                    accessibleLessons[nextId] = true;
-                    
-                    // Update UI
-                    updateLessonAccessibility();
-                    
-                    // Explicitly find and click the next lesson element
-                    const nextLessonElement = document.getElementById(nextId);
-                    if (nextLessonElement) {
-                        console.log('Navigating to:', nextId);
-                        nextLessonElement.click();
-                    } else {
-                        console.error('Next lesson element not found:', nextId);
-                        showModal('Navigation error: Could not find the next lesson.');
-                    }
-                } else {
-                    console.log('At the end of the sequence');
-                }
-            });
-            
-            // Initialize navigation buttons
-            updateNavigationButtons();
-        }
-        
-        // Track which lessons are accessible and which are completed
-        let accessibleLessons = {
-            // Module 1
-            'video-intro': true, // Start with video accessible
-            'screen-1-1': false,
-            'screen-1-2': false,
-            'screen-1-3': false,
-            'screen-1-4': false,
-            'screen-1-5': false,
-            'knowledge-check': false,
-            // Module 2
-            'video-2-1': false,
-            'screen-2-1': false,
-            'screen-2-1-1': false,
-            'screen-2-1-2': false,
-            'video-2-2': false,
-            'screen-2-2': false,
-            'screen-2-2-1': false,
-            'screen-2-2-2': false,
-            'video-2-3': false,
-            'screen-2-3': false,
-            'screen-2-3-1': false,
-            'knowledge-check-2': false,
-            // Module 3
-            'video-3-1': false,
-            'screen-3-1': false,
-            'screen-3-1-1': false,
-            'screen-3-1-2': false,
-            'video-3-2': false,
-            'screen-3-2': false,
-            'screen-3-2-1': false,
-            'screen-3-2-2': false,
-            'video-3-3': false,
-            'screen-3-3': false,
-            'screen-3-3-1': false,
-            'screen-3-3-2': false,
-            'knowledge-check-3': false
-        };
-        
-        // Separate tracking for completed lessons
-        let completedLessons = {
-            // Module 1
-            'video-intro': false,
-            'screen-1-1': false,
-            'screen-1-2': false,
-            'screen-1-3': false,
-            'screen-1-4': false,
-            'screen-1-5': false,
-            'knowledge-check': false,
-            // Module 2
-            'video-2-1': false,
-            'screen-2-1': false,
-            'screen-2-1-1': false,
-            'screen-2-1-2': false,
-            'video-2-2': false,
-            'screen-2-2': false,
-            'screen-2-2-1': false,
-            'screen-2-2-2': false,
-            'video-2-3': false,
-            'screen-2-3': false,
-            'screen-2-3-1': false,
-            'knowledge-check-2': false,
-            // Module 3
-            'video-3-1': false,
-            'screen-3-1': false,
-            'screen-3-1-1': false,
-            'screen-3-1-2': false,
-            'video-3-2': false,
-            'screen-3-2': false,
-            'screen-3-2-1': false,
-            'screen-3-2-2': false,
-            'video-3-3': false,
-            'screen-3-3': false,
-            'screen-3-3-1': false,
-            'screen-3-3-2': false,
-            'knowledge-check-3': false
-        };
-        
-        // Define the sequence of lessons
-        const lessonSequence = [
-            // Module 1
-            'video-intro',
-            'screen-1-1',
-            'screen-1-2',
-            'screen-1-3',
-            'screen-1-4',
-            'screen-1-5',
-            'knowledge-check',
-            // Module 2
-            'video-2-1',
-            'screen-2-1',
-            'screen-2-1-1',
-            'screen-2-1-2',
-            'video-2-2',
-            'screen-2-2',
-            'screen-2-2-1',
-            'screen-2-2-2',
-            'video-2-3',
-            'screen-2-3',
-            'screen-2-3-1',
-            'knowledge-check-2',
-            // Module 3
-            'video-3-1',
-            'screen-3-1',
-            'screen-3-1-1',
-            'screen-3-1-2',
-            'video-3-2',
-            'screen-3-2',
-            'screen-3-2-1',
-            'screen-3-2-2',
-            'video-3-3',
-            'screen-3-3',
-            'screen-3-3-1',
-            'screen-3-3-2',
-            'knowledge-check-3'
-        ];
-        
-        function setupLessonHandlers() {
-            const lessonItems = document.querySelectorAll('.lesson-item');
-            
-            // First, apply the locked styling to all lessons except the first
-            updateLessonAccessibility();
-            
-            lessonItems.forEach(item => {
-                item.addEventListener('click', function() {
-                    const lessonId = this.id;
-                    
-                    // Find the current active lesson and its index
-                    const activeLesson = document.querySelector('.lesson-item.active');
-                    const activeId = activeLesson ? activeLesson.id : null;
-                    const activeIndex = activeId ? lessonSequence.indexOf(activeId) : -1;
-                    const clickedIndex = lessonSequence.indexOf(lessonId);
-                    
-                    // Check if this is a valid next lesson (must be the immediate next or previous one)
-                    const isNextLesson = clickedIndex === activeIndex + 1;
-                    const isPreviousLesson = clickedIndex === activeIndex - 1;
-                    const isCurrentLesson = clickedIndex === activeIndex;
-                    
-                    // Only allow clicking on the current, immediate next, or previous lesson
-                    if (!isCurrentLesson && !isNextLesson && !isPreviousLesson && !completedLessons[lessonId]) {
-                        showModal('Please follow the lessons in sequence. You can only navigate to adjacent lessons.');
-                        return;
-                    }
-                    
-                    // Check if this lesson is accessible
-                    if (!isLessonAccessible(lessonId)) {
-                        // Show a notification that they need to complete previous lessons first
-                        showModal('Please complete the previous lessons in sequence before accessing this one.');
-                        return;
-                    }
-                    
-                    // Set this lesson as active
-                    lessonItems.forEach(l => l.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    // Update content based on the clicked item's ID
-                    updateContent(lessonId);
-                    
-                    // Mark the current lesson as completed
-                    completedLessons[lessonId] = true;
-                    
-                    // Update the next lesson to be accessible - ONLY the immediate next lesson
-                    const currentIndex = lessonSequence.indexOf(lessonId);
-                    if (currentIndex < lessonSequence.length - 1) {
-                        // Only make the immediate next lesson accessible
-                        const nextLessonId = lessonSequence[currentIndex + 1];
-                        accessibleLessons[nextLessonId] = true;
-                        
-                        // Explicitly lock all lessons after the next one
-                        for (let i = currentIndex + 2; i < lessonSequence.length; i++) {
-                            accessibleLessons[lessonSequence[i]] = false;
-                        }
-                    }
-                    
-                    // Update lesson styling based on completion status
-                    updateLessonAccessibility();
-                    
-                    // Update navigation buttons
-                    updateNavigationButtons();
-                });
-            });
-        }
-        
-        function isLessonAccessible(lessonId) {
-            return accessibleLessons[lessonId];
-        }
-        
-        function setupModuleHandlers() {
-            const moduleHeaders = document.querySelectorAll('.module-header');
-            moduleHeaders.forEach((header, index) => {
-                header.addEventListener('click', function() {
-                    const moduleItem = this.parentNode;
-                    const lessonsList = moduleItem.querySelector('.lesson-list');
-                    
-                    // For first module, we can always toggle
-                    if (index === 0) {
-                        lessonsList.style.display = lessonsList.style.display === 'none' ? 'block' : 'none';
-                        return;
-                    }
-                    
-                    // For module 2, we need to check if module 1 is completed
-                    if (index === 1) {
-                        // Check if Module 1 is completed (knowledge-check is completed)
-                        const isModule1Completed = completedLessons['knowledge-check'];
-                        
-                        if (isModule1Completed) {
-                            // If module is completed, we can toggle
-                            this.classList.remove('locked');
-                            lessonsList.style.display = lessonsList.style.display === 'none' ? 'block' : 'none';
-                            
-                            // Make first lesson of module 2 accessible
-                            accessibleLessons['video-2-1'] = true;
-                            updateLessonAccessibility();
-                        } else {
-                            // If module is not completed, show message
-                            showModal('Please complete Module 1 first before accessing Module 2.');
-                        }
-                        return;
-                    }
-                    
-                    // For module 3 and beyond, check if previous module is completed
-                    if (index >= 2) {
-                        const isModule2Completed = completedLessons['video-2-2'];
-                        
-                        if (isModule2Completed) {
-                            // If module is completed, we can toggle
-                            this.classList.remove('locked');
-                            lessonsList.style.display = lessonsList.style.display === 'none' ? 'block' : 'none';
-                        } else {
-                            // If module is not completed, show message
-                            showModal(`Please complete Module ${index} first before accessing Module ${index + 1}.`);
-                        }
-                    }
-                });
-            });
-        }
-        
-        function updateLessonAccessibility() {
-            const lessonItems = document.querySelectorAll('.lesson-item');
-            const currentActive = document.querySelector('.lesson-item.active');
-            
-            lessonItems.forEach(item => {
-                const lessonId = item.id;
-                
-                // Handle accessibility (unlocking/locking)
-                if (accessibleLessons[lessonId]) {
-                    // This lesson is accessible
-                    item.classList.remove('locked');
-                    item.style.opacity = '1';
-                    item.style.cursor = 'pointer';
-                } else {
-                    // This lesson is locked
-                    item.classList.add('locked');
-                    item.style.opacity = '0.5';
-                    item.style.cursor = 'not-allowed';
-                }
-                
-                // Handle completion (checkmarks) - only for completed lessons
-                if (completedLessons[lessonId] && item !== currentActive) {
-                    // It's a completed lesson and not the active one - add a check mark
-                    const icon = item.querySelector('i');
-                    if (icon && !icon.classList.contains('fa-check-circle')) {
-                        const originalClass = icon.className;
-                        item.setAttribute('data-original-icon', originalClass);
-                        icon.className = 'fas fa-check-circle text-success';
-                    }
-                } else if (!completedLessons[lessonId] && item.hasAttribute('data-original-icon')) {
-                    // It's not completed, restore original icon
-                    const icon = item.querySelector('i');
-                    const originalClass = item.getAttribute('data-original-icon');
-                    icon.className = originalClass;
-                }
-            });
-        }
-        
-        function updateContent(screenId) {
-            // Update the content title
-            let contentTitle = "";
-            let contentHTML = "";
-            
-            switch(screenId) {
-                case "video-intro":
-                    contentTitle = "Welcome to Futures Thinking";
-                    contentHTML = `
-                        <div class="video-container">
-                            <video controls class="w-100" id="intro-video">
-                                <source src="../assets/videos/1_Introduction_to_Futures_Thinking.mp4" type="video/mp4">
-                                Your browser does not support the video tag.
-                            </video>
-                        </div>
-                        <div class="alert alert-info mt-3">
-                            <i class="fas fa-info-circle"></i> <strong>Important:</strong> You must watch the entire video before the "Continue" button will be enabled.
-                        </div>
-                        <div class="video-progress-indicator mt-2 text-muted">
-                            <small><i class="fas fa-clock"></i> Video completion status: <span id="video-status-intro">Not started</span></small>
-                        </div>
-                    `;
-                    break;
-                    
-                case "screen-1-1":
-                    contentTitle = "What is Futures Thinking?";
-                    contentHTML = `
-                        <div class="text-content">
-                            <h3>What is Futures Thinking?</h3>
-                            <h5>A strategic mindset to explore change and build resilient policy</h5>
-                            <div class="mt-4">
-                                <ul>
-                                    <li>Futures Thinking helps identify long-term issues and uncertainties in a policy area.</li>
-                                    <li>It does not predict the future — it helps prepare for different possibilities.</li>
-                                    <li>Supports resilient policy design using tools like:
-                                        <ul>
-                                            <li>Scenario planning</li>
-                                            <li>Change driver analysis</li>
-                                            <li>Strategic workshops</li>
-                                        </ul>
-                                    </li>
-                                    <li>It is flexible — it can be adapted for quick brainstorming or in-depth strategy development.</li>
-                                    <li>Helps teams:
-                                        <ul>
-                                            <li>Understand trends</li>
-                                            <li>Make better-informed decisions</li>
-                                            <li>Mobilize stakeholder action</li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                    
-                case "screen-1-2":
-                    contentTitle = "Looking Ahead: The Three Horizons Model";
-                    contentHTML = `
-                        <div class="text-content">
-                            <h3>Looking Ahead: The Three Horizons Model</h3>
-                            <h5>A tool for thinking across short, medium, and long-term futures.</h5>
-                            <div class="mt-4">
-                                <div class="text-center mb-4">
-                                    <img src="../assets/images/1.2_The_Three_Horizons_Model.png" alt="Three Horizons Model" class="img-fluid" style="max-width: 100%; height: auto;">
-                                </div>
-                                <ul>
-                                    <li>The Three Horizons Framework breaks change into three phases:
-                                        <ul>
-                                            <li>Horizon 1 (H1): Present systems and issues we manage today</li>
-                                            <li>Horizon 2 (H2): Emerging changes and innovations disrupting the current system</li>
-                                            <li>Horizon 3 (H3): Long-term transformations and future possibilities</li>
-                                        </ul>
-                                    </li>
-                                    <li>Policymakers must:
-                                        <ul>
-                                            <li>Respond to current needs (H1)</li>
-                                            <li>Prepare for near-term shifts (H2)</li>
-                                            <li>Explore long-term visions (H3)</li>
-                                        </ul>
-                                    </li>
-                                    <li>Futures tools focus most on H2 and H3, helping policymakers stay ahead of change.</li>
-                                </ul>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                    
-                case "screen-1-3":
-                    contentTitle = "Identifying Change Drivers";
-                    contentHTML = `
-                        <div class="text-content">
-                            <h3>Identifying Change Drivers</h3>
-                            <h5>Understanding what shapes the future.</h5>
-                            <div class="mt-4">
-                                <ul>
-                                    <li>Change drivers are trends or forces influencing how the future develops.</li>
-                                    <li>Often categorized using PESTLE:
-                                        <ul>
-                                            <li>Political</li>
-                                            <li>Economic</li>
-                                            <li>Social</li>
-                                            <li>Technological</li>
-                                            <li>Legal</li>
-                                            <li>Environmental</li>
-                                        </ul>
-                                    </li>
-                                    <li>Look beyond current events—important drivers often emerge outside the usual policy space.</li>
-                                    <li>Tip: It's better to collect too many drivers than miss a critical one.</li>
-                                    <li>Driver identification is the foundation of most futures work.</li>
-                                </ul>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                    
-                case "screen-1-4":
-                    contentTitle = "Identifying Weak Signals";
-                    contentHTML = `
-                        <div class="text-content">
-                            <h3>Identifying Weak Signals</h3>
-                            <h5>Spotting early signs of future change.</h5>
-                            <div class="mt-4">
-                                <ul>
-                                    <li>Weak signals are early hints of significant future changes.</li>
-                                    <li>They are often unclear, rare, or not well understood yet.</li>
-                                    <li>Horizon Scanning helps identify these subtle trends.</li>
-                                    <li>Even if there's no solid data, trust your intuition — a weak signal might grow into a major shift.</li>
-                                    <li>Example: An unusual news article today could indicate a big future trend tomorrow.</li>
-                                </ul>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                    
-                case "screen-1-5":
-                    contentTitle = "Linking Futures Thinking to the Policy Cycle";
-                    contentHTML = `
-                        <div class="text-content">
-                            <h3>Linking Futures Thinking to the Policy Cycle</h3>
-                            <h5>Where foresight fits in policymaking.</h5>
-                            <div class="mt-4">
-                                <div class="text-center mb-4">
-                                    <img src="../assets/images/1.5_Illustrative_Policy_Cycle.png" alt="Illustrative Policy Cycle" class="img-fluid" style="max-width: 100%; height: auto;">
-                                </div>
-                                <ul>
-                                    <li>The policy cycle typically includes:
-                                        <ul>
-                                            <li>Formulation (where Futures Thinking is most valuable)</li>
-                                            <li>Implementation</li>
-                                            <li>Monitoring</li>
-                                            <li>Evaluation</li>
-                                            <li>Modification</li>
-                                        </ul>
-                                    </li>
-                                    <li>Futures Thinking supports early-stage strategy by:
-                                        <ul>
-                                            <li>Providing fresh insight and long-term perspective</li>
-                                            <li>Highlighting uncertainties and trade-offs</li>
-                                        </ul>
-                                    </li>
-                                    <li>Key to impact: Involve policy teams and decision-makers early in the futures process.</li>
-                                    <li>Use futures work to bridge long-term visioning with real policy goals.</li>
-                                </ul>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                    
-                case "knowledge-check":
-                    contentTitle = "Knowledge Check";
-                    contentHTML = `
-                        <div class="quiz-content">
-                            <div class="quiz-question">
-                                <h4>Question 1</h4>
-                                <p>What is the primary purpose of futures thinking?</p>
-                                <ul class="quiz-options">
-                                    <li class="quiz-option" onclick="selectAnswer(this, 'question1', 1)">To predict the exact future with certainty</li>
-                                    <li class="quiz-option" onclick="selectAnswer(this, 'question1', 2)">To explore possible futures and prepare for them</li>
-                                    <li class="quiz-option" onclick="selectAnswer(this, 'question1', 3)">To create a single preferred future</li>
-                                    <li class="quiz-option" onclick="selectAnswer(this, 'question1', 4)">To analyze only historical trends</li>
-                                </ul>
-                            </div>
-                        </div>
-                    `;
-                    
-                    // Add the selectAnswer function if it doesn't exist yet
-                    if (typeof window.selectAnswer !== 'function') {
-                        window.selectAnswer = function(element, questionId, answerId) {
-                            // Clear previous selections
-                            const options = document.querySelectorAll('.quiz-option');
-                            options.forEach(option => {
-                                option.classList.remove('selected');
-                                option.classList.remove('correct');
-                                option.classList.remove('incorrect');
-                            });
-                            
-                            // Mark this answer as selected
-                            element.classList.add('selected');
-                            
-                            // Check if answer is correct (answer 2 is correct for question 1)
-                            if (questionId === 'question1' && answerId === 2) {
-                                element.classList.add('correct');
-                                // Enable the complete module button
-                                const continueButton = document.querySelector('.btn-continue');
-                                if (continueButton) {
-                                    continueButton.disabled = false;
-                                }
-                            } else {
-                                element.classList.add('incorrect');
-                            }
-                        };
-                    }
-                    break;
-                    
-                // Module 2 Content
-                case "video-2-1":
-                    contentTitle = "Driver Mapping Video";
-                    contentHTML = `
-                        <div class="video-container">
-                            <video controls class="w-100" id="driver-mapping-video">
-                                <source src="../assets/videos/2.1_Driver_Mapping.mp4" type="video/mp4">
-                                Your browser does not support the video tag.
-                            </video>
-                        </div>
-                        <div class="alert alert-info mt-3">
-                            <i class="fas fa-info-circle"></i> <strong>Important:</strong> You must watch the entire video before the "Continue" button will be enabled.
-                        </div>
-                        <div class="video-progress-indicator mt-2 text-muted">
-                            <small><i class="fas fa-clock"></i> Video completion status: <span id="video-status-driver">Not started</span></small>
-                        </div>
-                    `;
-                    // Add video completion event listener
-                    setTimeout(() => {
-                        const video = document.getElementById('driver-mapping-video');
-                        if (video) {
-                            video.addEventListener('ended', function() {
-                                completedLessons['video-2-1'] = true;
-                                accessibleLessons['screen-2-1'] = true;
-                                updateLessonAccessibility();
-                                updateNavigationButtons();
-                            });
-                        }
-                    }, 100);
-                    break;
-                    
-                case "screen-2-1":
-                    contentTitle = "Driver Mapping";
-                    contentHTML = `
-                        <div class="text-content">
-                            <h3>Driver Mapping</h3>
-                            <h5>Drivers are influential forces of changes that are currently shaping or have the capacity to shape or transform a system. Driver mapping is one of the most important tools in foresight. It helps to identify the most influential forces of change in a system.</h5>
-                            <div class="mt-4">
-                                <p>To find these drivers, we often use tools like the STEEP or PESTLE frameworks. Think of these frameworks as ways to get a 'big picture' view of everything influencing a situation. They help us explore many different types of drivers by sorting them into categories:</p>
-                                <ul>
-                                    <li>STEEP looks at Social, Technological, Economic, Ecological (or Environmental), and Political drivers.</li>
-                                    <li>PESTLE includes all of those, plus an extra category for Legal drivers.</li>
-                                </ul>
-                                <div class="text-center mt-4 mb-4">
-                                    <img src="../assets/images/2.1_PESTLE.png" alt="PESTLE Framework" class="img-fluid" style="max-width: 100%; height: auto;">
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                    
-                case "screen-2-1-1":
-                    contentTitle = "Why Use Driver Mapping?";
-                    contentHTML = `
-                        <div class="text-content">
-                            <h3>Why Use Driver Mapping?</h3>
-                            <h5>Understanding the core reasons for identifying and analyzing key forces of change.</h5>
-                            <div class="mt-4">
-                                <p>When we use Drive Mapping, we're aiming to achieve a few important things:</p>
-                                <ul>
-                                    <li>Our first goal is to pinpoint all the major forces (we call them 'drivers') that are truly shaping the system or topic we're exploring. This helps us see the full picture of what's influencing the future.</li>
-                                    <li>Next, from all those identified drivers, we figure out which ones are the most critical or influential. This helps us focus our efforts on the 'game-changers' that will have the biggest impact.</li>
-                                    <li>Finally, this core set of important drivers becomes the essential starting point for all our deeper futures analysis. They are the key ingredients we use to explore different possible futures and build scenarios.</li>
-                                </ul>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                    
-                case "screen-2-1-2":
-                    contentTitle = "How to do Driver Mapping?";
-                    contentHTML = `
-                        <div class="text-content">
-                            <h3>How to do Driver Mapping?</h3>
-                            <h5>Drive Mapping is a practical exercise to figure out what forces are really shaping your topic of interest. Think of it like a detective's checklist to understand the big picture!</h5>
-                            <div class="mt-4">
-                                <p>How to Drive Mapping:</p>
-                                <ul>
-                                    <li>Define Your Focus
-                                        <ul>
-                                            <li>Clearly state your topic, boundaries, and time frame.</li>
-                                        </ul>
-                                    </li>
-                                    <li>Choose Your Framework
-                                        <ul>
-                                            <li>Pick a lens like STEEP or PESTLE to guide your thinking.</li>
-                                        </ul>
-                                    </li>
-                                    <li>Brainstorm Drivers
-                                        <ul>
-                                            <li>List all possible influences you can think of.</li>
-                                        </ul>
-                                    </li>
-                                    <li>Organize & Refine
-                                        <ul>
-                                            <li>Group similar drivers, remove duplicates, and tidy up your list.</li>
-                                        </ul>
-                                    </li>
-                                    <li>Filter External Drivers
-                                        <ul>
-                                            <li>Separate out drivers you can't influence, focusing on what you can act on.</li>
-                                        </ul>
-                                    </li>
-                                    <li>Finalize Your List
-                                        <ul>
-                                            <li>Ensure you have a balanced number of critical drivers – not too many, not too few.</li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                    
-                case "video-2-2":
-                    contentTitle = "Horizon Scanning Video";
-                    contentHTML = `
-                        <div class="video-container">
-                            <video controls class="w-100" id="horizon-scanning-video">
-                                <source src="../assets/videos/2.2_Horizon_Scanning.mp4" type="video/mp4">
-                                Your browser does not support the video tag.
-                            </video>
-                        </div>
-                        <div class="alert alert-info mt-3">
-                            <i class="fas fa-info-circle"></i> <strong>Important:</strong> You must watch the entire video before the "Continue" button will be enabled.
-                        </div>
-                        <div class="video-progress-indicator mt-2 text-muted">
-                            <small><i class="fas fa-clock"></i> Video completion status: <span id="video-status-horizon">Not started</span></small>
-                        </div>
-                    `;
-                    break;
-                
-                case "screen-2-2":
-                    contentTitle = "Horizon Scanning";
-                    contentHTML = `
-                        <div class="text-content">
-                            <h3>Horizon Scanning</h3>
-                            <h5>Horizon scanning is a foresight process focused on identifying and collating early warning signs of change, or emerging signals that may have significant impacts when they develop.</h5>
-                            <div class="mt-4">
-                                <ul>
-                                    <li>Scanning for signals of change
-                                        <ul>
-                                            <li>Actively looking for early clues about what might happen in the future. We're searching for potential problems, new chances, and things that are likely to develop.</li>
-                                        </ul>
-                                    </li>
-                                    <li>What is a 'Signal'?
-                                        <ul>
-                                            <li>It's the very first hint of a new event, a local trend, or an innovative idea from an organization.</li>
-                                            <li>These signals have the power to cause big changes or even completely transform things.</li>
-                                            <li>They can grow and spread, affecting larger areas or even entire regions.</li>
-                                        </ul>
-                                    </li>
-                                    <li>What is a 'Weak Signal'?
-                                        <ul>
-                                            <li>This is a clue that's really hard to notice or very subtle.</li>
-                                            <li>The information we have about it is often incomplete or messy.</li>
-                                            <li>We're not sure how it will develop in the future.</li>
-                                            <li>Even though they are faint and uncertain, weak signals are important to notice and keep an eye on because they can turn into strong, clear trends later on.</li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                                <div class="text-center mt-4 mb-4">
-                                    <img src="../assets/images/2.2_Emerging_Issue_Analysis.png" alt="Emerging Issue Analysis" class="img-fluid" style="max-width: 100%; height: auto;">
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                    
-                case "screen-2-2-1":
-                    contentTitle = "Why Use Horizon Scanning?";
-                    contentHTML = `
-                        <div class="text-content">
-                            <h3>Why Use Horizon Scanning?</h3>
-                            <h5>Discover how Horizon Scanning helps you spot future risks and opportunities early, preparing you for what's ahead.</h5>
-                            <div class="mt-4">
-                                <p>Horizon Scanning is a vital tool because it helps us to:</p>
-                                <ul>
-                                    <li>It allows us to systematically look for potential problems, exciting new chances, and uncertainties that could affect our current plans or future direction.</li>
-                                    <li>It serves as a baseline analysis for our planning and program design. By continuously watching for identified risks and signals, it acts like an 'early warning system' to alert us to changes.</li>
-                                    <li>It helps us find specific ways to strengthen our risk analysis and weave future insights from scanning into our existing processes, making them more robust.</li>
-                                </ul>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                    
-                case "screen-2-2-2":
-                    contentTitle = "How to do Horizon Scanning?";
-                    contentHTML = `
-                        <div class="text-content">
-                            <h3>How to do Horizon Scanning?</h3>
-                            <h5>Horizon Scanning helps you spot early signs of future changes so you can prepare. Think of it as looking ahead for clues!</h5>
-                            <div class="mt-4">
-                                <p>The 5 Steps:</p>
-                                <ul>
-                                    <li>Collect Signals
-                                        <ul>
-                                            <li>Look for tiny hints of change in news, social media, research, etc. (using categories like Social, Tech, Economic, Environment, Political, Values). Note down what it is, where it's from, and its possible impact.</li>
-                                        </ul>
-                                    </li>
-                                    <li>Collate Signals
-                                        <ul>
-                                            <li>Gather all your collected signals into one organized place, like a simple list or spreadsheet.</li>
-                                        </ul>
-                                    </li>
-                                    <li>Interpret Signals
-                                        <ul>
-                                            <li>Figure out what your signals mean. Use simple ratings (like 1-5) for how likely they are and how big their impact could be, then visualize them to see patterns.</li>
-                                        </ul>
-                                    </li>
-                                    <li>Make Sense of Signals
-                                        <ul>
-                                            <li>Discuss how these signals might change things in the future. This helps you make better decisions today, without trying to predict exactly what will happen.</li>
-                                        </ul>
-                                    </li>
-                                    <li>Integrate Insights
-                                        <ul>
-                                            <li>Use what you've learned from the signals to improve your current plans and strategies, making them more ready for the future.</li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                    
-                case "video-2-3":
-                    contentTitle = "Trends Identification Video";
-                    contentHTML = `
-                        <div class="video-container">
-                            <video controls class="w-100" id="trends-identification-video">
-                                <source src="../assets/videos/2.3_Trends_Identification_and_Analysis.mp4" type="video/mp4">
-                                Your browser does not support the video tag.
-                            </video>
-                        </div>
-                        <div class="alert alert-info mt-3">
-                            <i class="fas fa-info-circle"></i> <strong>Important:</strong> You must watch the entire video before the "Continue" button will be enabled.
-                        </div>
-                        <div class="video-progress-indicator mt-2 text-muted">
-                            <small><i class="fas fa-clock"></i> Video completion status: <span id="video-status-trends">Not started</span></small>
-                        </div>
-                    `;
-                    break;
-                    
-                case "screen-2-3":
-                    contentTitle = "Trends Identification and Analysis";
-                    contentHTML = `
-                        <div class="text-content">
-                            <h3>Trends Identification and Analysis</h3>
-                            <h5>Understanding the cascading impacts of change using structured brainstorming and visualization.</h5>
-                            <div class="mt-4">
-                                <ul>
-                                    <li>The Futures Wheel (also called the Implications Wheel) is a simple but powerful way to think about the future.</li>
-                                    <li>It helps us map out all the possible effects that a major change or event could have.</li>
-                                    <li>Think of it like dropping a pebble in a pond:
-                                        <ul>
-                                            <li>The first ripple is the direct impact.</li>
-                                            <li>Then, those ripples create new, smaller ripples, which are the indirect impacts (or 'second and third-order effects').</li>
-                                        </ul>
-                                    </li>
-                                    <li>This tool helps us see how one initial change "seed of change" can set off a chain reaction of consequences, both good and bad, that keep going and going.</li>
-                                </ul>
-                                <div class="text-center mt-4 mb-4">
-                                    <img src="../assets/images/2.3_Implications_Analysis_Considerations.png" alt="Implications Analysis Considerations" class="img-fluid" style="max-width: 100%; height: auto;">
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                    
-                case "screen-2-3-1":
-                    contentTitle = "How to do Futures Wheel Analysis?";
-                    contentHTML = `
-                        <div class="text-content">
-                            <h3>How to do Futures Wheel Analysis?</h3>
-                            <h5>Explore the ripple effects of a change! The Futures Wheel helps you map out all the possible consequences of a trend or event.</h5>
-                            <div class="mt-4">
-                                <ul>
-                                    <li>Choose Your Change
-                                        <ul>
-                                            <li>Pick the main trend, issue, or event you want to explore (this goes in the middle).</li>
-                                        </ul>
-                                    </li>
-                                    <li>First Impacts
-                                        <ul>
-                                            <li>What are the direct consequences? Write these in a circle around your change.</li>
-                                        </ul>
-                                    </li>
-                                    <li>Second Impacts
-                                        <ul>
-                                            <li>For each direct impact, what else happens because of it? Add these to an outer circle.</li>
-                                        </ul>
-                                    </li>
-                                    <li>Keep Expanding
-                                        <ul>
-                                            <li>Continue thinking about impacts of impacts for as long as it's useful.</li>
-                                        </ul>
-                                    </li>
-                                    <li>Think Strategy
-                                        <ul>
-                                            <li>What do all these potential ripples mean for your plans or decisions?</li>
-                                        </ul>
-                                    </li>
-                                    <li>Share & Learn
-                                        <ul>
-                                            <li>Discuss your findings with others to see different perspectives.</li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                    
-                case "knowledge-check-2":
-                    contentTitle = "Knowledge Check";
-                    contentHTML = `
-                        <div class="quiz-content">
-                            <div class="quiz-question">
-                                <h4>Question 1</h4>
-                                <p>What is the primary purpose of Horizon Scanning?</p>
-                                <ul class="quiz-options">
-                                    <li class="quiz-option" onclick="selectAnswer(this, 'question2', 1)">To predict future events with certainty</li>
-                                    <li class="quiz-option" onclick="selectAnswer(this, 'question2', 2)">To identify early warning signs of change and emerging signals</li>
-                                    <li class="quiz-option" onclick="selectAnswer(this, 'question2', 3)">To analyze only historical data</li>
-                                    <li class="quiz-option" onclick="selectAnswer(this, 'question2', 4)">To create detailed plans for the next fiscal year</li>
-                                </ul>
-                            </div>
-                        </div>
-                    `;
-                    
-                    // Add the selectAnswer function if it doesn't exist yet
-                    if (typeof window.selectAnswer !== 'function') {
-                        window.selectAnswer = function(element, questionId, answerId) {
-                            // Clear previous selections
-                            const options = document.querySelectorAll('.quiz-option');
-                            options.forEach(option => {
-                                option.classList.remove('selected');
-                                option.classList.remove('correct');
-                                option.classList.remove('incorrect');
-                            });
-                            
-                            // Mark this answer as selected
-                            element.classList.add('selected');
-                            
-                            // Check if answer is correct (answer 2 is correct for both questions)
-                            if ((questionId === 'question1' && answerId === 2) ||
-                                (questionId === 'question2' && answerId === 2)) {
-                                element.classList.add('correct');
-                                // Enable the complete module button
-                                const continueButton = document.querySelector('.btn-continue');
-                                if (continueButton) {
-                                    continueButton.disabled = false;
-                                }
-                            } else {
-                                element.classList.add('incorrect');
-                            }
-                        };
-                    }
-                    break;
-                    
-                // Module 3 content
-                case "video-3-1":
-                    contentTitle = "Causal Layered Analysis Video";
-                    contentHTML = `
-                        <div class="video-container">
-                            <video controls class="w-100" id="causal-layered-analysis-video">
-                                <source src="../assets/videos/3.1_Causal_Layered_Analysis.mp4" type="video/mp4">
-                                Your browser does not support the video tag.
-                            </video>
-                        </div>
-                        <div class="alert alert-info mt-3">
-                            <i class="fas fa-info-circle"></i> <strong>Important:</strong> You must watch the entire video before the "Continue" button will be enabled.
-                        </div>
-                        <div class="video-progress-indicator mt-2 text-muted">
-                            <small><i class="fas fa-clock"></i> Video completion status: <span id="video-status-cla">Not started</span></small>
-                        </div>
-                    `;
-                    break;
-                    
-                case "screen-3-1":
-                    contentTitle = "Causal Layered Analysis";
-                    contentHTML = `
-                        <div class="text-content">
-                            <h3>Causal Layered Analysis</h3>
-                            <h5>It is a powerful tool that helps us understand complex issues by looking beyond the surface. It's used to reveal hidden beliefs and perspectives that shape our current reality, and then to help create new stories that can lead to a desired future.</h5>
-                            <div class="mt-4">
-                                <p>The Four Levels of CLA:</p>
-                                <ul>
-                                    <li>Litany (The Surface Story):
-                                        <ul>
-                                            <li>This is what you see and hear every day – the headlines, the obvious facts, the immediate problems.</li>
-                                        </ul>
-                                    </li>
-                                    <li>Systemic Causes (The Structure Behind It):
-                                        <ul>
-                                            <li>Just below the surface, this level looks at the organized systems, structures, and historical reasons that cause the surface problem. It's about how things are set up.</li>
-                                        </ul>
-                                    </li>
-                                    <li>Worldviews (The Beliefs That Shape It):
-                                        <ul>
-                                            <li>Going deeper, this level explores the mindsets, cultural beliefs, values, and assumptions that influence the systems and the problem. It's about what people believe and how they think about the issue.</li>
-                                        </ul>
-                                    </li>
-                                    <li>Metaphors and Myths (The Deepest Stories):
-                                        <ul>
-                                            <li>This is the very deepest level, uncovering the powerful, often unspoken, stories and fundamental ideas that shape our worldviews. These are the unconscious narratives that truly influence how we see reality.</li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                                <div class="text-center mt-4 mb-4">
-                                    <img src="../assets/images/3.1_CLA_Levels_of_Analysis.png" alt="CLA Levels of Analysis" class="img-fluid" style="max-width: 100%; height: auto;">
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                    
-                case "screen-3-1-1":
-                    contentTitle = "Why Use Causal Layered Analysis?";
-                    contentHTML = `
-                        <div class="text-content">
-                            <h3>Why Use Causal Layered Analysis?</h3>
-                            <h5>Discover how Causal Layered Analysis helps you dig deeper into a problem, finding hidden beliefs and creating clearer paths forward.</h5>
-                            <div class="mt-4">
-                                <p>Causal Layered Analysis (CLA) is a powerful tool used for several key reasons:</p>
-                                <ul>
-                                    <li>It helps you unpack any issue or topic to understand it at a much profounder level than just the surface.</li>
-                                    <li>It lets you map out and understand the various, sometimes conflicting, ideas people have about the future.</li>
-                                    <li>It helps you break down a desired future (like a vision or a big goal) to understand its core parts and how to build it.</li>
-                                    <li>It allows you to grasp the different "stories" or narratives that people tell about a problem or the future.</li>
-                                    <li>It helps you develop solid, comprehensive strategies that address issues from their roots.</li>
-                                    <li>It assists in clearly defining and working towards a preferred vision of the future you want to create.</li>
-                                </ul>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                    
-                case "screen-3-1-2":
-                    contentTitle = "How to do Causal Layered Analysis?";
-                    contentHTML = `
-                        <div class="text-content">
-                            <h3>How to do Causal Layered Analysis?</h3>
-                            <h5>Learn to dig deep into any issue by exploring its surface, systems, beliefs, and hidden stories.</h5>
-                            <div class="mt-4">
-                                <p>Causal Layered Analysis (CLA) helps you understand a problem or topic by looking at it through four different levels, like peeling an onion. First, pick an issue you want to explore (like a new plan, a problem, or a topic of interest):</p>
-                                
-                                <p>The 4 Levels of CLA:</p>
-                                <ul>
-                                    <li>The Litany (What You See & Hear)
-                                        <ul>
-                                            <li>Ask: What are the most obvious facts, news headlines, or everyday discussions about this issue? How would a reporter describe it simply?</li>
-                                            <li>Think: This is the surface-level story.</li>
-                                        </ul>
-                                    </li>
-                                    <li>The System (How Things Are Organized)
-                                        <ul>
-                                            <li>Ask: What structures, policies, or organized ways of doing things support this issue? Why does it exist this way? What kind of new systems would be needed to change it?</li>
-                                            <li>Think: This is about the facts, data, and structures underneath the surface story.</li>
-                                        </ul>
-                                    </li>
-                                    <li>The Worldview (What People Believe)
-                                        <ul>
-                                            <li>Ask: What are the deeper beliefs, values, or mindsets that shape how this issue is understood or how the system works? Are these beliefs shared, or are they different among various groups? If your plan succeeds, what new ways of thinking or new cultural values would emerge?</li>
-                                            <li>Think: This explores the assumptions and core beliefs that drive behavior.</li>
-                                        </ul>
-                                    </li>
-                                    <li>The Myth/Metaphor (The Deepest Stories)
-                                        <ul>
-                                            <li>Ask: What are the unspoken, powerful stories, narratives, or images (metaphors) that influence people's worldviews about this issue? Is there a new story or a memorable metaphor that could help people understand or change things? What kind of mental shift would that new story require?</li>
-                                            <li>Think: This is about the unconscious stories and archetypes that deeply shape our reality.</li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                                <div class="text-center mt-4 mb-4">
-                                    <img src="../assets/images/3.1.2_Using_CLA.png" alt="Using CLA" class="img-fluid" style="max-width: 100%; height: auto;">
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                    
-                case "video-3-2":
-                    contentTitle = "Futures Triangle Video";
-                    contentHTML = `
-                        <div class="video-container">
-                            <video controls class="w-100" id="futures-triangle-video">
-                                <source src="../assets/videos/3.2_Futures_Triangle.mp4" type="video/mp4">
-                                Your browser does not support the video tag.
-                            </video>
-                        </div>
-                        <div class="alert alert-info mt-3">
-                            <i class="fas fa-info-circle"></i> <strong>Important:</strong> You must watch the entire video before the "Continue" button will be enabled.
-                        </div>
-                        <div class="video-progress-indicator mt-2 text-muted">
-                            <small><i class="fas fa-clock"></i> Video completion status: <span id="video-status-futures-triangle">Not started</span></small>
-                        </div>
-                    `;
-                    break;
-                    
-                case "screen-3-2":
-                    contentTitle = "Futures Triangle";
-                    contentHTML = `
-                        <div class="text-content">
-                            <h3>Futures Triangle</h3>
-                            <h5>Futures triangle is a futures method that helps us to map the present views of the future through three dimensions that are shaping it. The three dimensions are: the images (pull) of the future, the megatrends and drivers (push) of the present and the barriers (weight) of past/history.</h5>
-                            <div class="mt-4">
-                                <ul>
-                                    <li>The Futures Triangle is a quick and easy way to understand how the future might play out. It's built on three main forces constantly pushing and pulling on things:
-                                        <ul>
-                                            <li>The "Pull" of the Future (Your Visions):
-                                                <ul>
-                                                    <li>This is about the images we have in our minds of what the future could or should be like.</li>
-                                                    <li>Think of it as the dreams, hopes, and even fears that push us forward.</li>
-                                                    <li>These visions can come from anywhere: books, movies, political goals, religious ideas, or even advertisements. They're basically what people or groups strongly desire or dread for the future.</li>
-                                                </ul>
-                                            </li>
-                                            <li>The "Push" of the Present (Current Trends):
-                                                <ul>
-                                                    <li>These are the ongoing trends and major forces happening right now that are actively shaping what's coming next.</li>
-                                                    <li>Things like new technologies, economic changes, or shifts in how people live and interact.</li>
-                                                </ul>
-                                            </li>
-                                            <li>The "Weight" of the Past (Historical Barriers):
-                                                <ul>
-                                                    <li>This represents the old ways of doing things, traditions, established systems, and historical events that can slow down or block changes we want to see.</li>
-                                                    <li>It's like a heavy anchor from history that makes it harder to move in a new direction.</li>
-                                                </ul>
-                                            </li>
-                                            <li>Putting It All Together:
-                                                <ul>
-                                                    <li>The Futures Triangle shows that these three forces are always interacting and changing.</li>
-                                                    <li>If one force gets stronger, it affects the others. For example, if the "Weight of the Past" gets heavier (meaning old ways become more stubborn), it might weaken the "Pull of the Future" or slow down the "Push of the Present."</li>
-                                                    <li>This push and pull changes where the future is likely to go.</li>
-                                                </ul>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                                <div class="text-center mt-4 mb-4">
-                                    <img src="../assets/images/3.2_Futures_Triangle.png" alt="Futures Triangle" class="img-fluid" style="max-width: 100%; height: auto;">
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                    
-                case "screen-3-2-1":
-                    contentTitle = "Why Use the Futures Triangle?";
-                    contentHTML = `
-                        <div class="text-content">
-                            <h3>Why Use the Futures Triangle?</h3>
-                            <h5>Learn how this tool helps you understand the forces shaping the future – from the past, present, and your hopes for tomorrow.</h5>
-                            <div class="mt-4">
-                                <p>The Futures Triangle is a handy tool that helps us:</p>
-                                <ul>
-                                    <li>Understand how the past, what's happening now, and future possibilities all connect and influence each other.</li>
-                                    <li>Discover various believable futures by looking at how the forces from the past, present, and your future visions interact.</li>
-                                    <li>Use it as a foundation for creating detailed "what if" stories about the future.</li>
-                                    <li>Develop more effective actions and strategies that consider these powerful forces.</li>
-                                </ul>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                    
-                case "screen-3-2-2":
-                    contentTitle = "How to Use the Futures Triangle?";
-                    contentHTML = `
-                        <div class="text-content">
-                            <h3>How to Use the Futures Triangle?</h3>
-                            <h5>Understand the forces shaping your future by exploring your visions, current trends, and past influences.</h5>
-                            <div class="mt-4">
-                                <p>The Futures Triangle helps you map out how different forces — your hopes for the future, what's happening now, and lessons from the past — are all pushing and pulling on each other. It's about understanding the big picture to see where things might go.</p>
-                                <p>Here's how to use it, by exploring three key areas:</p>
-                                <ol>
-                                    <li>The "Pull" of the Future (Your Hopes)
-                                        <ul>
-                                            <li>What it is: Your vision for what you want the future to be.</li>
-                                            <li>Ask yourself:
-                                                <ul>
-                                                    <li>What's your ideal future?</li>
-                                                    <li>What resources help you get there?</li>
-                                                </ul>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li>The "Push" of the Present (Today's Trends)
-                                        <ul>
-                                            <li>What it is: The forces and changes happening right now that are shaping tomorrow.</li>
-                                            <li>Ask yourself:
-                                                <ul>
-                                                    <li>What big trends are happening?</li>
-                                                    <li>How are they moving us forward?</li>
-                                                </ul>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li>The "Weight" of the Past (Old Influences)
-                                        <ul>
-                                            <li>What it is: History, traditions, and old ways of doing things that might slow change.</li>
-                                            <li>Ask yourself:
-                                                <ul>
-                                                    <li>What's holding things back?</li>
-                                                    <li>Who benefits if nothing changes?</li>
-                                                </ul>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                </ol>
-                                <p>By thinking through these questions for each of the three points of the triangle, you'll start to see how they interact. This helps you understand the likely direction things are headed, imagine different possible futures, and develop clearer actions.</p>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                    
-                case "video-3-3":
-                    contentTitle = "Scenario Planning Video";
-                    contentHTML = `
-                        <div class="video-container">
-                            <video controls class="w-100" id="scenario-planning-video">
-                                <source src="../assets/videos/3.3_Scenario_Planning.mp4" type="video/mp4">
-                                Your browser does not support the video tag.
-                            </video>
-                        </div>
-                        <div class="alert alert-info mt-3">
-                            <i class="fas fa-info-circle"></i> <strong>Important:</strong> You must watch the entire video before the "Continue" button will be enabled.
-                        </div>
-                        <div class="video-progress-indicator mt-2 text-muted">
-                            <small><i class="fas fa-clock"></i> Video completion status: <span id="video-status-scenario">Not started</span></small>
-                        </div>
-                    `;
-                    break;
-                    
-                case "screen-3-3":
-                    contentTitle = "Scenario";
-                    contentHTML = `
-                        <div class="text-content">
-                            <h3>Scenario</h3>
-                            <h5>A scenario is a description of how the future may unfold based on an explicit, coherent and internally consistent set of plausible assumptions about key relationships among drivers of change.</h5>
-                            <div class="mt-4">
-                                <ol>
-                                    <li>Scenario planning is a special tool that helps us imagine and prepare for different possible futures. It's not about predicting one exact future, but rather creating several "what if" stories based on big trends and uncertainties we see today.</li>
-                                    <li>A scenario is simply a detailed story about how the future could unfold. Each story is realistic, makes sense internally, and is based on clear ideas about how different changes might connect.</li>
-                                </ol>
-                                <p>Types of scenarios methods:</p>
-                                <ul>
-                                    <li>2x2 scenarios</li>
-                                    <li>Organizational scenarios</li>
-                                    <li>Integrated scenarios</li>
-                                    <li>Manoa scenarios</li>
-                                    <li>Transformative scenarios</li>
-                                    <li>Change progression scenarios method</li>
-                                </ul>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                    
-                case "screen-3-3-1":
-                    contentTitle = "Why Use Scenario Planning?";
-                    contentHTML = `
-                        <div class="text-content">
-                            <h3>Why Use Scenario Planning?</h3>
-                            <h5>Learn how scenarios help you explore different possible futures, challenge your thinking, and prepare for anything.</h5>
-                            <div class="mt-4">
-                                <p>Using Scenarios is super helpful because it allows us to:</p>
-                                <ol>
-                                    <li>It makes us think beyond what we expect to happen, by exploring many different ways a plan, policy, or strategy could unfold in the future.</li>
-                                    <li>It helps us imagine how key issues, partners, and other people might act in various future situations.</li>
-                                    <li>It's a great way to create "what if" plans (contingency plans) for our programs, policies, and strategies, making us ready for different possible futures.</li>
-                                </ol>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                    
-                case "screen-3-3-2":
-                    contentTitle = "How to Build Scenarios?";
-                    contentHTML = `
-                        <div class="text-content">
-                            <h3>How to Build Scenarios?</h3>
-                            <h5>Learn to create different "what if" stories about the future to better understand and prepare for change.</h5>
-                            <div class="mt-4">
-                                <ol>
-                                    <li>Define Your Focus & Time
-                                        <ul>
-                                            <li>What issue are you exploring? (e.g., "The future of digital access.")</li>
-                                            <li>How far into the future? Pick a specific time (e.g., 5, 10, or 20 years from now).</li>
-                                        </ul>
-                                    </li>
-                                    <li>Pick Your Key Drivers
-                                        <ul>
-                                            <li>Identify the most important forces of change (drivers) that will shape your future.</li>
-                                            <li>These drivers become your "critical uncertainties" (for a 2x2 scenario) or help explore "colliding impacts" (for a Manoa scenario).</li>
-                                        </ul>
-                                    </li>
-                                    <li>Build Your Scenarios
-                                        <ul>
-                                            <li>For 2x2 Scenarios: Take your two most uncertain and impactful drivers. Imagine them as axes on a graph (like X and Y). This creates four unique future "corners" or stories.</li>
-                                            <li>For Manoa Scenarios: Explore how your chosen drivers might collide or interact in surprising ways. Think about how their impacts would combine.</li>
-                                        </ul>
-                                    </li>
-                                    <li>Develop Stories & Images
-                                        <ul>
-                                            <li>For each scenario you've built, create a clear story. What does this future look like?</li>
-                                            <li>Think about creating a catchy title and even a visual image for each one to make it memorable.</li>
-                                        </ul>
-                                    </li>
-                                    <li>Review & Discuss
-                                        <ul>
-                                            <li>Share your scenarios with others.</li>
-                                            <li>Ask: Does this scenario make sense? What are the biggest surprises? How would this future affect different people or groups?</li>
-                                        </ul>
-                                    </li>
-                                    <li>Find Your Message
-                                        <ul>
-                                            <li>What key insights or messages do you want people to take away from these scenarios?</li>
-                                            <li>What actions should be considered today based on these possible futures?</li>
-                                        </ul>
-                                    </li>
-                                </ol>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                    
-                case "knowledge-check-3":
-                    contentTitle = "Knowledge Check";
-                    contentHTML = `
-                        <div class="quiz-content">
-                            <div class="quiz-question">
-                                <h4>Question 1</h4>
-                                <p>What are the three dimensions in the Futures Triangle?</p>
-                                <ul class="quiz-options">
-                                    <li class="quiz-option" onclick="selectAnswer(this, 'question3', 1)">Past, Present, Future</li>
-                                    <li class="quiz-option" onclick="selectAnswer(this, 'question3', 2)">Pull of the Future, Push of the Present, Weight of the Past</li>
-                                    <li class="quiz-option" onclick="selectAnswer(this, 'question3', 3)">Uncertainty, Risk, Opportunity</li>
-                                    <li class="quiz-option" onclick="selectAnswer(this, 'question3', 4)">Social, Economic, Environmental</li>
-                                </ul>
-                            </div>
-                        </div>
-                    `;
-                    
-                    // Update the selectAnswer function to handle Module 3 knowledge check
-                    if (typeof window.selectAnswer !== 'function') {
-                        window.selectAnswer = function(element, questionId, answerId) {
-                            // Clear previous selections
-                            const options = document.querySelectorAll('.quiz-option');
-                            options.forEach(option => {
-                                option.classList.remove('selected');
-                                option.classList.remove('correct');
-                                option.classList.remove('incorrect');
-                            });
-                            
-                            // Mark this answer as selected
-                            element.classList.add('selected');
-                            
-                            // Check if answer is correct (answer 2 is correct for all questions)
-                            if ((questionId === 'question1' && answerId === 2) ||
-                                (questionId === 'question2' && answerId === 2) ||
-                                (questionId === 'question3' && answerId === 2)) {
-                                element.classList.add('correct');
-                                // Enable the complete module button
-                                const continueButton = document.querySelector('.btn-continue');
-                                if (continueButton) {
-                                    continueButton.disabled = false;
-                                }
-                            } else {
-                                element.classList.add('incorrect');
-                            }
-                        };
-                    }
-                    break;
-                    
-                default:
-                    contentTitle = "Welcome to Futures Thinking";
-                    contentHTML = `<p>Please select a lesson from the sidebar.</p>`;
-            }
-            
-            // Update the content
-            document.querySelector('.content-title').textContent = contentTitle;
-            document.querySelector('.content-body').innerHTML = contentHTML;
-        }
-        
-        function updateNavigationButtons() {
-            const backButton = document.querySelector('.btn-back');
-            const continueButton = document.querySelector('.btn-continue');
-            
-            // Get active lesson
-            const activeLesson = document.querySelector('.lesson-item.active');
-            if (!activeLesson) return;
-            
-            const activeId = activeLesson.id;
-            const activeIndex = lessonSequence.indexOf(activeId);
-            
-            // Enable/disable back button based on sequence
-            const hasPrevious = activeIndex > 0;
-            backButton.disabled = !hasPrevious;
-            
-            // Enable/disable continue button based on sequence
-            const hasNext = activeIndex < lessonSequence.length - 1;
-            
-            // Determine which module this lesson belongs to
-            let currentModule = 1;
-            if (activeId.startsWith('video-2') || activeId.startsWith('screen-2')) {
-                currentModule = 2;
-            }
-            
-            // Get the module boundaries
-            const module1StartIndex = 0;
-            const module1EndIndex = lessonSequence.indexOf('knowledge-check');
-            const module2StartIndex = lessonSequence.indexOf('video-2-1');
-            const module2EndIndex = lessonSequence.indexOf('knowledge-check-2');
-            
-            // Get the last lesson index for the current module
-            let lastLessonIndexForModule;
-            if (currentModule === 1) {
-                lastLessonIndexForModule = module1EndIndex;
-            } else if (currentModule === 2) {
-                lastLessonIndexForModule = module2EndIndex;
-            }
-            
-            // Check if this is the last lesson in the module
-            const isLastLessonInModule = activeIndex === lastLessonIndexForModule;
-            
-            // Determine which module range this lesson belongs to
-            const isInModule1 = activeIndex >= module1StartIndex && activeIndex <= module1EndIndex;
-            const isInModule2 = activeIndex >= module2StartIndex && activeIndex <= module2EndIndex;
-            
-            // Special handling for Knowledge Check - it should complete Module 1
-            if (activeId === 'knowledge-check') {
-                // Last lesson of Module 1
-                continueButton.innerHTML = 'Complete Module <i class="fas fa-check"></i>';
-                continueButton.disabled = true; // Disabled until the correct answer is selected
-                continueButton.onclick = function() {
-                    completeModule(1); // Complete Module 1 and unlock Module 2
-                };
-            } else if (activeId === 'knowledge-check-2') {
-                // Last lesson of Module 2
-                continueButton.innerHTML = 'Complete Module <i class="fas fa-check"></i>';
-                continueButton.disabled = true; // Disabled until the correct answer is selected
-                
-                continueButton.onclick = function() {
-                    completeModule(2); // Complete Module 2
-                };
-            } else if (activeId === 'knowledge-check-3') {
-                // Last lesson of Module 3
-                continueButton.innerHTML = 'Complete Module <i class="fas fa-check"></i>';
-                continueButton.disabled = true; // Disabled until the correct answer is selected
-                
-                continueButton.onclick = function() {
-                    completeModule(3); // Complete Module 3
-                };
-            } else if (isLastLessonInModule && currentModule === 1) {
-                // Fallback for Module 1 completion (should not typically be reached)
-                continueButton.innerHTML = 'Complete Module <i class="fas fa-check"></i>';
-                continueButton.disabled = false;
-                
-                continueButton.onclick = function() {
-                    completeModule(1);
-                };
-            } else {
-                // More lessons to go in the current module
-                continueButton.innerHTML = 'Continue <i class="fas fa-arrow-right"></i>';
-                
-                const nextId = lessonSequence[activeIndex + 1];
-                const nextIsAccessible = accessibleLessons[nextId];
-                
-                // IMPORTANT: DON'T set onclick handler here - it's overriding the one in setupNavigation
-                // This was causing the skipping issue by setting multiple click handlers
-                // We want to use the single handler defined in setupNavigation()
-                
-                // Handle video elements
-                if (activeId === 'video-intro' || activeId === 'video-2-1' || activeId === 'video-2-2') {
-                    let videoId;
-                    if (activeId === 'video-intro') videoId = 'intro-video';
-                    else if (activeId === 'video-2-1') videoId = 'driver-mapping-video';
-                    else if (activeId === 'video-2-2') videoId = 'horizon-scanning-video';
-                    
-                    const video = document.getElementById(videoId);
-                    
-                    if (video) {
-                        // Check if the lesson is already completed
-                        if (completedLessons[activeId]) {
-                            // If already completed, enable the continue button
-                            continueButton.disabled = false;
-                            return;
-                        }
-                        
-                        // If video has been watched previously (in the same session), enable continue
-                        if (video.currentTime > 0 && video.ended) {
-                            // Video has been watched, enable continue
-                            completedLessons[activeId] = true;
-                            
-                            // Make the next lesson accessible
-                            if (nextId) {
-                                accessibleLessons[nextId] = true;
-                            }
-                            
-                            continueButton.disabled = false;
-                            updateLessonAccessibility();
-                        } else {
-                            // Video hasn't been watched, add event listener for completion
-                            video.addEventListener('ended', function() {
-                                // Mark video as completed
-                                completedLessons[activeId] = true;
-                                
-                                // Make the next lesson accessible
-                                if (nextId) {
-                                    accessibleLessons[nextId] = true;
-                                }
-                                
-                                // Update UI
-                                updateLessonAccessibility();
-                                continueButton.disabled = false;
-                            });
-                            
-                            // If video is not complete, disable continue button
-                            continueButton.disabled = !(video.ended || completedLessons[activeId]);
-                        }
-                    } else {
-                        // Video element not found, fall back to default behavior
-                        continueButton.disabled = !nextIsAccessible;
-                    }
-                } else {
-                    // Not a video lesson, use default accessibility check
-                    continueButton.disabled = !nextIsAccessible;
-                }
-            }
-        }
     </script>
 </body>
 </html>
