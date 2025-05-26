@@ -103,9 +103,9 @@ CREATE TABLE lesson_screens (
     course_id INT NOT NULL,
     course_module_number INT NOT NULL,
     screen_number INT NOT NULL,
-    screen_title TEXT NOT NULL,
-    screen_description TEXT NOT NULL,
-    screen_content JSON NOT NULL,
+    screen_title TEXT NULL,
+    screen_description TEXT NULL,
+    screen_content JSON NULL,
     screen_url VARCHAR(255) NULL,
     FOREIGN KEY (course_id) REFERENCES courses(course_id)
 );

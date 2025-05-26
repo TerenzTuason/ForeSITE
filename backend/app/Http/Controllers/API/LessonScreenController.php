@@ -32,9 +32,9 @@ class LessonScreenController extends Controller
             'course_id' => 'required|exists:courses,course_id',
             'course_module_number' => 'required|integer|min:1',
             'screen_number' => 'required|integer|min:1',
-            'screen_title' => 'required|string|max:255',
-            'screen_description' => 'required|string',
-            'screen_content' => 'required|array',
+            'screen_title' => 'nullable|string|max:255',
+            'screen_description' => 'nullable|string',
+            'screen_content' => 'nullable|array',
             'screen_url' => 'nullable|string|max:255',
         ]);
 
@@ -98,9 +98,9 @@ class LessonScreenController extends Controller
             'course_id' => 'sometimes|required|exists:courses,course_id',
             'course_module_number' => 'sometimes|required|integer|min:1',
             'screen_number' => 'sometimes|required|integer|min:1',
-            'screen_title' => 'sometimes|required|string|max:255',
-            'screen_description' => 'sometimes|required|string',
-            'screen_content' => 'sometimes|required|array',
+            'screen_title' => 'nullable|string|max:255',
+            'screen_description' => 'nullable|string',
+            'screen_content' => 'nullable|array',
             'screen_url' => 'nullable|string|max:255',
         ]);
 

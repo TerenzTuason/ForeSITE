@@ -276,13 +276,13 @@ Before using the API, make sure you:
   "course_id": 1,
   "course_module_number": 1,
   "screen_number": 1,
-  "screen_title": "Introduction to Futures Thinking",
-  "screen_description": "Overview of the key concepts",
-  "screen_content": {
+  "screen_title": "Introduction to Futures Thinking", // Optional, can be null
+  "screen_description": "Overview of the key concepts", // Optional, can be null
+  "screen_content": { // Optional, can be null
     "content": "This is the introduction content...",
     "type": "text"
   },
-  "screen_url": null
+  "screen_url": null // Optional
 }
 ```
 
