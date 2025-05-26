@@ -66,15 +66,22 @@
 
         .online-users {
             padding: 1rem 1.5rem;
-            background: var(--light-gray);
+            background: white;
             border-bottom: 1px solid #dee2e6;
         }
 
         .online-users-list {
             display: flex;
-            gap: 1rem;
-            overflow-x: auto;
+            flex-wrap: wrap;
+            gap: 0.8rem;
             padding-bottom: 0.5rem;
+        }
+
+        .no-users-message {
+            color: #6c757d;
+            font-style: italic;
+            margin-left: 0.5rem;
+            font-size: 0.9rem;
         }
 
         .user-item {
@@ -100,6 +107,16 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+        }
+        
+        .user-item.current-user {
+            background-color: var(--maroon);
+            color: white;
+            font-weight: 500;
+        }
+        
+        .user-item.current-user .circle-indicator {
+            background-color: white;
         }
         
         .circle-indicator {
@@ -402,64 +419,145 @@
             fetch(`http://127.0.0.1:8000/api/v1/chat/users/learning-style/${learningStyleId}`)
                 .then(response => response.json())
                 .then(data => {
-                    if (data.data && data.data.length > 0) {
-                        const usersList = document.querySelector('.online-users-list');
-                        usersList.innerHTML = ''; // Clear existing list
-                        
-                        // Display other users
-                        data.data.forEach(user => {
-                            // Skip current user as we'll add them separately
-                            if (user.user_id === currentUserId) {
-                                return;
-                            }
+                    console.log('Users with same learning style:', data);
+                    
+                    // Get the users container
+                    const onlineUsersSection = document.querySelector('.online-users');
+                    const usersList = document.querySelector('.online-users-list');
+                    usersList.innerHTML = ''; // Clear existing list
+                    
+                    // Move the online users section above the chat messages
+                    const chatContainer = document.querySelector('.chat-container');
+                    const messagesContainer = document.querySelector('.chat-messages');
+                    chatContainer.insertBefore(onlineUsersSection, messagesContainer);
+                    
+                    // First add the current user to the list
+                    const currentUserElement = document.createElement('div');
+                    currentUserElement.className = 'user-item current-user';
+                    currentUserElement.innerHTML = `
+                        <div class="circle-indicator"></div>
+                        <span>You (${userData.first_name} ${userData.last_name})</span>
+                    `;
+                    usersList.appendChild(currentUserElement);
+                    
+                    // Also fetch users from chat messages to catch anyone who has messaged in this room
+                    if (currentRoomId) {
+                        fetch(`http://127.0.0.1:8000/api/v1/chat/messages/${currentRoomId}`)
+                            .then(response => response.json())
+                            .then(messageData => {
+                                console.log('Messages data for user extraction:', messageData);
+                                
+                                // Create a set to store unique user IDs we've displayed
+                                const displayedUserIds = new Set([currentUserId]);
+                                
+                                // First process users from the learning style API
+                                if (data.data && data.data.length > 0) {
+                                    // Display other users from learning style API
+                                    data.data.forEach(user => {
+                                        // Skip current user as we've already added them
+                                        if (user.user_id === currentUserId) {
+                                            return;
+                                        }
+                                        
+                                        // Add this user to our displayed set
+                                        displayedUserIds.add(user.user_id);
+                                        
+                                        // Create and add user element
+                                        const userElement = document.createElement('div');
+                                        userElement.className = 'user-item';
+                                        userElement.innerHTML = `
+                                            <div class="circle-indicator"></div>
+                                            <span>${user.first_name} ${user.last_name}</span>
+                                        `;
+                                        usersList.appendChild(userElement);
+                                    });
+                                }
+                                
+                                // Then add any users from chat messages who aren't already displayed
+                                if (messageData.data && messageData.data.length > 0) {
+                                    // Create a map to store user info by ID
+                                    const messageUsers = new Map();
+                                    
+                                    // Extract unique users from messages
+                                    messageData.data.forEach(msg => {
+                                        if (msg.user && msg.user.user_id && !displayedUserIds.has(msg.user.user_id)) {
+                                            messageUsers.set(msg.user.user_id, msg.user);
+                                        }
+                                    });
+                                    
+                                    // Add these users to the list
+                                    messageUsers.forEach(user => {
+                                        displayedUserIds.add(user.user_id);
+                                        
+                                        const userElement = document.createElement('div');
+                                        userElement.className = 'user-item';
+                                        userElement.innerHTML = `
+                                            <div class="circle-indicator"></div>
+                                            <span>${user.first_name} ${user.last_name}</span>
+                                        `;
+                                        usersList.appendChild(userElement);
+                                    });
+                                }
+                                
+                                // If no other users found besides the current user
+                                if (displayedUserIds.size === 1) {
+                                    const emptyMessage = document.createElement('div');
+                                    emptyMessage.className = 'no-users-message';
+                                    emptyMessage.textContent = 'No other users with the same learning style found.';
+                                    usersList.appendChild(emptyMessage);
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error fetching messages for user extraction:', error);
+                            });
+                    } else {
+                        // If no room ID, just show users from learning style API
+                        if (data.data && data.data.length > 0) {
+                            // Keep track of whether we found other users
+                            let otherUsersFound = false;
                             
-                            // Create and add user element
-                            const userElement = document.createElement('div');
-                            userElement.className = 'user-item';
-                            userElement.innerHTML = `
-                                <div class="circle-indicator"></div>
-                                <span>${user.first_name} ${user.last_name}</span>
-                            `;
-                            usersList.appendChild(userElement);
-                        });
-                        
-                        // Add the current user to the list
-                        const currentUserElement = document.createElement('div');
-                        currentUserElement.className = 'user-item';
-                        currentUserElement.innerHTML = `
-                            <div class="circle-indicator"></div>
-                            <span>You (${userData.first_name} ${userData.last_name})</span>
-                        `;
-                        usersList.appendChild(currentUserElement);
-                        
-                        // If no other users found (only current user)
-                        if (data.data.length === 1 && data.data[0].user_id === currentUserId) {
+                            // Display other users
+                            data.data.forEach(user => {
+                                // Skip current user as we've already added them
+                                if (user.user_id === currentUserId) {
+                                    return;
+                                }
+                                
+                                // We found at least one other user
+                                otherUsersFound = true;
+                                
+                                // Create and add user element
+                                const userElement = document.createElement('div');
+                                userElement.className = 'user-item';
+                                userElement.innerHTML = `
+                                    <div class="circle-indicator"></div>
+                                    <span>${user.first_name} ${user.last_name}</span>
+                                `;
+                                usersList.appendChild(userElement);
+                            });
+                            
+                            // If no other users found (only current user)
+                            if (!otherUsersFound) {
+                                const emptyMessage = document.createElement('div');
+                                emptyMessage.className = 'no-users-message';
+                                emptyMessage.textContent = 'No other users with the same learning style found.';
+                                usersList.appendChild(emptyMessage);
+                            }
+                        } else {
+                            // No users found with this learning style besides the current user
                             const emptyMessage = document.createElement('div');
-                            emptyMessage.className = 'text-muted';
+                            emptyMessage.className = 'no-users-message';
                             emptyMessage.textContent = 'No other users with the same learning style found.';
                             usersList.appendChild(emptyMessage);
                         }
-                    } else {
-                        // No users found with this learning style
-                        const usersList = document.querySelector('.online-users-list');
-                        usersList.innerHTML = ''; // Clear existing list
-                        
-                        // Add the current user to the list
-                        const currentUserElement = document.createElement('div');
-                        currentUserElement.className = 'user-item';
-                        currentUserElement.innerHTML = `
-                            <div class="circle-indicator"></div>
-                            <span>You (${userData.first_name} ${userData.last_name})</span>
-                        `;
-                        usersList.appendChild(currentUserElement);
-                        
-                        const emptyMessage = document.createElement('div');
-                        emptyMessage.className = 'text-muted';
-                        emptyMessage.textContent = 'No other users with the same learning style found.';
-                        usersList.appendChild(emptyMessage);
                     }
                 })
-                .catch(error => console.error('Error fetching users:', error));
+                .catch(error => {
+                    console.error('Error fetching users:', error);
+                    // Show error message
+                    const usersList = document.querySelector('.online-users-list');
+                    usersList.innerHTML = '<div class="text-danger">Error loading users. Please refresh the page.</div>';
+                });
         }
 
         function loadChatMessages(roomId) {
@@ -676,11 +774,17 @@
             }
         }
         
-        // Set up polling for new messages every 5 seconds
+        // Set up polling for new messages and users list every 5 seconds
         function setupPolling() {
             setInterval(function() {
                 if (currentRoomId) {
+                    // Refresh chat messages
                     loadChatMessages(currentRoomId);
+                    
+                    // Also refresh the users list to show new participants
+                    if (currentLearningStyleId) {
+                        loadLearningStyleUsers(currentLearningStyleId);
+                    }
                 }
             }, 5000);
         }
