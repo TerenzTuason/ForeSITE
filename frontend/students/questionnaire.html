@@ -33,6 +33,31 @@
         justify-content: center;
         padding: 2rem 0;
       }
+      
+      .text-maroon {
+        color: var(--maroon);
+      }
+
+      .text-gold {
+        color: var(--gold);
+      }
+
+      .modal-content {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      }
+
+      .learning-style-badge {
+        background-color: var(--maroon);
+        color: white;
+        border-radius: 8px;
+        text-transform: uppercase;
+        font-weight: 600;
+        box-shadow: 0 4px 10px rgba(128, 0, 0, 0.2);
+      }
+      
+      /* We're removing the roulette styles from here since they will now be on the dashboard page */
       .questionnaire-container {
         max-width: 800px;
         margin: 0 auto;
@@ -319,6 +344,8 @@
       </div>
     </div>
 
+    <!-- We're removing the modal from here since it will now be on the dashboard page -->
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -456,7 +483,7 @@
           .then(data => {
             if (data.data && data.data.length > 0) {
               // User has already taken the assessment, redirect to enrollment page
-              window.location.href = "enrollment.html";
+              window.location.href = "dashboard.html";
               return;
             }
             // Continue with the rest of the code if no assessment results found
@@ -734,8 +761,10 @@
                                 );
                               });
                                                          }
-                             // Navigate to enrollment page
-                             window.location.href = "enrollment.html";
+                             // Store the learning style in session storage to be used on the dashboard
+                             sessionStorage.setItem('learning_style', data.learning_style.toLowerCase());
+                             // Redirect to dashboard
+                             window.location.href = "dashboard.html";
                            })
                            .catch((error) => {
                             console.error('Error storing assessment results:', error);
@@ -787,6 +816,8 @@
             updateProgress();
           });
         }
+
+        // We're removing this function as it will now be on the dashboard page
       });
     </script>
   </body>
