@@ -148,9 +148,6 @@
                             <h2 id="user-full-name">Loading...</h2>
                             <p id="user-email"><i class="fas fa-envelope me-2"></i>Loading...</p>
                             <p id="user-department"><i class="fas fa-building me-2"></i>Loading...</p>
-                            <span id="learning-style-badge" class="learning-style-badge">
-                                <i class="fas fa-brain me-1"></i>Loading...
-                            </span>
                         </div>
                     </div>
 
@@ -180,14 +177,7 @@
                                     </div>
                                     <small class="text-muted">For security reasons, your password is masked.</small>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="department" class="form-label">Department</label>
-                                    <input type="text" class="form-control" id="department" readonly>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="learning-style" class="form-label">Learning Style</label>
-                                    <input type="text" class="form-control" id="learning-style" readonly>
-                                </div>
+
 
                             </div>
                         </div>
@@ -314,27 +304,10 @@
             const department = user.departmentFromAssessment || user.department || user.studentProfile?.department || 'Not specified';
             document.getElementById('user-department').innerHTML = `<i class="fas fa-building me-2"></i>${department}`;
             
-            // Learning style (could be in different places in the API response)
-            let learningStyle = 'Not determined';
-            if (user.learningStyleFromAssessment) {
-                // Prioritize learning style from assessment results
-                learningStyle = user.learningStyleFromAssessment;
-            } else if (user.result && user.result.learning_style) {
-                // From assessment results directly in user object
-                learningStyle = user.result.learning_style;
-            } else if (user.studentProfile?.learningStyle?.style_name) {
-                // From student profile
-                learningStyle = user.studentProfile.learningStyle.style_name;
-            }
-            
-            document.getElementById('learning-style-badge').innerHTML = `<i class="fas fa-brain me-1"></i>${learningStyle}`;
-            document.getElementById('learning-style').value = learningStyle;
-            
             // Form fields
             document.getElementById('first-name').value = user.first_name;
             document.getElementById('last-name').value = user.last_name;
             document.getElementById('email').value = user.email;
-            document.getElementById('department').value = department;
         }
         
         // Display assessment results
@@ -404,7 +377,6 @@
             // Populate modal fields with current values
             document.getElementById('modal-first-name').value = document.getElementById('first-name').value;
             document.getElementById('modal-last-name').value = document.getElementById('last-name').value;
-            document.getElementById('modal-department').value = document.getElementById('department').value;
             document.getElementById('modal-password').value = '';
             
             // Show modal
@@ -418,7 +390,6 @@
                 const userId = currentUser.user_id;
                 const firstName = document.getElementById('modal-first-name').value;
                 const lastName = document.getElementById('modal-last-name').value;
-                const department = document.getElementById('modal-department').value;
                 const password = document.getElementById('modal-password').value;
                 
                 // Validation
@@ -454,15 +425,8 @@
                 
                 if (!response.ok) throw new Error('Failed to update profile');
                 
-                // For department update, we'll only update the user data first
-                // The department information will be taken from the user data on next profile load
-                // This is simpler and more reliable than trying to update the assessment result directly
-                
-                // We will log department changes for now, but not attempt to modify assessment results
-                console.log(`Department updated to: ${department}`);
-                
-                // If needed in the future, we can implement a specific API endpoint for department updates
-                // through a more direct mechanism that doesn't depend on assessment result IDs
+                // Department is no longer edited in the profile modal
+                // It is displayed from assessment results in the header
                 
                 // Hide modal
                 const editProfileModal = bootstrap.Modal.getInstance(document.getElementById('edit-profile-modal'));
@@ -542,11 +506,7 @@
                             <small class="text-muted">Leave blank if you don't want to change your password</small>
                         </div>
                         
-                        <!-- Department -->
-                        <div class="mb-3">
-                            <label for="modal-department" class="form-label">Department</label>
-                            <input type="text" class="form-control" id="modal-department">
-                        </div>
+
                     </form>
                 </div>
                 <div class="modal-footer">
