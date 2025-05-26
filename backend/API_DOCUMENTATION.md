@@ -107,14 +107,13 @@ The API provides CRUD (Create, Read, Update, Delete) operations for the main ent
 - **GET /api/v1/users/{user}/module-progress**: Get all module progress entries for a specific user
 - **GET /api/v1/courses/{course}/module-progress**: Get all module progress entries for a specific course
 
-### 10. Module Contents (`module_contents` table)
-- **GET /api/v1/modules/{module}/contents**: List all content for a module
-- **GET /api/v1/module-progress/{moduleId}/contents**: List all content for a module progress
-- **GET /api/v1/contents/{id}**: Get specific content
-- **POST /api/v1/modules/{module}/contents**: Create new content for a module
-- **POST /api/v1/module-progress/{moduleId}/contents**: Create new content for a module progress
-- **PUT /api/v1/contents/{id}**: Update content
-- **DELETE /api/v1/contents/{id}**: Delete content
+### 10. Lesson Screen Progress (`lesson_screen_progress` table)
+- **GET /api/v1/module-progress/{moduleId}/screen-progress**: List all screen progress entries for a module progress
+- **GET /api/v1/screen-progress/{id}**: Get specific screen progress entry
+- **POST /api/v1/module-progress/{moduleId}/screen-progress**: Create new screen progress entry
+- **PUT /api/v1/screen-progress/{id}**: Update screen progress entry
+- **DELETE /api/v1/screen-progress/{id}**: Delete screen progress entry
+- **GET /api/v1/lesson-screens/{lessonScreenId}/progress**: Get progress entries for a specific lesson screen for a module progress
 
 ### 11. Certificates (`certificates` table)
 - **GET /api/v1/certificates**: List all certificates
@@ -136,8 +135,8 @@ The API provides CRUD (Create, Read, Update, Delete) operations for the main ent
 - **POST /api/v1/lesson-screens**: Create a new lesson screen
 - **PUT /api/v1/lesson-screens/{id}**: Update a lesson screen
 - **DELETE /api/v1/lesson-screens/{id}**: Delete a lesson screen
-- **GET /api/v1/courses/{course}/lesson-screens**: Get all lesson screens for a specific course
-- **GET /api/v1/courses/{course}/modules/{module}/lesson-screens**: Get all lesson screens for a specific course module
+- **GET /api/v1/courses/{course}/lesson-screens**: Get all lesson screens associated with a specific course through module progress
+- **GET /api/v1/courses/{course}/modules/{module}/lesson-screens**: Get all lesson screens for a specific course module through module progress
 
 ### 14. Enrollments (`enrollments` table)
 - **POST /api/v1/enrollments**: Create a new enrollment
@@ -205,77 +204,133 @@ Before using the API, make sure you:
 3. Pagination for large result sets
 4. Advanced filtering and searching
 
-## Module Progress API Examples
+## Lesson Screen Progress API Examples
 
-### Create a Single Module Progress Entry
+### Get Single Screen Progress Entry
 ```json
-// POST /api/v1/module-progress
+// GET /api/v1/screen-progress/{screenProgressId}
 {
-  "user_id": 1,
-  "course_id": 1,
-  "module_number": 1,
-  "module_title": "Introduction to Futures Thinking",
-  "module_focus": "Use of drivers, scenarios, and the Three Horizons model",
-  "status": "not_started",
-  "progress_percentage": 0,
-  "started_at": null,
-  "completed_at": null,
-  "time_spent_minutes": 0,
-  "score": null
-}
-```
-
-### Create Multiple Module Progress Entries
-```json
-// POST /api/v1/module-progress
-{
-  "data": [
-    {
+  "data": {
+    "screen_progress_id": 1,
+    "module_progress_id": 1,
+    "lesson_screen_id": 1,
+    "status": "completed",
+    "progress_percentage": 100,
+    "module_progress": {
+      "progress_id": 1,
       "user_id": 1,
       "course_id": 1,
       "module_number": 1,
       "module_title": "Introduction to Futures Thinking",
       "module_focus": "Use of drivers, scenarios, and the Three Horizons model",
-      "status": "not_started",
-      "progress_percentage": 0,
-      "time_spent_minutes": 0
+      "status": "in_progress",
+      "progress_percentage": 50,
+      "started_at": "2024-05-25T10:00:00Z",
+      "completed_at": null,
+      "time_spent_minutes": 30,
+      "score": null
+    },
+    "lesson_screen": {
+      "lesson_screen_id": 1,
+      "course_id": 1,
+      "course_module_number": 1,
+      "screen_number": 1,
+      "screen_title": "Introduction to Futures Thinking",
+      "screen_description": "Overview of the key concepts",
+      "screen_content": {
+        "content": "This is the introduction content...",
+        "type": "text"
+      },
+      "screen_url": null
+    }
+  }
+}
+```
+
+### Create Multiple Screen Progress Entries
+```json
+// POST /api/v1/module-progress/{moduleId}/screen-progress
+{
+  "data": [
+    {
+      "lesson_screen_id": 1,
+      "status": "completed",
+      "progress_percentage": 100
     },
     {
-      "user_id": 1,
-      "course_id": 1,
-      "module_number": 2,
-      "module_title": "Futures Process Design",
-      "module_focus": "Building projects with clear aims",
-      "status": "not_started",
-      "progress_percentage": 0,
-      "time_spent_minutes": 0
+      "lesson_screen_id": 2,
+      "status": "in_progress",
+      "progress_percentage": 50
     }
   ]
 }
 ```
 
-## Module Content API Examples
-
-### Create a Module Content Entry
+### Update Screen Progress
 ```json
-// POST /api/v1/module-progress/{moduleId}/contents
+// PUT /api/v1/screen-progress/{screenProgressId}
 {
-  "content_type": "text",
-  "content_title": "Introduction to the Module",
-  "content_data": "This is the content text for the introduction...",
-  "sequence_order": 1
+  "status": "completed",
+  "progress_percentage": 100
 }
 ```
 
-## Lesson Screens API Examples
+### Get Module Progress Screen Entries
+```json
+// GET /api/v1/module-progress/{moduleId}/screen-progress
+{
+  "data": [
+    {
+      "screen_progress_id": 1,
+      "module_progress_id": 1,
+      "lesson_screen_id": 1,
+      "status": "completed",
+      "progress_percentage": 100,
+      "lesson_screen": {
+        "lesson_screen_id": 1,
+        "course_id": 1,
+        "course_module_number": 1,
+        "screen_number": 1,
+        "screen_title": "Introduction to Futures Thinking",
+        "screen_description": "Overview of the key concepts",
+        "screen_content": {
+          "content": "This is the introduction content...",
+          "type": "text"
+        },
+        "screen_url": null
+      }
+    },
+    {
+      "screen_progress_id": 2,
+      "module_progress_id": 1,
+      "lesson_screen_id": 2,
+      "status": "in_progress",
+      "progress_percentage": 50,
+      "lesson_screen": {
+        "lesson_screen_id": 2,
+        "course_id": 1,
+        "course_module_number": 1,
+        "screen_number": 2,
+        "screen_title": "Key Principles of Strategic Foresight",
+        "screen_description": "Understanding the fundamental principles",
+        "screen_content": {
+          "content": "This is the content about key principles...",
+          "type": "text"
+        },
+        "screen_url": null
+      }
+    }
+  ]
+}
+```
+
+### Lesson Screens API Examples
 
 ### Create a Lesson Screen
 ```json
 // POST /api/v1/lesson-screens
 {
-  "course_id": 1,
-  "course_module_number": 1,
-  "screen_number": 1,
+  "screen_number": "1.1", // Now accepts alphanumeric values like "1", "1.1", "2a", etc.
   "screen_title": "Introduction to Futures Thinking", // Optional, can be null
   "screen_description": "Overview of the key concepts", // Optional, can be null
   "screen_content": { // Optional, can be null
@@ -292,25 +347,14 @@ Before using the API, make sure you:
 {
   "data": {
     "lesson_screen_id": 1,
-    "course_id": 1,
-    "course_module_number": 1,
-    "screen_number": 1,
+    "screen_number": "1.1", // Now returned as a string value
     "screen_title": "Introduction to Futures Thinking",
     "screen_description": "Overview of the key concepts",
     "screen_content": {
       "content": "This is the introduction content...",
       "type": "text"
     },
-    "screen_url": null,
-    "course": {
-      "course_id": 1,
-      "name": "Applied Strategic Foresight: Practical Tools for Future-Ready Decision Making",
-      "description": "This course provides a comprehensive overview of strategic foresight tools and techniques...",
-      "objectives": [...],
-      "structure": [...],
-      "learning_style_id": 1,
-      "created_at": "2024-05-25T10:00:00Z"
-    }
+    "screen_url": null
   }
 }
 ```
@@ -322,9 +366,7 @@ Before using the API, make sure you:
   "data": [
     {
       "lesson_screen_id": 1,
-      "course_id": 1,
-      "course_module_number": 1,
-      "screen_number": 1,
+      "screen_number": "1.1", // Now uses string format for alphanumeric screen numbers
       "screen_title": "Introduction to Futures Thinking",
       "screen_description": "Overview of the key concepts",
       "screen_content": {
@@ -335,9 +377,7 @@ Before using the API, make sure you:
     },
     {
       "lesson_screen_id": 2,
-      "course_id": 1,
-      "course_module_number": 1,
-      "screen_number": 2,
+      "screen_number": "1.2", // Now uses string format for alphanumeric screen numbers
       "screen_title": "Key Principles of Strategic Foresight",
       "screen_description": "Understanding the fundamental principles",
       "screen_content": {

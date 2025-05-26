@@ -18,7 +18,7 @@ class LessonScreenController extends Controller
      */
     public function index(): JsonResponse
     {
-        $lessonScreens = LessonScreen::with('course')->get();
+        $lessonScreens = LessonScreen::all();
         return response()->json(['data' => $lessonScreens], Response::HTTP_OK);
     }
 
@@ -29,9 +29,7 @@ class LessonScreenController extends Controller
     {
         // Validate request
         $validator = Validator::make($request->all(), [
-            'course_id' => 'required|exists:courses,course_id',
-            'course_module_number' => 'required|integer|min:1',
-            'screen_number' => 'required|integer|min:1',
+            'screen_number' => 'required|string|max:50',
             'screen_title' => 'nullable|string|max:255',
             'screen_description' => 'nullable|string',
             'screen_content' => 'nullable|array',
@@ -42,22 +40,18 @@ class LessonScreenController extends Controller
             return response()->json(['error' => $validator->errors()], Response::HTTP_BAD_REQUEST);
         }
 
-        // Check if a lesson screen with the same course_id, course_module_number, and screen_number already exists
-        $existingScreen = LessonScreen::where('course_id', $request->course_id)
-            ->where('course_module_number', $request->course_module_number)
-            ->where('screen_number', $request->screen_number)
+        // Check if a lesson screen with the same screen_number already exists
+        $existingScreen = LessonScreen::where('screen_number', $request->screen_number)
             ->first();
             
         if ($existingScreen) {
             return response()->json([
-                'error' => 'A lesson screen with this course ID, module number, and screen number already exists'
+                'error' => 'A lesson screen with this screen number already exists'
             ], Response::HTTP_CONFLICT);
         }
 
         // Create the lesson screen
         $lessonScreen = LessonScreen::create([
-            'course_id' => $request->course_id,
-            'course_module_number' => $request->course_module_number,
             'screen_number' => $request->screen_number,
             'screen_title' => $request->screen_title,
             'screen_description' => $request->screen_description,
@@ -73,7 +67,7 @@ class LessonScreenController extends Controller
      */
     public function show(string $id): JsonResponse
     {
-        $lessonScreen = LessonScreen::with('course')->find($id);
+        $lessonScreen = LessonScreen::find($id);
         
         if (!$lessonScreen) {
             return response()->json(['error' => 'Lesson screen not found'], Response::HTTP_NOT_FOUND);
@@ -95,9 +89,7 @@ class LessonScreenController extends Controller
         
         // Validate request
         $validator = Validator::make($request->all(), [
-            'course_id' => 'sometimes|required|exists:courses,course_id',
-            'course_module_number' => 'sometimes|required|integer|min:1',
-            'screen_number' => 'sometimes|required|integer|min:1',
+            'screen_number' => 'sometimes|required|string|max:50',
             'screen_title' => 'nullable|string|max:255',
             'screen_description' => 'nullable|string',
             'screen_content' => 'nullable|array',
@@ -108,28 +100,22 @@ class LessonScreenController extends Controller
             return response()->json(['error' => $validator->errors()], Response::HTTP_BAD_REQUEST);
         }
 
-        // Check for uniqueness if course_id, course_module_number, or screen_number is being updated
-        if (($request->has('course_id') && $request->course_id != $lessonScreen->course_id) ||
-            ($request->has('course_module_number') && $request->course_module_number != $lessonScreen->course_module_number) ||
-            ($request->has('screen_number') && $request->screen_number != $lessonScreen->screen_number)) {
+        // Check for uniqueness if screen_number is being updated
+        if ($request->has('screen_number') && $request->screen_number != $lessonScreen->screen_number) {
             
-            $existingScreen = LessonScreen::where('course_id', $request->input('course_id', $lessonScreen->course_id))
-                ->where('course_module_number', $request->input('course_module_number', $lessonScreen->course_module_number))
-                ->where('screen_number', $request->input('screen_number', $lessonScreen->screen_number))
+            $existingScreen = LessonScreen::where('screen_number', $request->screen_number)
                 ->where('lesson_screen_id', '!=', $id)
                 ->first();
                 
             if ($existingScreen) {
                 return response()->json([
-                    'error' => 'A lesson screen with this course ID, module number, and screen number already exists'
+                    'error' => 'A lesson screen with this screen number already exists'
                 ], Response::HTTP_CONFLICT);
             }
         }
 
         // Prepare update data
         $updateData = $request->only([
-            'course_id',
-            'course_module_number',
             'screen_number',
             'screen_title',
             'screen_description',
@@ -186,9 +172,17 @@ class LessonScreenController extends Controller
             return response()->json(['error' => 'Module number not found in course structure'], Response::HTTP_NOT_FOUND);
         }
         
-        $lessonScreens = LessonScreen::where('course_id', $courseId)
-            ->where('course_module_number', $moduleNumber)
-            ->orderBy('screen_number')
+        // Get lesson screens for this course module by joining with the screen progress table
+        // Using natural sorting for alphanumeric screen numbers
+        $lessonScreens = DB::table('lesson_screens')
+            ->join('lesson_screen_progress', 'lesson_screens.lesson_screen_id', '=', 'lesson_screen_progress.lesson_screen_id')
+            ->join('module_progress', 'lesson_screen_progress.module_progress_id', '=', 'module_progress.progress_id')
+            ->where('module_progress.course_id', $courseId)
+            ->where('lesson_screen_progress.course_module_number', $moduleNumber)
+            ->select('lesson_screens.*')
+            ->distinct()
+            ->orderBy(DB::raw('LENGTH(lesson_screens.screen_number)'))
+            ->orderBy('lesson_screens.screen_number')
             ->get();
             
         return response()->json(['data' => $lessonScreens], Response::HTTP_OK);
@@ -205,9 +199,17 @@ class LessonScreenController extends Controller
             return response()->json(['error' => 'Course not found'], Response::HTTP_NOT_FOUND);
         }
         
-        $lessonScreens = LessonScreen::where('course_id', $courseId)
-            ->orderBy('course_module_number')
-            ->orderBy('screen_number')
+        // Get lesson screens for this course by joining with the screen progress and module_progress tables
+        // Using natural sorting for alphanumeric screen numbers
+        $lessonScreens = DB::table('lesson_screens')
+            ->join('lesson_screen_progress', 'lesson_screens.lesson_screen_id', '=', 'lesson_screen_progress.lesson_screen_id')
+            ->join('module_progress', 'lesson_screen_progress.module_progress_id', '=', 'module_progress.progress_id')
+            ->where('module_progress.course_id', $courseId)
+            ->select('lesson_screens.*')
+            ->distinct()
+            ->orderBy('lesson_screen_progress.course_module_number')
+            ->orderBy(DB::raw('LENGTH(lesson_screens.screen_number)'))
+            ->orderBy('lesson_screens.screen_number')
             ->get();
             
         return response()->json(['data' => $lessonScreens], Response::HTTP_OK);

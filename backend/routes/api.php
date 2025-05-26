@@ -8,12 +8,12 @@ use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\StudentProfileController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ModuleController;
-use App\Http\Controllers\Api\ModuleContentController;
 use App\Http\Controllers\Api\ModuleProgressController;
 use App\Http\Controllers\Api\FeedbackController;
 use App\Http\Controllers\Api\CertificateController;
 use App\Http\Controllers\Api\EnrollmentController;
 use App\Http\Controllers\Api\LessonScreenController;
+use App\Http\Controllers\Api\LessonScreenProgressController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -101,9 +101,9 @@ Route::prefix('v1')->group(function () {
     Route::get('users/{user}/module-progress', [ModuleProgressController::class, 'getProgressByUser']);
     Route::get('courses/{course}/module-progress', [ModuleProgressController::class, 'getProgressByCourse']);
     
-    // Module Content
-    Route::apiResource('modules.contents', ModuleContentController::class)->shallow();
-    Route::apiResource('module-progress.contents', ModuleContentController::class)->shallow();
+    // Lesson Screen Progress
+    Route::apiResource('module-progress.screen-progress', LessonScreenProgressController::class)->shallow();
+    Route::get('lesson-screens/{lessonScreen}/progress', [LessonScreenProgressController::class, 'getByLessonScreen']);
     
     // Certificates
     Route::apiResource('certificates', CertificateController::class);
