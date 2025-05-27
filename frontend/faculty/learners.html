@@ -309,11 +309,6 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">
-                            <i class="fas fa-book me-2"></i>Courses
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
                             <i class="fas fa-user-circle me-2"></i>Profile
                         </a>
                     </li>
@@ -332,42 +327,19 @@
         <div class="sidebar">
             <div class="mb-4">
                 <div class="input-group mb-3">
-                    <input type="text" class="form-control search-input" placeholder="Search learners...">
+                    <input type="text" class="form-control search-input" id="searchInput" placeholder="Search learners...">
                     <button class="btn btn-search" type="button">
                         <i class="fas fa-search"></i>
                     </button>
                 </div>
-                <select class="form-select search-input">
-                    <option selected>All Courses</option>
-                    <option>Introduction to Futures Thinking</option>
-                    <option>Advanced Forecasting Methods</option>
-                    <option>Strategic Foresight Workshop</option>
-                </select>
             </div>
 
-            <div class="learners-list">
-                <div class="learner-card active">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h6 class="mb-1">John Smith</h6>
-                        <small>#12345</small>
+            <div class="learners-list" id="learnersList">
+                <div class="text-center p-3">
+                    <div class="spinner-border text-maroon" role="status">
+                        <span class="visually-hidden">Loading...</span>
                     </div>
-                    <small>Introduction to Futures Thinking</small>
-                </div>
-
-                <div class="learner-card">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h6 class="mb-1">Maria Johnson</h6>
-                        <small>#12346</small>
-                    </div>
-                    <small>Advanced Forecasting Methods</small>
-                </div>
-
-                <div class="learner-card">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h6 class="mb-1">Robert Parker</h6>
-                        <small>#12347</small>
-                    </div>
-                    <small>Strategic Foresight Workshop</small>
+                    <p class="mt-2">Loading learners...</p>
                 </div>
             </div>
         </div>
@@ -478,6 +450,179 @@
                 sessionStorage.removeItem('user');
                 window.location.href = '../admin/login.html';
             });
+
+            // API base URL
+            const apiBaseUrl = 'http://127.0.0.1:8000/api/v1';
+            
+            // Fetch students
+            fetchStudents();
+            
+            // Search functionality
+            document.getElementById('searchInput').addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase().trim();
+                const learnerCards = document.querySelectorAll('.learner-card');
+                
+                learnerCards.forEach(card => {
+                    const studentName = card.querySelector('h6').textContent.toLowerCase();
+                    if (studentName.includes(searchTerm)) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+            
+            // Function to fetch students
+            function fetchStudents() {
+                fetch(`${apiBaseUrl}/users`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Filter users with student role
+                        const students = data.data.filter(user => 
+                            user.role && user.role.role_name === 'student'
+                        );
+                        
+                        // Update the learners list
+                        displayStudents(students);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching students:', error);
+                        document.getElementById('learnersList').innerHTML = `
+                            <div class="alert alert-danger">
+                                Error loading students. Please try again later.
+                            </div>
+                        `;
+                    });
+            }
+            
+            // Function to display students in the sidebar
+            function displayStudents(students) {
+                const learnersListContainer = document.getElementById('learnersList');
+                
+                if (students.length === 0) {
+                    learnersListContainer.innerHTML = `
+                        <div class="alert alert-info">
+                            No students found.
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let learnerCardsHTML = '';
+                
+                students.forEach((student, index) => {
+                    const isActive = index === 0 ? 'active' : '';
+                    
+                    learnerCardsHTML += `
+                        <div class="learner-card ${isActive}" data-user-id="${student.user_id}">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="mb-1">${student.first_name} ${student.last_name}</h6>
+                                <small>#${student.user_id}</small>
+                            </div>
+                            <small class="learning-style-info" data-user-id="${student.user_id}">
+                                <i class="fas fa-spinner fa-spin me-1"></i> Loading learning style...
+                            </small>
+                        </div>
+                    `;
+                });
+                
+                learnersListContainer.innerHTML = learnerCardsHTML;
+                
+                // Fetch learning styles for each student
+                students.forEach(student => {
+                    fetchLearningStyle(student.user_id);
+                });
+                
+                // Add click event listeners to learner cards
+                document.querySelectorAll('.learner-card').forEach(card => {
+                    card.addEventListener('click', function() {
+                        // Remove active class from all cards
+                        document.querySelectorAll('.learner-card').forEach(c => {
+                            c.classList.remove('active');
+                        });
+                        
+                        // Add active class to clicked card
+                        this.classList.add('active');
+                        
+                        // TODO: Load student details in the main content
+                        // Will be implemented in the next phase
+                    });
+                });
+            }
+            
+            // Function to fetch learning style for a student
+            function fetchLearningStyle(userId) {
+                // First try to get the user's assessment results
+                fetch(`${apiBaseUrl}/users/${userId}/assessment-results`)
+                    .then(response => {
+                        if (!response.ok) {
+                            // If no assessment results for this user, try the general endpoint
+                            return fetch(`${apiBaseUrl}/assessment-results`);
+                        }
+                        return response;
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        let learningStyle = 'No learning style';
+                        let styleColor = '#6c757d'; // Default gray color
+                        
+                        // Try to find the learning style in the response
+                        if (data && data.data) {
+                            // If it's a user-specific endpoint, the structure might be different
+                            let assessmentResults = Array.isArray(data.data) ? data.data : [data.data];
+                            
+                            // Find an assessment result for this user
+                            const userResult = assessmentResults.find(result => 
+                                result.user_id === userId || 
+                                (result.result && result.result.learning_style)
+                            );
+                            
+                            if (userResult && userResult.result && userResult.result.learning_style) {
+                                learningStyle = userResult.result.learning_style;
+                                
+                                // Set color based on learning style
+                                switch(learningStyle.toLowerCase()) {
+                                    case 'activist':
+                                        styleColor = '#dc3545'; // Red
+                                        break;
+                                    case 'reflector':
+                                        styleColor = '#0d6efd'; // Blue
+                                        break;
+                                    case 'theorist':
+                                        styleColor = '#6f42c1'; // Purple
+                                        break;
+                                    case 'pragmatist':
+                                        styleColor = '#198754'; // Green
+                                        break;
+                                }
+                            }
+                        }
+                        
+                        // Update the learning style info for this user
+                        const learningStyleElements = document.querySelectorAll(`.learning-style-info[data-user-id="${userId}"]`);
+                        learningStyleElements.forEach(element => {
+                            element.innerHTML = `<i class="fas fa-brain me-1" style="color: ${styleColor}"></i> ${learningStyle}`;
+                        });
+                    })
+                    .catch(error => {
+                        console.error(`Error fetching learning style for user ${userId}:`, error);
+                        // Update with error message
+                        const learningStyleElements = document.querySelectorAll(`.learning-style-info[data-user-id="${userId}"]`);
+                        learningStyleElements.forEach(element => {
+                            element.innerHTML = `<i class="fas fa-exclamation-circle me-1"></i> No learning style`;
+                        });
+                    });
+            }
         });
     </script>
 </body>
