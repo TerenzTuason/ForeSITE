@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learner Progress - ForeSITE Admin</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --maroon: #800000;
+            --gold: #FFB81C;
+            --light-gray: #f5f5f5;
+            --dark-gray: #333;
+            --border-radius: 8px;
+            --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--light-gray);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Navigation Styles */
+        .navbar {
+            background: var(--maroon);
+            padding: 1rem 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            color: white !important;
+            font-weight: 600;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .navbar-brand img {
+            height: 35px;
+        }
+
+        .nav-link {
+            color: rgba(255,255,255,0.9) !important;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.75rem 1.5rem !important;
+            border-radius: 50px;
+            margin: 0 0.5rem;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--gold) !important;
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+        }
+
+        .nav-link.btn-logout {
+            background-color: var(--gold);
+            color: var(--maroon) !important;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .nav-link.btn-logout:hover {
+            background-color: #fff;
+            transform: translateY(-2px);
+        }
+
+        /* Layout Styles */
+        .main-wrapper {
+            display: flex;
+            padding: 2rem;
+            gap: 2rem;
+            max-width: 1600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .sidebar {
+            width: 320px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            padding: 2rem;
+            height: fit-content;
+        }
+
+        .main-content {
+            flex-grow: 1;
+        }
+
+        /* Search and Filter Styles */
+        .search-input {
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            border: 2px solid #eee;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .search-input:focus {
+            border-color: var(--maroon);
+            box-shadow: none;
+        }
+
+        .btn-search {
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            background: var(--maroon);
+            border: none;
+            color: white;
+            font-weight: 500;
+        }
+
+        .btn-search:hover {
+            background-color: #600000;
+        }
+
+        /* Learner Card Styles */
+        .learner-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            border: 1px solid #eee;
+            cursor: pointer;
+        }
+
+        .learner-card:hover {
+            transform: translateX(5px);
+            box-shadow: var(--card-shadow);
+            border-color: var(--maroon);
+        }
+
+        .learner-card.active {
+            background: var(--maroon);
+            color: white;
+            border: none;
+        }
+
+        /* Stats Grid Styles */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: var(--card-shadow);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Module Card Styles */
+        .module-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+            box-shadow: var(--card-shadow);
+        }
+
+        .module-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .progress {
+            height: 8px;
+            border-radius: 50px;
+            margin: 1rem 0;
+            background-color: #eee;
+        }
+
+        .progress-bar {
+            background: var(--maroon);
+            border-radius: 50px;
+        }
+
+        .feedback-display {
+            background-color: var(--light-gray);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1.5rem;
+        }
+
+        .feedback-text {
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid var(--maroon);
+        }
+
+        .no-feedback {
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        .badge {
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 500;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: var(--maroon);
+        }
+
+        @media (max-width: 1400px) {
+            .main-wrapper {
+                padding: 1.5rem;
+            }
+            .sidebar {
+                width: 280px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .main-wrapper {
+                flex-direction: column;
+                padding: 1rem;
+            }
+            .sidebar {
+                width: 100%;
+                margin-bottom: 2rem;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .module-card {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .navbar-brand img {
+                height: 30px;
+            }
+            .nav-link {
+                padding: 0.5rem 1rem !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand" href="#">
+                <img src="../assets/logo/pup.png" alt="PUP Logo">
+                <span class="d-none d-sm-inline">FORESITE: Admin Portal</span>
+                <span class="d-inline d-sm-none">FORESITE</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="dashboard.html">
+                            <i class="fas fa-home me-2"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="users.html">
+                            <i class="fas fa-users me-2"></i>Users
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="progress.html">
+                            <i class="fas fa-chart-line me-2"></i>Progress
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="courses.html">
+                            <i class="fas fa-book me-2"></i>Courses
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn-logout" href="login.html" id="logoutBtn">
+                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-wrapper">
+        <!-- Sidebar with Learner List -->
+        <div class="sidebar">
+            <div class="mb-4">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control search-input" id="searchInput" placeholder="Search learners...">
+                    <button class="btn btn-search" type="button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="learners-list" id="learnersList">
+                <div class="text-center p-3">
+                    <div class="spinner-border text-maroon" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Loading learners...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Learner Overview -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div id="studentInfoContainer">
+                    <h1 class="section-title mb-0" id="studentName">Select a Student</h1>
+                    <p class="text-muted" id="studentDepartment">Department information will appear here</p>
+                </div>
+                <div class="text-end">
+                    <h4 class="text-muted mb-2">Overall Progress</h4>
+                    <h2 style="color: var(--maroon); font-size: 3rem;" id="overallProgress">0%</h2>
+                </div>
+            </div>
+
+            <!-- Performance Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="fas fa-book"></i>
+                    <h2 id="totalModules">0</h2>
+                    <p class="mb-0">Total Modules</p>
+                    <small class="text-muted">In Current Course</small>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-check-circle"></i>
+                    <h2 id="completedModules">0</h2>
+                    <p class="mb-0">Completed Modules</p>
+                    <small class="text-muted">With Passing Score</small>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-clock"></i>
+                    <h2 id="ongoingModules">0</h2>
+                    <p class="mb-0">Ongoing Modules</p>
+                    <small class="text-muted">In Progress</small>
+                </div>
+            </div>
+
+            <!-- Module Progress -->
+            <h2 class="section-title">Module Progress</h2>
+            
+            <div id="moduleContainer">
+                <div class="text-center p-5">
+                    <p class="text-muted">Select a student to view their module progress</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const userData = JSON.parse(sessionStorage.getItem('user'));
+            
+            if (!userData) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            if (userData.role.role_name !== 'admin') {
+                alert('Unauthorized access. This portal is only for admin users.');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            document.getElementById('logoutBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                sessionStorage.removeItem('user');
+                window.location.href = 'login.html';
+            });
+
+            // API base URL
+            const apiBaseUrl = 'http://127.0.0.1:8000/api/v1';
+            
+            // Fetch students
+            fetchStudents();
+            
+            // Search functionality
+            document.getElementById('searchInput').addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase().trim();
+                const learnerCards = document.querySelectorAll('.learner-card');
+                
+                learnerCards.forEach(card => {
+                    const studentName = card.querySelector('h6').textContent.toLowerCase();
+                    if (studentName.includes(searchTerm)) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+            
+            // Function to fetch students
+            function fetchStudents() {
+                fetch(`${apiBaseUrl}/users`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Filter users with student role
+                        const students = data.data.filter(user => 
+                            user.role && user.role.role_name === 'student'
+                        );
+                        
+                        // Update the learners list
+                        displayStudents(students);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching students:', error);
+                        document.getElementById('learnersList').innerHTML = `
+                            <div class="alert alert-danger">
+                                Error loading students. Please try again later.
+                            </div>
+                        `;
+                    });
+            }
+            
+            // Function to display students in the sidebar
+            function displayStudents(students) {
+                const learnersListContainer = document.getElementById('learnersList');
+                
+                if (students.length === 0) {
+                    learnersListContainer.innerHTML = `
+                        <div class="alert alert-info">
+                            No students found.
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let learnerCardsHTML = '';
+                
+                students.forEach((student, index) => {
+                    const isActive = index === 0 ? 'active' : '';
+                    
+                    learnerCardsHTML += `
+                        <div class="learner-card ${isActive}" data-user-id="${student.user_id}">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="mb-1">${student.first_name} ${student.last_name}</h6>
+                                <small>#${student.user_id}</small>
+                            </div>
+                            <small class="learning-style-info" data-user-id="${student.user_id}">
+                                <i class="fas fa-spinner fa-spin me-1"></i> Loading learning style...
+                            </small>
+                        </div>
+                    `;
+                });
+                
+                learnersListContainer.innerHTML = learnerCardsHTML;
+                
+                // Fetch learning styles for each student
+                students.forEach(student => {
+                    fetchLearningStyle(student.user_id);
+                });
+                
+                // Add click event listeners to learner cards
+                document.querySelectorAll('.learner-card').forEach(card => {
+                    card.addEventListener('click', function() {
+                        // Remove active class from all cards
+                        document.querySelectorAll('.learner-card').forEach(c => {
+                            c.classList.remove('active');
+                        });
+                        
+                        // Add active class to clicked card
+                        this.classList.add('active');
+                        
+                        // Load student details in the main content
+                        const userId = this.getAttribute('data-user-id');
+                        loadStudentDetails(userId);
+                    });
+                });
+                
+                // Automatically load the first student's details
+                if (students.length > 0) {
+                    const firstStudentCard = document.querySelector('.learner-card.active');
+                    if (firstStudentCard) {
+                        const firstUserId = firstStudentCard.getAttribute('data-user-id');
+                        loadStudentDetails(firstUserId);
+                    }
+                }
+            }
+            
+            // Function to load student details
+            function loadStudentDetails(userId) {
+                fetch(`${apiBaseUrl}/users/${userId}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data && data.data) {
+                            const student = data.data;
+                            
+                            // Update student name
+                            document.getElementById('studentName').textContent = 
+                                `${student.first_name} ${student.last_name}`;
+                            
+                            // Get student email from users API
+                            const studentEmail = student.email || 'No email available';
+                            
+                            // Now fetch assessment results to get department
+                            fetch(`${apiBaseUrl}/users/${userId}/assessment-results`)
+                                .then(response => {
+                                    if (!response.ok) {
+                                        // If user has no assessment results
+                                        throw new Error('No assessment results');
+                                    }
+                                    return response.json();
+                                })
+                                .then(assessmentData => {
+                                    let departmentInfo = 'No department';
+                                    
+                                    // Try to find department in assessment results
+                                    if (assessmentData && assessmentData.data) {
+                                        const results = Array.isArray(assessmentData.data) ? 
+                                            assessmentData.data : [assessmentData.data];
+                                            
+                                        // Look for department in assessment results
+                                        for (const result of results) {
+                                            if (result.department) {
+                                                departmentInfo = result.department;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    
+                                    // Update department and email with circle separator
+                                    document.getElementById('studentDepartment').textContent = 
+                                        `${departmentInfo} • ${studentEmail}`;
+                                })
+                                .catch(error => {
+                                    console.error(`Error fetching assessment results for user ${userId}:`, error);
+                                    // If no assessment results, just show email
+                                    document.getElementById('studentDepartment').textContent = 
+                                        `No department • ${studentEmail}`;
+                                });
+                                
+                            // For demo purposes, show mock module data
+                            displayModuleData();
+                        }
+                    })
+                    .catch(error => {
+                        console.error(`Error fetching details for user ${userId}:`, error);
+                        document.getElementById('studentName').textContent = 'Error loading student';
+                        document.getElementById('studentDepartment').textContent = 'Please try again';
+                    });
+            }
+            
+            // Function to fetch learning style for a student
+            function fetchLearningStyle(userId) {
+                // First try to get the user's assessment results
+                fetch(`${apiBaseUrl}/users/${userId}/assessment-results`)
+                    .then(response => {
+                        if (!response.ok) {
+                            // If no assessment results for this user, try the general endpoint
+                            return fetch(`${apiBaseUrl}/assessment-results`);
+                        }
+                        return response;
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        let learningStyle = 'No learning style';
+                        let styleColor = '#6c757d'; // Default gray color
+                        
+                        // Try to find the learning style in the response
+                        if (data && data.data) {
+                            // If it's a user-specific endpoint, the structure might be different
+                            let assessmentResults = Array.isArray(data.data) ? data.data : [data.data];
+                            
+                            // Find an assessment result for this user
+                            const userResult = assessmentResults.find(result => 
+                                result.user_id === userId || 
+                                (result.result && result.result.learning_style)
+                            );
+                            
+                            if (userResult && userResult.result && userResult.result.learning_style) {
+                                learningStyle = userResult.result.learning_style;
+                                
+                                // Set color based on learning style
+                                switch(learningStyle.toLowerCase()) {
+                                    case 'activist':
+                                        styleColor = '#dc3545'; // Red
+                                        break;
+                                    case 'reflector':
+                                        styleColor = '#0d6efd'; // Blue
+                                        break;
+                                    case 'theorist':
+                                        styleColor = '#6f42c1'; // Purple
+                                        break;
+                                    case 'pragmatist':
+                                        styleColor = '#198754'; // Green
+                                        break;
+                                }
+                            }
+                        }
+                        
+                        // Update the learning style info for this user
+                        const learningStyleElements = document.querySelectorAll(`.learning-style-info[data-user-id="${userId}"]`);
+                        learningStyleElements.forEach(element => {
+                            element.innerHTML = `<i class="fas fa-brain me-1" style="color: ${styleColor}"></i> ${learningStyle}`;
+                        });
+                    })
+                    .catch(error => {
+                        console.error(`Error fetching learning style for user ${userId}:`, error);
+                        // Update with error message
+                        const learningStyleElements = document.querySelectorAll(`.learning-style-info[data-user-id="${userId}"]`);
+                        learningStyleElements.forEach(element => {
+                            element.innerHTML = `<i class="fas fa-exclamation-circle me-1"></i> No learning style`;
+                        });
+                    });
+            }
+            
+            // Function to display module data (mock data for now)
+            function displayModuleData() {
+                // Update overall progress
+                document.getElementById('overallProgress').textContent = '85%';
+                
+                // Update module stats
+                document.getElementById('totalModules').textContent = '3';
+                document.getElementById('completedModules').textContent = '1';
+                document.getElementById('ongoingModules').textContent = '2';
+                
+                // Display module progress
+                const moduleContainer = document.getElementById('moduleContainer');
+                
+                moduleContainer.innerHTML = `
+                    <div class="module-card">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5>Module 1: Introduction to Foresight</h5>
+                            <span class="badge bg-success">Completed</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar" style="width: 100%"></div>
+                        </div>
+                        <p class="mb-0 mt-2">Score: 92%</p>
+                        <div class="feedback-display">
+                            <h6>Faculty Feedback</h6>
+                            <div class="feedback-text">
+                                <p class="mb-0">Excellent work on understanding the basic concepts. Your discussion post showed great insight into the foresight methodologies.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5>Module 2: Forecasting Techniques</h5>
+                            <span class="badge bg-warning text-dark">In Progress</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar" style="width: 65%"></div>
+                        </div>
+                        <p class="mb-0 mt-2">Progress: 65%</p>
+                        <div class="feedback-display">
+                            <h6>Faculty Feedback</h6>
+                            <div class="feedback-text">
+                                <p class="no-feedback">No feedback provided yet.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5>Module 3: Strategic Planning</h5>
+                            <span class="badge bg-secondary">Not Started</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar" style="width: 0%"></div>
+                        </div>
+                        <p class="mb-0 mt-2">Progress: 0%</p>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>
