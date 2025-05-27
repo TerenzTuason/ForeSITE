@@ -208,21 +208,6 @@ CREATE TABLE assessment_results (
     FOREIGN KEY (course_id) REFERENCES courses(course_id)
 );
 
--- Student enrollment in courses
-CREATE TABLE enrollments (
-    enrollment_id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT NOT NULL,
-    course_id INT NOT NULL,
-    assessment_result_id INT NOT NULL,
-    enrollment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    completion_status ENUM('not_started', 'in_progress', 'completed') DEFAULT 'not_started',
-    completion_date TIMESTAMP NULL,
-    FOREIGN KEY (user_id) REFERENCES users(user_id),
-    FOREIGN KEY (course_id) REFERENCES courses(course_id),
-    FOREIGN KEY (assessment_result_id) REFERENCES assessment_results(result_id),
-    UNIQUE KEY unique_enrollment (user_id, course_id)
-);
-
 -- Lesson screen for each course module
 CREATE TABLE lesson_screens (
     lesson_screen_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -770,6 +755,21 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
     )
   ),
   null
+);
+
+-- Student enrollment in courses
+CREATE TABLE enrollments (
+    enrollment_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    course_id INT NOT NULL,
+    assessment_result_id INT NOT NULL,
+    enrollment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    completion_status ENUM('not_started', 'in_progress', 'completed') DEFAULT 'not_started',
+    completion_date TIMESTAMP NULL,
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (course_id) REFERENCES courses(course_id),
+    FOREIGN KEY (assessment_result_id) REFERENCES assessment_results(result_id),
+    UNIQUE KEY unique_enrollment (user_id, course_id)
 );
 
 -- Student progress in modules
