@@ -546,15 +546,15 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
   "Why Use Causal Layered Analysis?",
   "Discover how Causal Layered Analysis helps you dig deeper into a problem, finding hidden beliefs and creating clearer paths forward.",
   '[
-        "Causal Layered Analysis (CLA) is a powerful tool used for several key reasons:",
-        [
+      "Causal Layered Analysis (CLA) is a powerful tool used for several key reasons:",
+      [
           "It helps you unpack any issue or topic to understand it at a much profounder level than just the surface.",
           "It lets you map out and understand the various, sometimes conflicting, ideas people have about the future.",
           "It helps you break down a desired future (like a vision or a big goal) to understand its core parts and how to build it.",
-          "It allows you to grasp the different \"stories\" or narratives that people tell about a problem or the future.",
+          "It allows you to grasp the different stories or narratives that people tell about a problem or the future.",
           "It helps you develop solid, comprehensive strategies that address issues from their roots.",
           "It assists in clearly defining and working towards a preferred vision of the future you want to create."
-        ]
+      ]
   ]',
   null
 );
@@ -564,30 +564,30 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
   "How to do Causal Layered Analysis?",
   "Learn to dig deep into any issue by exploring its surface, systems, beliefs, and hidden stories.",
   '[
-        "Causal Layered Analysis (CLA) helps you understand a problem or topic by looking at it through four different levels, like peeling an onion. First, pick an issue you want to explore (like a new plan, a problem, or a topic of interest):",
-        "The 4 Levels of CLA:",
-        [
-          "The Litany (What You See & Hear)",
-          [
-            "Ask: What are the most obvious facts, news headlines, or everyday discussions about this issue? How would a reporter describe it simply?",
-            "Think: This is the surface-level story."
-          ],
-          "The System (How Things Are Organized)",
-          [
-            "Ask: What structures, policies, or organized ways of doing things support this issue? Why does it exist this way? What kind of new systems would be needed to change it?",
-            "Think: This is about the facts, data, and structures underneath the surface story."
-          ],
-          "The Worldview (What People Believe)",
-          [
-            "Ask: What are the deeper beliefs, values, or mindsets that shape how this issue is understood or how the system works? Are these beliefs shared, or are they different among various groups? If your plan succeeds, what new ways of thinking or new cultural values would emerge?",
-            "Think: This explores the assumptions and core beliefs that drive behavior."
-          ],
-          "The Myth/Metaphor (The Deepest Stories)",
-          [
-            "Ask: What are the unspoken, powerful stories, narratives, or images (metaphors) that influence people\'s worldviews about this issue? Is there a new story or a memorable metaphor that could help people understand or change things? What kind of mental shift would that new story require?",
-            "Think: This is about the unconscious stories and archetypes that deeply shape our reality."
-          ]
-        ],
+    "Causal Layered Analysis (CLA) helps you understand a problem or topic by looking at it through four different levels, like peeling an onion. First, pick an issue you want to explore (like a new plan, a problem, or a topic of interest):",
+    "The 4 Levels of CLA:",
+    [
+      "The Litany (What You See & Hear)",
+      [
+        "Ask: What are the most obvious facts, news headlines, or everyday discussions about this issue? How would a reporter describe it simply?",
+        "Think: This is the surface-level story."
+      ],
+      "The System (How Things Are Organized)",
+      [
+        "Ask: What structures, policies, or organized ways of doing things support this issue? Why does it exist this way? What kind of new systems would be needed to change it?",
+        "Think: This is about the facts, data, and structures underneath the surface story."
+      ],
+      "The Worldview (What People Believe)",
+      [
+        "Ask: What are the deeper beliefs, values, or mindsets that shape how this issue is understood or how the system works? Are these beliefs shared, or are they different among various groups? If your plan succeeds, what new ways of thinking or new cultural values would emerge?",
+        "Think: This explores the assumptions and core beliefs that drive behavior."
+      ],
+      "The Myth/Metaphor (The Deepest Stories)",
+      [
+        "Ask: What are the unspoken, powerful stories, narratives, or images (metaphors) that influence peoples worldviews about this issue? Is there a new story or a memorable metaphor that could help people understand or change things? What kind of mental shift would that new story require?",
+        "Think: This is about the unconscious stories and archetypes that deeply shape our reality."
+      ]
+    ]
   ]',
   "https://res.cloudinary.com/dwn5t3o4j/image/upload/v1748186079/3.1.2_Using_CLA_sfpy9p.png"
 );
@@ -604,33 +604,33 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
   "3.2",
   "Futures Triangle",
   "Futures triangle is a futures method that helps us to map the present views of the future through three dimensions that are shaping it. The three dimensions are: the images (pull) of the future, the megatrends and drivers (push) of the present and the barriers (weight) of past/history.",
-  '[
-        "The Futures Triangle is a quick and easy way to understand how the future might play out. It\'s built on three main forces constantly pushing and pulling on things:",
-        [
-          "The "Pull" of the Future (Your Visions):",
-          [
-            "This is about the images we have in our minds of what the future could or should be like.",
-            "Think of it as the dreams, hopes, and even fears that push us forward.",
-            "These visions can come from anywhere: books, movies, political goals, religious ideas, or even advertisements. They\'re basically what people or groups strongly desire or dread for the future."
-          ],
-        ],
-        "The "Push" of the Present (Current Trends):",
-        [
-          "These are the ongoing trends and major forces happening right now that are actively shaping what\'s coming next.",
-          "Things like new technologies, economic changes, or shifts in how people live and interact."
-        ],
-        "The "Weight" of the Past (Historical Barriers):",
-        [
-          "This represents the old ways of doing things, traditions, established systems, and historical events that can slow down or block changes we want to see.",
-          "It\'s like a heavy anchor from history that makes it harder to move in a new direction."
-        ],
-        "Putting It All Together:",
-        [
-          "The Futures Triangle shows that these three forces are always interacting and changing.",
-          "If one force gets stronger, it affects the others. For example, if the "Weight of the Past" gets heavier (meaning old ways become more stubborn), it might weaken the "Pull of the Future" or slow down the "Push of the Present.",
-          "This push and pull changes where the future is likely to go."
-        ]
-  ]',
+  JSON_ARRAY(
+    "The Futures Triangle is a quick and easy way to understand how the future might play out. It's built on three main forces constantly pushing and pulling on things:",
+    JSON_ARRAY(
+      "The \"Pull\" of the Future (Your Visions):",
+      JSON_ARRAY(
+        "This is about the images we have in our minds of what the future could or should be like.",
+        "Think of it as the dreams, hopes, and even fears that push us forward.",
+        "These visions can come from anywhere: books, movies, political goals, religious ideas, or even advertisements. They're basically what people or groups strongly desire or dread for the future."
+      )
+    ),
+    "The \"Push\" of the Present (Current Trends):",
+    JSON_ARRAY(
+      "These are the ongoing trends and major forces happening right now that are actively shaping what's coming next.",
+      "Things like new technologies, economic changes, or shifts in how people live and interact."
+    ),
+    "The \"Weight\" of the Past (Historical Barriers):",
+    JSON_ARRAY(
+      "This represents the old ways of doing things, traditions, established systems, and historical events that can slow down or block changes we want to see.",
+      "It's like a heavy anchor from history that makes it harder to move in a new direction."
+    ),
+    "Putting It All Together:",
+    JSON_ARRAY(
+      "The Futures Triangle shows that these three forces are always interacting and changing.",
+      "If one force gets stronger, it affects the others. For example, if the \"Weight of the Past\" gets heavier (meaning old ways become more stubborn), it might weaken the \"Pull of the Future\" or slow down the \"Push of the Present.\"",
+      "This push and pull changes where the future is likely to go."
+    )
+  ),
   "https://res.cloudinary.com/dwn5t3o4j/image/upload/v1748186111/3.2_Futures_Triangle_kzo8sy.png"
 );
 
@@ -638,15 +638,15 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
   "3.2.1",
   "Why Use the Futures Triangle?",
   "Learn how this tool helps you understand the forces shaping the future – from the past, present, and your hopes for tomorrow.",
-  '[
+  JSON_ARRAY(
         "The Futures Triangle is a handy tool that helps us:",
-        [
-          "Understand how the past, what\'s happening now, and future possibilities all connect and influence each other.",
+        JSON_ARRAY(
+          "Understand how the past, what's happening now, and future possibilities all connect and influence each other.",
           "Discover various believable futures by looking at how the forces from the past, present, and your future visions interact.",
-          "Use it as a foundation for creating detailed "what if" stories about the future.",
+          "Use it as a foundation for creating detailed \"what if\" stories about the future.",
           "Develop more effective actions and strategies that consider these powerful forces."
-        ]
-  ]',
+        )
+  ),
   null
 );
 
@@ -654,39 +654,39 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
   "3.2.2",
   "How to Use the Futures Triangle?",
   "Understand the forces shaping your future by exploring your visions, current trends, and past influences.",
-  '[
-        "The Futures Triangle helps you map out how different forces — your hopes for the future, what\'s happening now, and lessons from the past — are all pushing and pulling on each other. It\'s about understanding the big picture to see where things might go.",
-        "Here\'s how to use it, by exploring three key areas:",
-        [
-          "The "Pull" of the Future (Your Hopes)",
-          [
-            "What it is: Your vision for what you want the future to be.",
-            "Ask yourself:",
-            ["What\'s your ideal future?"],
-            "What resources help you get there?"
-          ],
-          "The "Push" of the Present (Today\'s Trends)",
-          [
-            "What it is: The forces and changes happening right now that are shaping tomorrow.",
-            "Ask yourself:",
-            [
-              "What big trends are happening?",
-              "How are they moving us forward?"
-            ],
-              "What resources help you get there?"
-          ],
-          "The "Weight" of the Past (Old Influences)",
-          [
-            "What it is: History, traditions, and old ways of doing things that might slow change.",
-            "Ask yourself:",
-            [
-              "What\'s holding things back?",
-              "Who benefits if nothing changes?"
-            ],
-          ]
-        ],
-        "By thinking through these questions for each of the three points of the triangle, you\'ll start to see how they interact. This helps you understand the likely direction things are headed, imagine different possible futures, and develop clearer actions."
-  ]',
+  JSON_ARRAY(
+    "The Futures Triangle helps you map out how different forces — your hopes for the future, what's happening now, and lessons from the past — are all pushing and pulling on each other. It's about understanding the big picture to see where things might go.",
+    "Here's how to use it, by exploring three key areas:",
+    JSON_ARRAY(
+      "The \"Pull\" of the Future (Your Hopes)",
+      JSON_ARRAY(
+        "What it is: Your vision for what you want the future to be.",
+        "Ask yourself:",
+        JSON_ARRAY("What's your ideal future?"),
+        "What resources help you get there?"
+      ),
+      "The \"Push\" of the Present (Today's Trends)",
+      JSON_ARRAY(
+        "What it is: The forces and changes happening right now that are shaping tomorrow.",
+        "Ask yourself:",
+        JSON_ARRAY(
+          "What big trends are happening?",
+          "How are they moving us forward?"
+        ),
+        "What resources help you get there?"
+      ),
+      "The \"Weight\" of the Past (Old Influences)",
+      JSON_ARRAY(
+        "What it is: History, traditions, and old ways of doing things that might slow change.",
+        "Ask yourself:",
+        JSON_ARRAY(
+          "What's holding things back?",
+          "Who benefits if nothing changes?"
+        )
+      )
+    ),
+    "By thinking through these questions for each of the three points of the triangle, you'll start to see how they interact. This helps you understand the likely direction things are headed, imagine different possible futures, and develop clearer actions."
+  ),
   null
 );
 
@@ -702,19 +702,19 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
   "3.3",
   "Scenario",
   "A scenario is a description of how the future may unfold based on an explicit, coherent and internally consistent set of plausible assumptions about key relationships among drivers of change.",
-  '[
-        "Scenario planning is a special tool that helps us imagine and prepare for different possible futures. It\'s not about predicting one exact future, but rather creating several "what if" stories based on big trends and uncertainties we see today.",
-        "A scenario is simply a detailed story about how the future could unfold. Each story is realistic, makes sense internally, and is based on clear ideas about how different changes might connect.",
-        "Types of scenarios methods",
-        [
-          "2x2 scenarios",
-          "Organizational scenarios",
-          "Integrated scenarios",
-          "Manoa scenarios",
-          "Transformative scenarios",
-          "Change progression scenarios method"
-        ]
-  ]',
+  JSON_ARRAY(
+    "Scenario planning is a special tool that helps us imagine and prepare for different possible futures. It's not about predicting one exact future, but rather creating several \"what if\" stories based on big trends and uncertainties we see today.",
+    "A scenario is simply a detailed story about how the future could unfold. Each story is realistic, makes sense internally, and is based on clear ideas about how different changes might connect.",
+    "Types of scenarios methods",
+    JSON_ARRAY(
+      "2x2 scenarios",
+      "Organizational scenarios",
+      "Integrated scenarios",
+      "Manoa scenarios",
+      "Transformative scenarios",
+      "Change progression scenarios method"
+    )
+  ),
   null
 );
 
@@ -722,14 +722,14 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
   "3.3.1",
   "Why Use Scenario Planning?",
   "Learn how scenarios help you explore different possible futures, challenge your thinking, and prepare for anything.",
-  '[
-        "Using Scenarios is super helpful because it allows us to:",
-        [
-          "It makes us think beyond what we expect to happen, by exploring many different ways a plan, policy, or strategy could unfold in the future.",
-          "It helps us imagine how key issues, partners, and other people might act in various future situations.",
-          "It\'s a great way to create "what if" plans (contingency plans) for our programs, policies, and strategies, making us ready for different possible futures."
-        ]
-  ]',
+  JSON_ARRAY(
+    "Using Scenarios is super helpful because it allows us to:",
+    JSON_ARRAY(
+      "It makes us think beyond what we expect to happen, by exploring many different ways a plan, policy, or strategy could unfold in the future.",
+      "It helps us imagine how key issues, partners, and other people might act in various future situations.",
+      "It's a great way to create \"what if\" plans (contingency plans) for our programs, policies, and strategies, making us ready for different possible futures."
+    )
+  ),
   null
 );
 
@@ -737,38 +737,38 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
   "3.3.2",
   "How to Build Scenarios?",
   "Learn to create different 'what if' stories about the future to better understand and prepare for change.",
-  '[
-        "Define Your Focus & Time",
-        [
-          "What issue are you exploring? (e.g., "The future of digital access.")",
-          "How far into the future? Pick a specific time (e.g., 5, 10, or 20 years from now)."
-        ],
-        "Pick Your Key Drivers",
-        [
-          "Identify the most important forces of change (drivers) that will shape your future.",
-          "These drivers become your "critical uncertainties" (for a 2x2 scenario) or help explore "colliding impacts" (for a Manoa scenario)."
-        ],
-        "Build Your Scenarios",
-        [
-          "For 2x2 Scenarios: Take your two most uncertain and impactful drivers. Imagine them as axes on a graph (like X and Y). This creates four unique future "corners" or stories."
-          "For Manoa Scenarios: Explore how your chosen drivers might collide or interact in surprising ways. Think about how their impacts would combine."
-        ],
-        "Develop Stories & Images",
-        [
-          "For each scenario you\'ve built, create a clear story. What does this future look like?",
-          "Think about creating a catchy title and even a visual image for each one to make it memorable."
-        ],
-        "Review & Discuss",
-        [
-          "Share your scenarios with others.",
-          "Ask: Does this scenario make sense? What are the biggest surprises? How would this future affect different people or groups?"
-        ],
-        "Find Your Message",
-        [
-          "What key insights or messages do you want people to take away from these scenarios?",
-          "What actions should be considered today based on these possible futures?"
-        ]
-  ]',
+  JSON_ARRAY(
+    "Define Your Focus & Time",
+    JSON_ARRAY(
+      "What issue are you exploring? (e.g., \"The future of digital access.\")",
+      "How far into the future? Pick a specific time (e.g., 5, 10, or 20 years from now)."
+    ),
+    "Pick Your Key Drivers",
+    JSON_ARRAY(
+      "Identify the most important forces of change (drivers) that will shape your future.",
+      "These drivers become your \"critical uncertainties\" (for a 2x2 scenario) or help explore \"colliding impacts\" (for a Manoa scenario)."
+    ),
+    "Build Your Scenarios",
+    JSON_ARRAY(
+      "For 2x2 Scenarios: Take your two most uncertain and impactful drivers. Imagine them as axes on a graph (like X and Y). This creates four unique future \"corners\" or stories.",
+      "For Manoa Scenarios: Explore how your chosen drivers might collide or interact in surprising ways. Think about how their impacts would combine."
+    ),
+    "Develop Stories & Images",
+    JSON_ARRAY(
+      "For each scenario you've built, create a clear story. What does this future look like?",
+      "Think about creating a catchy title and even a visual image for each one to make it memorable."
+    ),
+    "Review & Discuss",
+    JSON_ARRAY(
+      "Share your scenarios with others.",
+      "Ask: Does this scenario make sense? What are the biggest surprises? How would this future affect different people or groups?"
+    ),
+    "Find Your Message",
+    JSON_ARRAY(
+      "What key insights or messages do you want people to take away from these scenarios?",
+      "What actions should be considered today based on these possible futures?"
+    )
+  ),
   null
 );
 
