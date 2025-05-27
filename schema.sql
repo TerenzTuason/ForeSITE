@@ -219,6 +219,14 @@ CREATE TABLE lesson_screens (
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
+  "1",
+  null,
+  null,
+  null,
+  "https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185804/1_Introduction_to_Futures_Thinking_egkgxg.mp4"
+);
+
+INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
   "1.1",
   "What is Futures Thinking?",
   "A strategic mindset to explore change and build resilient policy",
@@ -382,7 +390,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
   null,
   null,
   null,
-  "https://www.youtube.com/watch?v=1Pd0xSsdCAU"
+  "https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185779/2.2_Horizon_Scanning_yhuel4.mp4"
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
@@ -451,7 +459,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
   null,
   null,
   null,
-  "https://www.youtube.com/watch?v=QeILzDCS_6U"
+  "https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185774/2.3_Trends_Identification_and_Analysis_zfvxos.mp4"
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
@@ -497,7 +505,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
   null,
   null,
   null,
-  "https://www.youtube.com/watch?v=ImWDmFPfifI"
+  "https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185859/3.1_Causal_Layered_Analysis_u1pfwq.mp4"
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
@@ -582,7 +590,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
   null,
   null,
   null,
-  "https://www.youtube.com/watch?v=KuSDCu6aTgM"
+  "https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185745/3.2_Futures_Triangle_l837ah.mp4"
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
@@ -680,7 +688,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
   null,
   null,
   null,
-  "https://www.youtube.com/watch?v=ukr9ItEQX2Y"
+  "https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185751/3.3_Scenario_Planning_viem5x.mp4"
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
