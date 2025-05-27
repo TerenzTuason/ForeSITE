@@ -252,13 +252,36 @@
             justify-content: center;
         }
 
+        .pagination {
+            margin-bottom: 2rem;
+        }
+        
+        .pagination .page-item .page-link {
+            color: var(--maroon);
+            border-color: #dee2e6;
+            min-width: 40px;
+            text-align: center;
+        }
+        
+        .pagination .page-item .page-link:hover {
+            background-color: #f8f9fa;
+            color: var(--maroon);
+            border-color: #dee2e6;
+        }
+        
         .pagination .page-item.active .page-link {
             background-color: var(--maroon);
             border-color: var(--maroon);
+            color: white;
+            font-weight: 500;
+            z-index: 3;
         }
-
-        .pagination .page-link {
-            color: var(--maroon);
+        
+        .pagination .page-item.disabled .page-link {
+            color: #6c757d;
+            pointer-events: none;
+            background-color: #fff;
+            border-color: #dee2e6;
         }
 
         .spinner-container {
@@ -797,14 +820,20 @@
                     tableBody.appendChild(row);
                     
                     // Fetch learning style for this user
-                    fetchLearningStyle(user.id, learningStyleCell);
+                    fetchLearningStyle(user.id, learningStyleCell, user.role);
                 });
             }
             
             // Function to fetch learning style for a user
-            async function fetchLearningStyle(userId, cell) {
+            async function fetchLearningStyle(userId, cell, userRole) {
                 if (!userId) {
                     cell.innerHTML = `<span class="text-muted">Not available</span>`;
+                    return;
+                }
+                
+                // For faculty, immediately show "Not applicable" without API call
+                if (userRole && userRole.toLowerCase() === 'faculty') {
+                    cell.innerHTML = `<span class="text-muted">Not applicable</span>`;
                     return;
                 }
                 
@@ -812,13 +841,13 @@
                     const response = await fetch(`${API_BASE_URL}/users/${userId}/assessment-results`);
                     
                     if (!response.ok) {
-                        cell.innerHTML = `<span class="text-muted">Not applicable</span>`;
+                        cell.innerHTML = `<span class="text-muted">Not assessed</span>`;
                         return;
                     }
                     
                     const data = await response.json();
                     
-                    let learningStyle = 'Not applicable';
+                    let learningStyle = 'Not assessed';
                     let styleClass = '';
                     
                     // Try to find the learning style in the response
@@ -988,32 +1017,175 @@
             // Initialize user list
             fetchUsers();
             
-            // Add User Form Submission
-            document.getElementById('saveUserBtn').addEventListener('click', function() {
+            // Update the Add User Form Submission
+            document.getElementById('saveUserBtn').addEventListener('click', async function() {
                 const form = document.getElementById('addUserForm');
                 if (form.checkValidity()) {
-                    // Here you would normally send data to your API
-                    alert('User creation functionality would be implemented here');
-                    
-                    // Close modal
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('addUserModal'));
-                    modal.hide();
-                    
-                    // Clear form
-                    form.reset();
+                    try {
+                        // Get form data
+                        const name = document.getElementById('userName').value;
+                        const email = document.getElementById('userEmail').value;
+                        const role = document.getElementById('userRole').value;
+                        const password = document.getElementById('userPassword').value;
+                        const confirmPassword = document.getElementById('userConfirmPassword').value;
+                        
+                        // Check if passwords match
+                        if (password !== confirmPassword) {
+                            alert('Passwords do not match');
+                            return;
+                        }
+                        
+                        // Determine role_id based on selected role
+                        let roleId;
+                        switch(role) {
+                            case 'student':
+                                roleId = 1;
+                                break;
+                            case 'faculty':
+                                roleId = 2;
+                                break;
+                            default:
+                                alert('Please select a valid role');
+                                return;
+                        }
+                        
+                        // Split the name into first and last name
+                        const nameParts = name.split(' ');
+                        const firstName = nameParts[0] || '';
+                        const lastName = nameParts.slice(1).join(' ') || '';
+                        
+                        // Prepare the request data
+                        const userData = {
+                            first_name: firstName,
+                            last_name: lastName,
+                            email: email,
+                            password: password,
+                            role_id: roleId,
+                            is_active: true
+                        };
+                        
+                        // Show loading indicator
+                        const saveBtn = document.getElementById('saveUserBtn');
+                        const originalText = saveBtn.innerHTML;
+                        saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...';
+                        saveBtn.disabled = true;
+                        
+                        // Make API request to create user
+                        const response = await fetch(`${API_BASE_URL}/users`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(userData)
+                        });
+                        
+                        // Reset button state
+                        saveBtn.innerHTML = originalText;
+                        saveBtn.disabled = false;
+                        
+                        if (!response.ok) {
+                            const errorData = await response.json();
+                            throw new Error(errorData.error ? JSON.stringify(errorData.error) : 'Failed to create user');
+                        }
+                        
+                        // Get created user data
+                        const data = await response.json();
+                        console.log('User created successfully:', data);
+                        
+                        // Close modal
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('addUserModal'));
+                        modal.hide();
+                        
+                        // Clear form
+                        form.reset();
+                        
+                        // Show success message
+                        const alertDiv = document.createElement('div');
+                        alertDiv.className = 'alert alert-success alert-dismissible fade show';
+                        alertDiv.setAttribute('role', 'alert');
+                        alertDiv.innerHTML = `
+                            <i class="fas fa-check-circle me-2"></i>
+                            User created successfully!
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        `;
+                        userListContainer.prepend(alertDiv);
+                        
+                        // Auto dismiss the alert after 5 seconds
+                        setTimeout(() => {
+                            alertDiv.classList.remove('show');
+                            setTimeout(() => alertDiv.remove(), 150);
+                        }, 5000);
+                        
+                        // Refresh user list
+                        fetchUsers();
+                    } catch (error) {
+                        console.error('Error creating user:', error);
+                        alert(`Failed to create user: ${error.message}`);
+                    }
                 } else {
                     form.reportValidity();
                 }
             });
             
-            // Delete User Confirmation
-            document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
-                // Here you would normally send delete request to your API
-                alert('User deletion functionality would be implemented here');
-                
-                // Close modal
-                const modal = bootstrap.Modal.getInstance(document.getElementById('deleteUserModal'));
-                modal.hide();
+            // Update the Delete User Confirmation
+            document.getElementById('confirmDeleteBtn').addEventListener('click', async function() {
+                try {
+                    const userId = document.getElementById('deleteUserId').value;
+                    if (!userId) {
+                        throw new Error('User ID is missing');
+                    }
+                    
+                    // Show loading indicator
+                    const deleteBtn = document.getElementById('confirmDeleteBtn');
+                    const originalText = deleteBtn.innerHTML;
+                    deleteBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Deleting...';
+                    deleteBtn.disabled = true;
+                    
+                    // Make API request to delete user
+                    const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    // Reset button state
+                    deleteBtn.innerHTML = originalText;
+                    deleteBtn.disabled = false;
+                    
+                    if (!response.ok) {
+                        if (response.status === 404) {
+                            throw new Error('User not found');
+                        } else {
+                            const errorData = await response.json();
+                            throw new Error(errorData.error || 'Failed to delete user');
+                        }
+                    }
+                    
+                    // Close modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('deleteUserModal'));
+                    modal.hide();
+                    
+                    // Show success message
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert alert-success alert-dismissible fade show';
+                    alertDiv.setAttribute('role', 'alert');
+                    alertDiv.innerHTML = `
+                        <i class="fas fa-check-circle me-2"></i>
+                        User deleted successfully!
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    `;
+                    userListContainer.prepend(alertDiv);
+                    
+                    // Auto dismiss the alert after 5 seconds
+                    setTimeout(() => {
+                        alertDiv.classList.remove('show');
+                        setTimeout(() => alertDiv.remove(), 150);
+                    }, 5000);
+                    
+                    // Refresh user list
+                    fetchUsers();
+                } catch (error) {
+                    console.error('Error deleting user:', error);
+                    alert(`Failed to delete user: ${error.message}`);
+                }
             });
             
             // Logout functionality
