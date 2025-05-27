@@ -308,11 +308,6 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="fas fa-user-circle me-2"></i>Profile
-                        </a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link btn-logout" href="../admin/login.html" id="logoutBtn">
                             <i class="fas fa-sign-out-alt me-2"></i>Logout
                         </a>
@@ -348,9 +343,9 @@
         <div class="main-content">
             <!-- Learner Overview -->
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h1 class="section-title mb-0">John Smith</h1>
-                    <p class="text-muted">Student ID: 12345 • john.smith@example.com</p>
+                <div id="studentInfoContainer">
+                    <h1 class="section-title mb-0" id="studentName">Select a Student</h1>
+                    <p class="text-muted" id="studentDepartment">Department information will appear here</p>
                 </div>
                 <div class="text-end">
                     <h4 class="text-muted mb-2">Overall Progress</h4>
@@ -549,10 +544,76 @@
                         // Add active class to clicked card
                         this.classList.add('active');
                         
-                        // TODO: Load student details in the main content
-                        // Will be implemented in the next phase
+                        // Load student details in the main content
+                        const userId = this.getAttribute('data-user-id');
+                        loadStudentDetails(userId);
                     });
                 });
+            }
+            
+            // Function to load student details
+            function loadStudentDetails(userId) {
+                fetch(`${apiBaseUrl}/users/${userId}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data && data.data) {
+                            const student = data.data;
+                            
+                            // Update student name
+                            document.getElementById('studentName').textContent = 
+                                `${student.first_name} ${student.last_name}`;
+                            
+                            // Get student email from users API
+                            const studentEmail = student.email || 'No email available';
+                            
+                            // Now fetch assessment results to get department
+                            fetch(`${apiBaseUrl}/users/${userId}/assessment-results`)
+                                .then(response => {
+                                    if (!response.ok) {
+                                        // If user has no assessment results
+                                        throw new Error('No assessment results');
+                                    }
+                                    return response.json();
+                                })
+                                .then(assessmentData => {
+                                    let departmentInfo = 'No department';
+                                    
+                                    // Try to find department in assessment results
+                                    if (assessmentData && assessmentData.data) {
+                                        const results = Array.isArray(assessmentData.data) ? 
+                                            assessmentData.data : [assessmentData.data];
+                                            
+                                        // Look for department in assessment results
+                                        for (const result of results) {
+                                            if (result.department) {
+                                                departmentInfo = result.department;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    
+                                    // Update department and email with circle separator
+                                    document.getElementById('studentDepartment').textContent = 
+                                        `${departmentInfo} • ${studentEmail}`;
+                                })
+                                .catch(error => {
+                                    console.error(`Error fetching assessment results for user ${userId}:`, error);
+                                    // If no assessment results, just show email
+                                    document.getElementById('studentDepartment').textContent = 
+                                        `No department • ${studentEmail}`;
+                                });
+                        }
+                    })
+                    .catch(error => {
+                        console.error(`Error fetching details for user ${userId}:`, error);
+                        document.getElementById('studentName').textContent = 'Error loading student';
+                        document.getElementById('studentDepartment').textContent = 'Please try again';
+                    });
             }
             
             // Function to fetch learning style for a student
