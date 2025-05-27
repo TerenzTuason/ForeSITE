@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Learner Information - ForeSITE</title>
+    <title>Learner Progress - ForeSITE Admin</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Bootstrap CSS -->
@@ -195,37 +195,23 @@
             border-radius: 50px;
         }
 
-        .feedback-section {
+        .feedback-display {
             background-color: var(--light-gray);
             padding: 1.5rem;
             border-radius: 8px;
             margin-top: 1.5rem;
         }
 
-        .feedback-section textarea {
-            border-radius: 8px;
-            resize: none;
-            border: 2px solid #eee;
+        .feedback-text {
             padding: 1rem;
-        }
-
-        .feedback-section textarea:focus {
-            border-color: var(--maroon);
-            box-shadow: none;
-        }
-
-        .btn-primary {
-            background: var(--maroon);
-            border: none;
+            background: white;
             border-radius: 8px;
-            padding: 0.75rem 2rem;
-            font-weight: 500;
-            transition: all 0.3s ease;
+            border-left: 4px solid var(--maroon);
         }
 
-        .btn-primary:hover {
-            background-color: #600000;
-            transform: translateY(-2px);
+        .no-feedback {
+            color: #6c757d;
+            font-style: italic;
         }
 
         .badge {
@@ -289,7 +275,7 @@
         <div class="container-fluid px-4">
             <a class="navbar-brand" href="#">
                 <img src="../assets/logo/pup.png" alt="PUP Logo">
-                <span class="d-none d-sm-inline">FORESITE: Faculty Portal</span>
+                <span class="d-none d-sm-inline">FORESITE: Admin Portal</span>
                 <span class="d-inline d-sm-none">FORESITE</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -303,12 +289,22 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="learners.html">
-                            <i class="fas fa-users me-2"></i>Learners
+                        <a class="nav-link" href="users.html">
+                            <i class="fas fa-users me-2"></i>Users
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link btn-logout" href="../admin/login.html" id="logoutBtn">
+                        <a class="nav-link active" href="progress.html">
+                            <i class="fas fa-chart-line me-2"></i>Progress
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="courses.html">
+                            <i class="fas fa-book me-2"></i>Courses
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn-logout" href="login.html" id="logoutBtn">
                             <i class="fas fa-sign-out-alt me-2"></i>Logout
                         </a>
                     </li>
@@ -349,7 +345,7 @@
                 </div>
                 <div class="text-end">
                     <h4 class="text-muted mb-2">Overall Progress</h4>
-                    <h2 style="color: var(--maroon); font-size: 3rem;">85%</h2>
+                    <h2 style="color: var(--maroon); font-size: 3rem;" id="overallProgress">0%</h2>
                 </div>
             </div>
 
@@ -357,19 +353,19 @@
             <div class="stats-grid">
                 <div class="stat-card">
                     <i class="fas fa-book"></i>
-                    <h2>3</h2>
+                    <h2 id="totalModules">0</h2>
                     <p class="mb-0">Total Modules</p>
                     <small class="text-muted">In Current Course</small>
                 </div>
                 <div class="stat-card">
                     <i class="fas fa-check-circle"></i>
-                    <h2>1</h2>
+                    <h2 id="completedModules">0</h2>
                     <p class="mb-0">Completed Modules</p>
                     <small class="text-muted">With Passing Score</small>
                 </div>
                 <div class="stat-card">
                     <i class="fas fa-clock"></i>
-                    <h2>2</h2>
+                    <h2 id="ongoingModules">0</h2>
                     <p class="mb-0">Ongoing Modules</p>
                     <small class="text-muted">In Progress</small>
                 </div>
@@ -378,47 +374,10 @@
             <!-- Module Progress -->
             <h2 class="section-title">Module Progress</h2>
             
-            <div class="module-card">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h5>Module 1: Introduction to Foresight</h5>
-                    <span class="badge bg-success">Completed</span>
+            <div id="moduleContainer">
+                <div class="text-center p-5">
+                    <p class="text-muted">Select a student to view their module progress</p>
                 </div>
-                <div class="progress">
-                    <div class="progress-bar" style="width: 100%"></div>
-                </div>
-                <p class="mb-0 mt-2">Score: 92%</p>
-                <div class="feedback-section">
-                    <h6>Faculty Feedback</h6>
-                    <textarea class="form-control mb-3" rows="3" placeholder="Add your feedback here..."></textarea>
-                    <button class="btn btn-primary">Submit Feedback</button>
-                </div>
-            </div>
-
-            <div class="module-card">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h5>Module 2: Forecasting Techniques</h5>
-                    <span class="badge bg-warning text-dark">In Progress</span>
-                </div>
-                <div class="progress">
-                    <div class="progress-bar" style="width: 65%"></div>
-                </div>
-                <p class="mb-0 mt-2">Progress: 65%</p>
-                <div class="feedback-section">
-                    <h6>Faculty Feedback</h6>
-                    <textarea class="form-control mb-3" rows="3" placeholder="Add your feedback here..."></textarea>
-                    <button class="btn btn-primary">Submit Feedback</button>
-                </div>
-            </div>
-
-            <div class="module-card">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h5>Module 3: Strategic Planning</h5>
-                    <span class="badge bg-secondary">Not Started</span>
-                </div>
-                <div class="progress">
-                    <div class="progress-bar" style="width: 0%"></div>
-                </div>
-                <p class="mb-0 mt-2">Progress: 0%</p>
             </div>
         </div>
     </div>
@@ -430,20 +389,20 @@
             const userData = JSON.parse(sessionStorage.getItem('user'));
             
             if (!userData) {
-                window.location.href = '../admin/login.html';
+                window.location.href = 'login.html';
                 return;
             }
             
-            if (userData.role.role_name !== 'faculty') {
-                alert('Unauthorized access. This portal is only for faculty members.');
-                window.location.href = '../admin/login.html';
+            if (userData.role.role_name !== 'admin') {
+                alert('Unauthorized access. This portal is only for admin users.');
+                window.location.href = 'login.html';
                 return;
             }
             
             document.getElementById('logoutBtn').addEventListener('click', function(e) {
                 e.preventDefault();
                 sessionStorage.removeItem('user');
-                window.location.href = '../admin/login.html';
+                window.location.href = 'login.html';
             });
 
             // API base URL
@@ -616,6 +575,9 @@
                                     document.getElementById('studentDepartment').textContent = 
                                         `No department • ${studentEmail}`;
                                 });
+                                
+                            // For demo purposes, show mock module data
+                            displayModuleData();
                         }
                     })
                     .catch(error => {
@@ -692,6 +654,67 @@
                             element.innerHTML = `<i class="fas fa-exclamation-circle me-1"></i> No learning style`;
                         });
                     });
+            }
+            
+            // Function to display module data (mock data for now)
+            function displayModuleData() {
+                // Update overall progress
+                document.getElementById('overallProgress').textContent = '85%';
+                
+                // Update module stats
+                document.getElementById('totalModules').textContent = '3';
+                document.getElementById('completedModules').textContent = '1';
+                document.getElementById('ongoingModules').textContent = '2';
+                
+                // Display module progress
+                const moduleContainer = document.getElementById('moduleContainer');
+                
+                moduleContainer.innerHTML = `
+                    <div class="module-card">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5>Module 1: Introduction to Foresight</h5>
+                            <span class="badge bg-success">Completed</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar" style="width: 100%"></div>
+                        </div>
+                        <p class="mb-0 mt-2">Score: 92%</p>
+                        <div class="feedback-display">
+                            <h6>Faculty Feedback</h6>
+                            <div class="feedback-text">
+                                <p class="mb-0">Excellent work on understanding the basic concepts. Your discussion post showed great insight into the foresight methodologies.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5>Module 2: Forecasting Techniques</h5>
+                            <span class="badge bg-warning text-dark">In Progress</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar" style="width: 65%"></div>
+                        </div>
+                        <p class="mb-0 mt-2">Progress: 65%</p>
+                        <div class="feedback-display">
+                            <h6>Faculty Feedback</h6>
+                            <div class="feedback-text">
+                                <p class="no-feedback">No feedback provided yet.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5>Module 3: Strategic Planning</h5>
+                            <span class="badge bg-secondary">Not Started</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar" style="width: 0%"></div>
+                        </div>
+                        <p class="mb-0 mt-2">Progress: 0%</p>
+                    </div>
+                `;
             }
         });
     </script>
