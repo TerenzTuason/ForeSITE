@@ -234,6 +234,52 @@
             border-radius: 4px;
         }
 
+        /* Loading screen styles */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            color: white;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        
+        .loading-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .loading-spinner {
+            width: 80px;
+            height: 80px;
+            border: 8px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--gold);
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            font-size: 1.2rem;
+            font-weight: 500;
+            text-align: center;
+            max-width: 80%;
+            line-height: 1.6;
+        }
+        
         /* Content type specific styles */
         .video-content {
             position: relative;
@@ -345,6 +391,12 @@
 <body>
     <!-- Navigation -->
     <div id="navbar-placeholder"></div>
+    
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text" id="loadingText">Loading your course content...</div>
+    </div>
 
     <div class="course-container">
         <!-- Sidebar -->
@@ -529,17 +581,11 @@
                     <h2 class="content-title">Welcome to Futures Thinking</h2>
                 </div>
                 <div class="content-body">
-                    <div class="video-container">
-                        <video controls class="w-100" id="intro-video">
-                            <source src="../assets/videos/1_Introduction_to_Futures_Thinking.mp4" type="video/mp4">
+                    <div class="video-container mb-4">
+                        <video id="lessonVideo" controls class="w-100">
+                            <source src="https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185804/1_Introduction_to_Futures_Thinking_egkgxg.mp4" type="video/mp4">
                             Your browser does not support the video tag.
                         </video>
-                    </div>
-                    <div class="alert alert-info mt-3">
-                        <i class="fas fa-info-circle"></i> <strong>Important:</strong> You must watch the entire video before the "Continue" button will be enabled.
-                    </div>
-                    <div class="video-progress-indicator mt-2 text-muted">
-                        <small><i class="fas fa-clock"></i> Video completion status: <span id="video-status-intro">Not started</span></small>
                     </div>
                 </div>
                 <div class="content-footer">
@@ -560,14 +606,512 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
-            // Basic UI initialization only
             // Load navbar
             $("#navbar-placeholder").load("../components/navbar.html");
+            
+            // Get user data from session storage
+            const userData = JSON.parse(sessionStorage.getItem('user'));
+            if (!userData) {
+                window.location.href = '../login.html';
+                return;
+            }
+            
+            // Initialize variables
+            let currentModuleProgress = null;
+            let currentLessonScreenProgress = null;
+            let moduleProgressData = [];
+            let allLessonScreens = [];
+            let lessonScreenProgressByModule = {};
+            
+            // Show loading overlay
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const loadingText = document.getElementById('loadingText');
+            loadingOverlay.classList.add('active');
+            
+            // Fetch user's module progress
+            fetchModuleProgress(userData.user_id);
             
             // Toggle module lists
             $(".module-header").click(function() {
                 $(this).siblings(".lesson-list").slideToggle();
             });
+            
+            // Handle lesson item clicks
+            $(document).on('click', '.lesson-item', function() {
+                const lessonId = $(this).attr('id');
+                const [type, moduleNum, screenNum] = lessonId.split('-');
+                
+                // Remove active class from all lesson items
+                $('.lesson-item').removeClass('active');
+                // Add active class to clicked lesson item
+                $(this).addClass('active');
+                
+                if (type === 'screen') {
+                    // Find the corresponding lesson screen
+                    // If screenNum is empty, just use moduleNum as the screen number (for cases like "screen-1")
+                    const screenNumber = screenNum ? `${moduleNum}.${screenNum}` : moduleNum;
+                    console.log('Looking for screen with number:', screenNumber);
+                    const lessonScreen = allLessonScreens.find(screen => screen.screen_number === screenNumber);
+                    
+                    if (lessonScreen) {
+                        displayLessonScreen(lessonScreen);
+                    } else {
+                        console.error('Lesson screen not found:', screenNumber);
+                    }
+                } else if (type === 'video') {
+                    // For backward compatibility - only used if we can't find a matching lesson screen
+                    // Look for a lesson screen with the matching module number first
+                    const screenNumber = moduleNum;
+                    const lessonScreen = allLessonScreens.find(screen => screen.screen_number === screenNumber);
+                    
+                    if (lessonScreen) {
+                        // If we find a matching lesson screen, use that instead
+                        displayLessonScreen(lessonScreen);
+                    } else {
+                        // Fall back to old video handling
+                        console.log('No lesson screen found for video, using legacy video display');
+                        displayVideoContent(moduleNum);
+                    }
+                }
+            });
+            
+            /**
+             * Fetch module progress for the user
+             */
+            function fetchModuleProgress(userId) {
+                loadingText.textContent = 'Loading your module progress...';
+                fetch(`http://127.0.0.1:8000/api/v1/users/${userId}/module-progress`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.data && data.data.length > 0) {
+                            moduleProgressData = data.data;
+                            
+                            // Get all lesson screens
+                            loadingText.textContent = 'Loading lesson content...';
+                            return fetch('http://127.0.0.1:8000/api/v1/lesson-screens');
+                        } else {
+                            throw new Error('No module progress found');
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.data && data.data.length > 0) {
+                            allLessonScreens = data.data;
+                            
+                            // Get lesson screen progress for each module
+                            loadingText.textContent = 'Loading your progress data...';
+                            const fetchPromises = moduleProgressData.map(module => 
+                                fetch(`http://127.0.0.1:8000/api/v1/module-progress/${module.progress_id}/screen-progress`)
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.data) {
+                                            lessonScreenProgressByModule[module.module_number] = data.data;
+                                        }
+                                        return data;
+                                    })
+                            );
+                            
+                            return Promise.all(fetchPromises);
+                        } else {
+                            throw new Error('No lesson screens found');
+                        }
+                    })
+                    .then(() => {
+                        // Build module list based on module progress
+                        loadingText.textContent = 'Building your course interface...';
+                        buildModuleList();
+                        
+                        // Select first module and lesson by default
+                        if (moduleProgressData.length > 0) {
+                            const firstModule = moduleProgressData[0];
+                            selectModule(firstModule.module_number);
+                            
+                            // Select first lesson in the module
+                            const firstLessonItem = $(`#module-${firstModule.module_number}-lessons .lesson-item:first`);
+                            if (firstLessonItem.length) {
+                                firstLessonItem.click();
+                            }
+                            
+                            // Hide loading overlay
+                            setTimeout(() => {
+                                loadingOverlay.classList.remove('active');
+                            }, 500);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading module progress:', error);
+                        // Show error in loading overlay
+                        loadingText.textContent = 'Error loading course data. Please try again later.';
+                        // Hide loading overlay after a delay
+                        setTimeout(() => {
+                            loadingOverlay.classList.remove('active');
+                        }, 3000);
+                    });
+            }
+            
+            /**
+             * Build module list based on module progress
+             */
+            function buildModuleList() {
+                const moduleList = $('.module-list');
+                moduleList.empty();
+                
+                // Sort modules by module number
+                moduleProgressData.sort((a, b) => a.module_number - b.module_number);
+                
+                moduleProgressData.forEach(module => {
+                    const moduleItem = $(`
+                        <li class="module-item" id="module-${module.module_number}">
+                            <div class="module-header ${module.status === 'completed' ? 'completed' : (module.status === 'in_progress' ? 'active' : '')}">
+                                <i class="fas ${module.status === 'completed' ? 'fa-check-circle' : 'fa-book'}"></i>
+                                <span>${module.module_title}</span>
+                                ${module.status === 'completed' ? '<span class="badge bg-success ms-auto">Completed</span>' : ''}
+                            </div>
+                            <ul class="lesson-list" id="module-${module.module_number}-lessons" style="display: none;">
+                            </ul>
+                        </li>
+                    `);
+                    
+                    moduleList.append(moduleItem);
+                    
+                    // Add lesson items for this module
+                    const lessonList = $(`#module-${module.module_number}-lessons`);
+                    
+                    // Get all lesson screens for this module
+                    let moduleScreens = [];
+                    
+                    // If this is module 1, include the intro video (screen_number = "1")
+                    if (module.module_number === 1) {
+                        const introScreen = allLessonScreens.find(screen => screen.screen_number === "1");
+                        if (introScreen) {
+                            moduleScreens.push(introScreen);
+                        }
+                    }
+                    
+                    // Add all other screens for this module
+                    const otherScreens = allLessonScreens.filter(screen => {
+                        // Skip the intro screen if already added
+                        if (screen.screen_number === "1") return false;
+                        
+                        // Check if screen belongs to this module
+                        const parts = screen.screen_number.split('.');
+                        if (parts.length > 0) {
+                            const moduleNum = parseInt(parts[0]);
+                            return moduleNum === module.module_number;
+                        }
+                        return false;
+                    });
+                    
+                    // Combine all screens for this module
+                    moduleScreens = moduleScreens.concat(otherScreens);
+                    
+                    // Sort screens by screen number
+                    moduleScreens.sort((a, b) => {
+                        return a.screen_number.localeCompare(b.screen_number, undefined, { numeric: true, sensitivity: 'base' });
+                    });
+                    
+                    // Add all lesson screens to the list
+                    moduleScreens.forEach(screen => {
+                        // Find progress for this screen
+                        const screenProgress = lessonScreenProgressByModule[module.module_number]?.find(progress => 
+                            progress.lesson_screen_id === screen.lesson_screen_id
+                        );
+                        
+                        const isCompleted = screenProgress && screenProgress.status === 'completed';
+                        
+                        // Check if it's a video (from YouTube or Cloudinary)
+                        const isVideo = screen.screen_url && (
+                            screen.screen_url.includes('youtube') || 
+                            screen.screen_url.includes('/video/') || 
+                            screen.screen_url.endsWith('.mp4') || 
+                            screen.screen_url.endsWith('.webm') || 
+                            screen.screen_url.endsWith('.mov')
+                        );
+                        
+                        // Generate a display title for the screen
+                        let displayTitle = screen.screen_title;
+                        if (!displayTitle) {
+                            if (isVideo) {
+                                displayTitle = `Video ${screen.screen_number}`;
+                            } else {
+                                displayTitle = `Screen ${screen.screen_number}`;
+                            }
+                        }
+                        
+                        lessonList.append(`
+                            <li class="lesson-item ${isCompleted ? 'completed' : ''}" id="screen-${screen.screen_number}">
+                                <i class="fas ${isCompleted ? 'fa-check-circle' : (isVideo ? 'fa-video' : 'fa-file-alt')}"></i>
+                                <span>${displayTitle}</span>
+                            </li>
+                        `);
+                    });
+                    
+                    // Add knowledge check at the end
+                    lessonList.append(`
+                        <li class="lesson-item" id="knowledge-check-${module.module_number}">
+                            <i class="fas fa-question-circle"></i>
+                            <span>Knowledge Check</span>
+                        </li>
+                    `);
+                });
+            }
+            
+            /**
+             * Select a module and show its lessons
+             */
+            function selectModule(moduleNumber) {
+                // Hide all lesson lists
+                $('.lesson-list').hide();
+                
+                // Remove active class from all modules
+                $('.module-item').removeClass('active');
+                $('.module-header').removeClass('active');
+                
+                // Add active class to selected module
+                $(`#module-${moduleNumber}`).addClass('active');
+                $(`#module-${moduleNumber} .module-header`).addClass('active');
+                
+                // Show lessons for selected module
+                $(`#module-${moduleNumber}-lessons`).show();
+                
+                // Set current module progress
+                currentModuleProgress = moduleProgressData.find(module => module.module_number === moduleNumber);
+            }
+            
+            /**
+             * Display lesson screen content
+             */
+            function displayLessonScreen(lessonScreen) {
+                const contentContainer = $('.content-container');
+                
+                // Scroll main content to top
+                $('.main-content').scrollTop(0);
+                
+                // Update title
+                // Check if it's a video from Cloudinary with no title
+                const isCloudinaryVideo = lessonScreen.screen_url && (
+                    (lessonScreen.screen_url.includes('cloudinary') && 
+                    (lessonScreen.screen_url.includes('/video/') || 
+                    lessonScreen.screen_url.endsWith('.mp4') || 
+                    lessonScreen.screen_url.endsWith('.webm') || 
+                    lessonScreen.screen_url.endsWith('.mov')))
+                );
+                
+                if (isCloudinaryVideo && !lessonScreen.screen_title) {
+                    // If it's a Cloudinary video without a title, use "Video" as the default title
+                    $('.content-title').text(`Video ${lessonScreen.screen_number}`);
+                } else {
+                    // Otherwise use the screen title or a default
+                    $('.content-title').text(lessonScreen.screen_title || `Screen ${lessonScreen.screen_number}`);
+                }
+                
+                // Create content HTML
+                let contentHtml = '';
+                
+                if (lessonScreen.screen_description) {
+                    contentHtml += `<p class="lead">${lessonScreen.screen_description}</p>`;
+                }
+                
+                if (lessonScreen.screen_url && lessonScreen.screen_url.includes('youtube')) {
+                    // Display YouTube video
+                    const videoId = lessonScreen.screen_url.split('v=')[1] || lessonScreen.screen_url.split('/').pop();
+                    contentHtml += `
+                        <div class="video-content mb-4">
+                            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>
+                        </div>
+                    `;
+                } else if (lessonScreen.screen_url && lessonScreen.screen_url.includes('cloudinary')) {
+                    // Check if it's a video file from Cloudinary
+                    if (lessonScreen.screen_url.includes('/video/') || 
+                        lessonScreen.screen_url.endsWith('.mp4') || 
+                        lessonScreen.screen_url.endsWith('.webm') || 
+                        lessonScreen.screen_url.endsWith('.mov')) {
+                        // Display video player for Cloudinary video
+                        contentHtml += `
+                            <div class="video-container mb-4">
+                                <video controls class="w-100">
+                                    <source src="${lessonScreen.screen_url}" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            </div>
+                        `;
+                    } else {
+                        // Display image
+                        contentHtml += `
+                            <div class="image-content mb-4">
+                                <img src="${lessonScreen.screen_url}" class="img-fluid" alt="${lessonScreen.screen_title}">
+                            </div>
+                        `;
+                    }
+                }
+                
+                if (lessonScreen.screen_content) {
+                    // Parse content - could be a string or JSON
+                    let content;
+                    if (typeof lessonScreen.screen_content === 'string') {
+                        try {
+                            content = JSON.parse(lessonScreen.screen_content);
+                        } catch (e) {
+                            content = lessonScreen.screen_content;
+                        }
+                    } else {
+                        content = lessonScreen.screen_content;
+                    }
+                    
+                    contentHtml += '<div class="lesson-content mb-4">';
+                    
+                    // Format content with proper indentation for sub-arrays
+                    if (Array.isArray(content)) {
+                        contentHtml += formatArrayContent(content, 0);
+                    } else if (typeof content === 'string') {
+                        contentHtml += `<p>${content}</p>`;
+                    }
+                    
+                    contentHtml += '</div>';
+                }
+                
+                // Update content body
+                $('.content-body').html(contentHtml);
+                
+                // Update navigation buttons
+                updateNavigationButtons(lessonScreen.screen_number);
+            }
+            
+            /**
+             * Format array content with proper indentation for sub-arrays
+             */
+            function formatArrayContent(arr, level) {
+                let html = level === 0 ? '' : '<ul>';
+                
+                arr.forEach(item => {
+                    if (Array.isArray(item)) {
+                        // Sub-array - next indentation level
+                        html += formatArrayContent(item, level + 1);
+                    } else {
+                        if (level === 0) {
+                            html += `<p>${item}</p>`;
+                        } else {
+                            html += `<li>${item}</li>`;
+                        }
+                    }
+                });
+                
+                html += level === 0 ? '' : '</ul>';
+                return html;
+            }
+            
+            /**
+             * Display video content
+             */
+            function displayVideoContent(videoId) {
+                const contentContainer = $('.content-container');
+                
+                // Scroll main content to top
+                $('.main-content').scrollTop(0);
+                let videoUrl;
+                let videoTitle;
+                
+                // Check if there's a corresponding lesson screen with a Cloudinary URL first
+                const matchingScreen = allLessonScreens.find(screen => screen.screen_number === videoId);
+                
+                if (matchingScreen && matchingScreen.screen_url && matchingScreen.screen_url.includes('cloudinary')) {
+                    // Use the Cloudinary URL directly
+                    videoUrl = matchingScreen.screen_url;
+                    videoTitle = matchingScreen.screen_title || `Video ${videoId}`;
+                } else if (videoId === 'intro') {
+                    // Try to find the intro video in lesson screens
+                    const introScreen = allLessonScreens.find(screen => screen.screen_number === "1");
+                    if (introScreen && introScreen.screen_url) {
+                        videoUrl = introScreen.screen_url;
+                    } else {
+                        // Fallback to default
+                        videoUrl = 'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185804/1_Introduction_to_Futures_Thinking_egkgxg.mp4';
+                    }
+                    videoTitle = 'Welcome to Futures Thinking';
+                } else {
+                    // Fallback to Cloudinary URLs with a naming pattern
+                    console.warn(`No direct mapping found for video ${videoId}, using Cloudinary URL pattern`);
+                    videoUrl = `https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185804/${videoId}_Lesson_Video.mp4`;
+                    videoTitle = `Lesson ${videoId}`;
+                }
+                
+                // Update title
+                $('.content-title').text(videoTitle);
+                
+                // Create video HTML
+                const contentHtml = `
+                    <div class="video-container">
+                        <video controls class="w-100" id="${videoId}-video">
+                            <source src="${videoUrl}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                    <div class="alert alert-info mt-3">
+                        <i class="fas fa-info-circle"></i> <strong>Important:</strong> You must watch the entire video before the "Continue" button will be enabled.
+                    </div>
+                    <div class="video-progress-indicator mt-2 text-muted">
+                        <small><i class="fas fa-clock"></i> Video completion status: <span id="video-status-${videoId}">Not started</span></small>
+                    </div>
+                `;
+                
+                // Update content body
+                $('.content-body').html(contentHtml);
+                
+                // Set up video event listeners
+                const video = document.getElementById(`${videoId}-video`);
+                if (video) {
+                    video.addEventListener('play', function() {
+                        $(`#video-status-${videoId}`).text('In progress');
+                    });
+                    
+                    video.addEventListener('ended', function() {
+                        $(`#video-status-${videoId}`).text('Completed');
+                        $('.btn-continue').prop('disabled', false);
+                    });
+                }
+                
+                // Update navigation buttons
+                updateNavigationButtons(videoId);
+            }
+            
+            /**
+             * Update navigation buttons based on current content
+             */
+            function updateNavigationButtons(currentId) {
+                const btnBack = $('.btn-back');
+                const btnContinue = $('.btn-continue');
+                
+                // Find current lesson item
+                const currentItem = $(`#${currentId}`).length ? $(`#${currentId}`) : $(`.lesson-item.active`);
+                
+                // Get previous and next items
+                const prevItem = currentItem.prev('.lesson-item');
+                const nextItem = currentItem.next('.lesson-item');
+                
+                // Enable/disable back button
+                if (prevItem.length) {
+                    btnBack.prop('disabled', false);
+                    btnBack.off('click').on('click', function() {
+                        prevItem.click();
+                    });
+                } else {
+                    btnBack.prop('disabled', true);
+                }
+                
+                // Enable/disable continue button (always enabled for content, disabled for videos until watched)
+                if (nextItem.length) {
+                    // For videos, the button is enabled when the video is complete
+                    if (!currentId.includes('video')) {
+                        btnContinue.prop('disabled', false);
+                    }
+                    
+                    btnContinue.off('click').on('click', function() {
+                        nextItem.click();
+                    });
+                } else {
+                    btnContinue.prop('disabled', true);
+                }
+            }
         });
     </script>
 </body>
