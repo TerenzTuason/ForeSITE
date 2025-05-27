@@ -549,6 +549,15 @@
                         loadStudentDetails(userId);
                     });
                 });
+                
+                // Automatically load the first student's details
+                if (students.length > 0) {
+                    const firstStudentCard = document.querySelector('.learner-card.active');
+                    if (firstStudentCard) {
+                        const firstUserId = firstStudentCard.getAttribute('data-user-id');
+                        loadStudentDetails(firstUserId);
+                    }
+                }
             }
             
             // Function to load student details
