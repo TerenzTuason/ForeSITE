@@ -672,6 +672,25 @@
                 window.location.href = '../login.html';
                 return;
             }
+            
+            // Check if user is enrolled in any courses
+            fetch(`http://127.0.0.1:8000/api/v1/users/${userData.user_id}/enrollments`)
+                .then(response => response.json())
+                .then(data => {
+                    // If user has enrollments, hide the available course section
+                    if (data.data && data.data.length > 0) {
+                        // Find all sections and look for the one containing course list
+                        const sections = document.querySelectorAll('section');
+                        sections.forEach(section => {
+                            if (section.querySelector('.course-list')) {
+                                section.style.display = 'none';
+                            }
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking enrollments:', error);
+                });
 
             // Add logout functionality
             const logoutBtn = document.querySelector('.btn-logout');
