@@ -208,6 +208,21 @@ CREATE TABLE assessment_results (
     FOREIGN KEY (course_id) REFERENCES courses(course_id)
 );
 
+-- Student enrollment in courses
+CREATE TABLE enrollments (
+    enrollment_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    course_id INT NOT NULL,
+    assessment_result_id INT NOT NULL,
+    enrollment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    completion_status ENUM('not_started', 'in_progress', 'completed') DEFAULT 'not_started',
+    completion_date TIMESTAMP NULL,
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (course_id) REFERENCES courses(course_id),
+    FOREIGN KEY (assessment_result_id) REFERENCES assessment_results(result_id),
+    UNIQUE KEY unique_enrollment (user_id, course_id)
+);
+
 -- Lesson screen for each course module
 CREATE TABLE lesson_screens (
     lesson_screen_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -216,14 +231,6 @@ CREATE TABLE lesson_screens (
     screen_description TEXT NULL,
     screen_content JSON NULL,
     screen_url VARCHAR(255) NULL
-);
-
-INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
-  "1",
-  null,
-  null,
-  null,
-  "https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185804/1_Introduction_to_Futures_Thinking_egkgxg.mp4"
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
@@ -390,7 +397,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
   null,
   null,
   null,
-  "https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185779/2.2_Horizon_Scanning_yhuel4.mp4"
+  "https://www.youtube.com/watch?v=1Pd0xSsdCAU"
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
@@ -459,7 +466,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
   null,
   null,
   null,
-  "https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185774/2.3_Trends_Identification_and_Analysis_zfvxos.mp4"
+  "https://www.youtube.com/watch?v=QeILzDCS_6U"
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
@@ -505,7 +512,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
   null,
   null,
   null,
-  "https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185859/3.1_Causal_Layered_Analysis_u1pfwq.mp4"
+  "https://www.youtube.com/watch?v=ImWDmFPfifI"
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
@@ -590,7 +597,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
   null,
   null,
   null,
-  "https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185745/3.2_Futures_Triangle_l837ah.mp4"
+  "https://www.youtube.com/watch?v=KuSDCu6aTgM"
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
@@ -688,7 +695,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
   null,
   null,
   null,
-  "https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185751/3.3_Scenario_Planning_viem5x.mp4"
+  "https://www.youtube.com/watch?v=ukr9ItEQX2Y"
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
@@ -763,21 +770,6 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
     )
   ),
   null
-);
-
--- Student enrollment in courses
-CREATE TABLE enrollments (
-    enrollment_id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT NOT NULL,
-    course_id INT NOT NULL,
-    assessment_result_id INT NOT NULL,
-    enrollment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    completion_status ENUM('not_started', 'in_progress', 'completed') DEFAULT 'not_started',
-    completion_date TIMESTAMP NULL,
-    FOREIGN KEY (user_id) REFERENCES users(user_id),
-    FOREIGN KEY (course_id) REFERENCES courses(course_id),
-    FOREIGN KEY (assessment_result_id) REFERENCES assessment_results(result_id),
-    UNIQUE KEY unique_enrollment (user_id, course_id)
 );
 
 -- Student progress in modules
