@@ -99,10 +99,9 @@
             color: white;
         }
 
-        .module-header.locked {
-            background: #e9ecef;
-            color: #6c757d;
-            cursor: not-allowed;
+        /* Removed locked state styling as per requirements */
+        .module-header, .lesson-item {
+            cursor: pointer !important;
         }
         
         .module-header.completed {
@@ -657,21 +656,19 @@
             // Fetch user's module progress
             fetchModuleProgress(userData.user_id);
             
-            // Toggle module lists
-            $(".module-header").click(function() {
+            // Toggle module lists (attach as delegated event for dynamically created elements)
+            $(document).on('click', '.module-header', function() {
                 $(this).siblings(".lesson-list").slideToggle();
+                $(this).find('.fa-chevron-down').toggleClass('fa-chevron-up');
             });
             
             // Handle lesson item clicks
             $(document).on('click', '.lesson-item', function() {
-                // Check if the lesson item is disabled (not clickable yet)
-                if ($(this).hasClass('disabled')) {
-                    console.log('Lesson screen is locked and cannot be accessed yet');
-                    return;
-                }
+                // Removed the disabled check as per requirement
                 
                 const lessonId = $(this).attr('id');
-                const [type, moduleNum, screenNum] = lessonId.split('-');
+                const parts = lessonId.split('-');
+                const type = parts[0]; // 'screen'
                 
                 // Remove active class from all lesson items
                 $('.lesson-item').removeClass('active');
@@ -679,9 +676,24 @@
                 $(this).addClass('active');
                 
                 if (type === 'screen') {
-                    // Find the corresponding lesson screen
-                    // If screenNum is empty, just use moduleNum as the screen number (for cases like "screen-1")
-                    const screenNumber = screenNum ? `${moduleNum}.${screenNum}` : moduleNum;
+                    // Check if this is a video screen (ends with -video)
+                    const isVideoScreen = parts.includes('video') || parts[parts.length - 1] === 'video';
+                    
+                    // Build the screen number based on the ID parts
+                    let screenNumber = '';
+                    
+                    if (isVideoScreen) {
+                        // For video screens like "screen-3-1-video", the screen number is "3.1-video"
+                        // Remove 'screen' and 'video' parts and join the middle parts with dots
+                        const numberParts = parts.slice(1, parts.length - 1);
+                        screenNumber = numberParts.join('.') + '-video';
+                    } else {
+                        // For regular screens, just join the number parts with dots
+                        // For example, "screen-3-1" becomes "3.1"
+                        const numberParts = parts.slice(1);
+                        screenNumber = numberParts.join('.');
+                    }
+                    
                     console.log('Looking for screen with number:', screenNumber);
                     const lessonScreen = allLessonScreens.find(screen => screen.screen_number === screenNumber);
                     
@@ -693,7 +705,7 @@
                 } else if (type === 'video') {
                     // For backward compatibility - only used if we can't find a matching lesson screen
                     // Look for a lesson screen with the matching module number first
-                    const screenNumber = moduleNum;
+                    const screenNumber = parts[1];
                     const lessonScreen = allLessonScreens.find(screen => screen.screen_number === screenNumber);
                     
                     if (lessonScreen) {
@@ -702,7 +714,7 @@
                     } else {
                         // Fall back to old video handling
                         console.log('No lesson screen found for video, using legacy video display');
-                        displayVideoContent(moduleNum);
+                        displayVideoContent(parts[1]);
                     }
                 }
             });
@@ -1162,72 +1174,70 @@
             }
             
             /**
-             * Update which lesson screens the user can access
+             * Update which lesson screens the user can access - Simplified to just mark status
+             * without restricting access to any screens
              */
             function updateLessonScreenAccess() {
-                // Reset all lesson items
-                $('.lesson-item').removeClass('disabled completed in-progress');
+                // Check if module progress exists for the current module
+                if (!currentModuleProgress) {
+                    console.log('No module progress found for current module');
+                    return;
+                }
                 
-                // Get screen progress for current module
-                const moduleId = currentModuleProgress ? currentModuleProgress.progress_id : null;
-                if (!moduleId) return;
-                
+                // Find module screen progress for this module
                 const moduleScreens = screenProgressData.filter(progress => 
-                    progress.module_progress_id === moduleId);
+                    progress.module_progress_id === currentModuleProgress.progress_id);
                 
-                // Find the in-progress screen (should only be one)
-                const inProgressScreen = moduleScreens.find(screen => screen.status === 'in_progress');
+                // Find in-progress screen
+                const inProgressScreen = moduleScreens.find(progress => progress.status === 'in_progress');
                 
-                // Mark lesson items as completed or disabled based on progress
+                // Go through each lesson item and update completed/in-progress status only
                 $('.lesson-item').each(function() {
-                    const itemId = $(this).attr('id');
-                    const screenNumber = getScreenNumberFromId(itemId);
+                    const lessonId = $(this).attr('id');
+                    const [type, moduleNum, screenNum] = lessonId.split('-');
                     
-                    if (!screenNumber) return; // Skip items without valid screen numbers
+                    // Skip if not a screen
+                    if (type !== 'screen') return;
                     
-                    // Find the lesson screen with this number
-                    const lessonScreen = allLessonScreens.find(screen => screen.screen_number === screenNumber);
-                    if (!lessonScreen) return;
+                    // Get screen number in format used in database (e.g., '1.1')
+                    const screenNumber = screenNum ? `${moduleNum}.${screenNum}` : moduleNum;
                     
-                    // Find matching screen progress
-                    const screenProgress = moduleScreens.find(progress => 
-                        progress.lesson_screen_id === lessonScreen.lesson_screen_id);
+                    // Remove status classes
+                    $(this).removeClass('disabled completed in-progress');
                     
-                    if (screenProgress) {
-                        if (screenProgress.status === 'completed') {
-                            // Mark as completed
-                            $(this).addClass('completed');
-                        } else if (screenProgress.status === 'in_progress') {
-                            // Mark as in-progress
-                            $(this).addClass('in-progress');
-                        }
-                    } else if (inProgressScreen) {
-                        // If there's an in-progress screen, disable all others
-                        // except ones that are already completed
-                        const isCompleted = moduleScreens.some(progress => {
-                            const completedScreen = allLessonScreens.find(screen => 
-                                screen.lesson_screen_id === progress.lesson_screen_id);
-                            return progress.status === 'completed' && 
-                                completedScreen && 
-                                completedScreen.screen_number === screenNumber;
-                        });
-                        
-                        if (!isCompleted) {
-                            $(this).addClass('disabled');
-                        }
+                    // Check if this screen is completed
+                    const isCompleted = moduleScreens.some(progress => {
+                        const completedScreen = allLessonScreens.find(screen => 
+                            screen.lesson_screen_id === progress.lesson_screen_id);
+                        return progress.status === 'completed' && 
+                            completedScreen && 
+                            completedScreen.screen_number === screenNumber;
+                    });
+                    
+                    // Check if this screen is in progress
+                    const isInProgress = inProgressScreen && moduleScreens.some(progress => {
+                        const inProgressScreenObj = allLessonScreens.find(screen => 
+                            screen.lesson_screen_id === progress.lesson_screen_id);
+                        return progress.status === 'in_progress' && 
+                            inProgressScreenObj && 
+                            inProgressScreenObj.screen_number === screenNumber;
+                    });
+                    
+                    if (isCompleted) {
+                        // Mark as completed
+                        $(this).addClass('completed');
+                    } else if (isInProgress) {
+                        // Mark as in-progress
+                        $(this).addClass('in-progress');
                     }
+                    // No disabled state - all screens are accessible
                 });
                 
-                // Add CSS for the disabled and completed states if not already in stylesheet
+                // Update CSS styles - remove disabled styles since we don't want restrictions
                 if (!document.getElementById('progress-styles')) {
                     const styleSheet = document.createElement('style');
                     styleSheet.id = 'progress-styles';
                     styleSheet.innerHTML = `
-                        .lesson-item.disabled {
-                            opacity: 0.5;
-                            cursor: not-allowed;
-                            color: #6c757d;
-                        }
                         .lesson-item.completed {
                             color: #28a745;
                         }
@@ -1254,12 +1264,14 @@
                 moduleProgressData.sort((a, b) => a.module_number - b.module_number);
                 
                 moduleProgressData.forEach(module => {
+                    // Create module item with collapsible indicator
                     const moduleItem = $(`
                         <li class="module-item" id="module-${module.module_number}">
                             <div class="module-header ${module.status === 'completed' ? 'completed' : (module.status === 'in_progress' ? 'active' : '')}">
                                 <i class="fas ${module.status === 'completed' ? 'fa-check-circle' : 'fa-book'}"></i>
                                 <span>${module.module_title}</span>
-                                ${module.status === 'completed' ? '<span class="badge bg-success ms-auto">Completed</span>' : ''}
+                                <i class="fas fa-chevron-down ms-auto"></i>
+                                ${module.status === 'completed' ? '<span class="badge bg-success">Completed</span>' : ''}
                             </div>
                             <ul class="lesson-list" id="module-${module.module_number}-lessons" style="display: none;">
                             </ul>
@@ -1306,25 +1318,31 @@
                     
                     // Add each screen as a lesson item
                     moduleScreens.forEach(screen => {
-                        const screenParts = screen.screen_number.split('.');
+                        // Check if this is a video screen
+                        const isVideo = screen.screen_number.includes('-video');
+                        
+                        // Extract the base screen number without the -video suffix
+                        const baseScreenNumber = isVideo ? screen.screen_number.replace('-video', '') : screen.screen_number;
+                        const screenParts = baseScreenNumber.split('.');
                         let screenId;
                         
+                        // Generate a unique ID based on screen number format
                         if (screenParts.length === 2) {
                             // Format: 1.1, 1.2, etc.
-                            screenId = `screen-${screenParts[0]}-${screenParts[1]}`;
+                            screenId = `screen-${screenParts[0]}-${screenParts[1]}${isVideo ? '-video' : ''}`;
                         } else if (screenParts.length === 3) {
                             // Format: 1.1.1, 1.1.2, etc.
-                            screenId = `screen-${screenParts[0]}-${screenParts[1]}-${screenParts[2]}`;
+                            screenId = `screen-${screenParts[0]}-${screenParts[1]}-${screenParts[2]}${isVideo ? '-video' : ''}`;
                         } else {
                             // Format: 1, 2, etc.
-                            screenId = `screen-${screen.screen_number}`;
+                            screenId = `screen-${baseScreenNumber}${isVideo ? '-video' : ''}`;
                         }
                         
-                        // Create lesson item
+                        // Create lesson item with appropriate icon based on content type
                         const lessonItem = $(`
-                            <li class="lesson-item" id="${screenId}">
-                                <i class="fas fa-file-alt"></i>
-                                <span>${screen.screen_title || `Screen ${screen.screen_number}`}</span>
+                            <li class="lesson-item ${screen.status === 'completed' ? 'completed' : (screen.status === 'in_progress' ? 'in-progress' : '')}" id="${screenId}">
+                                <i class="fas ${isVideo ? 'fa-video' : (screen.status === 'completed' ? 'fa-check-circle' : 'fa-file-alt')}"></i>
+                                <span>${screen.screen_title || `Screen ${screen.screen_number}`}${isVideo ? ' (Video)' : ''}</span>
                             </li>
                         `);
                         
@@ -1333,8 +1351,8 @@
                 });
             }
             function selectModule(moduleNumber) {
-                // Hide all lesson lists
-                $('.lesson-list').hide();
+                // Don't hide all lesson lists as we want to allow multiple modules to be expanded
+                // $('.lesson-list').hide();
                 
                 // Remove active class from all modules
                 $('.module-item').removeClass('active');
@@ -1344,8 +1362,11 @@
                 $(`#module-${moduleNumber}`).addClass('active');
                 $(`#module-${moduleNumber} .module-header`).addClass('active');
                 
-                // Show lessons for selected module
-                $(`#module-${moduleNumber}-lessons`).show();
+                // Show lessons for selected module if not already visible
+                if (!$(`#module-${moduleNumber}-lessons`).is(':visible')) {
+                    $(`#module-${moduleNumber}-lessons`).show();
+                    $(`#module-${moduleNumber} .module-header .fa-chevron-down`).addClass('fa-chevron-up');
+                }
                 
                 // Set current module progress
                 currentModuleProgress = moduleProgressData.find(module => module.module_number === moduleNumber);
@@ -1367,16 +1388,10 @@
                 $('.main-content').scrollTop(0);
                 
                 // Update title
-                // Check if it's a video from Cloudinary with no title
-                const isCloudinaryVideo = lessonScreen.screen_url && (
-                    (lessonScreen.screen_url.includes('cloudinary') && 
-                    (lessonScreen.screen_url.includes('/video/') || 
-                    lessonScreen.screen_url.endsWith('.mp4') || 
-                    lessonScreen.screen_url.endsWith('.webm') || 
-                    lessonScreen.screen_url.endsWith('.mov')))
-                );
+                // Check if it's a video by examining the screen_number suffix
+                const isVideo = lessonScreen.screen_number && lessonScreen.screen_number.includes('-video');
                 
-                if (isCloudinaryVideo && !lessonScreen.screen_title) {
+                if (isVideo && !lessonScreen.screen_title) {
                     // If it's a Cloudinary video without a title, use "Video" as the default title
                     $('.content-title').text(`Video ${lessonScreen.screen_number}`);
                 } else {
@@ -1400,12 +1415,9 @@
                         </div>
                     `;
                 } else if (lessonScreen.screen_url && lessonScreen.screen_url.includes('cloudinary')) {
-                    // Check if it's a video file from Cloudinary
-                    if (lessonScreen.screen_url.includes('/video/') || 
-                        lessonScreen.screen_url.endsWith('.mp4') || 
-                        lessonScreen.screen_url.endsWith('.webm') || 
-                        lessonScreen.screen_url.endsWith('.mov')) {
-                        // Display video player for Cloudinary video
+                    // Check if it's a video based on screen_number suffix
+                    if (lessonScreen.screen_number && lessonScreen.screen_number.includes('-video')) {
+                        // Display video player for video
                         contentHtml += `
                             <div class="video-container mb-4">
                                 <video controls class="w-100">
@@ -1490,10 +1502,20 @@
                 let videoUrl;
                 let videoTitle;
                 
-                // Check if there's a corresponding lesson screen with a Cloudinary URL first
-                const matchingScreen = allLessonScreens.find(screen => screen.screen_number === videoId);
+                // First check if the videoId itself has the -video suffix
+                const hasVideoSuffix = videoId && videoId.includes('-video');
                 
-                if (matchingScreen && matchingScreen.screen_url && matchingScreen.screen_url.includes('cloudinary')) {
+                // Then check if there's a corresponding lesson screen
+                const matchingScreen = allLessonScreens.find(screen => {
+                    // If videoId already has -video suffix, match it exactly
+                    if (hasVideoSuffix) {
+                        return screen.screen_number === videoId;
+                    }
+                    // Otherwise check if there's a screen with videoId + -video suffix
+                    return screen.screen_number === `${videoId}-video` || screen.screen_number === videoId;
+                });
+                
+                if (matchingScreen && matchingScreen.screen_url) {
                     // Use the Cloudinary URL directly
                     videoUrl = matchingScreen.screen_url;
                     videoTitle = matchingScreen.screen_title || `Video ${videoId}`;
