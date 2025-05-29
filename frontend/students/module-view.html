@@ -624,6 +624,9 @@
             let screenProgressData = [];
             let lessonScreenProgressByModule = {};
             
+            // Global variable to store the complete API response
+            let allProgressData = null;
+            
             // CSS styles for lesson statuses
             const styleSheet = document.createElement('style');
             styleSheet.id = 'progress-styles';
@@ -712,49 +715,11 @@
                 fetch(`http://127.0.0.1:8000/api/v1/users/${userId}/all-progress`)
                     .then(response => response.json())
                     .then(data => {
-                        if (data.data && data.data.length > 0) {
-                            // Process the response data
-                            const courseData = data.data[0]; // Get the first course
-                            
-                            // Extract module progress data
-                            if (courseData.modules && courseData.modules.length > 0) {
-                                moduleProgressData = courseData.modules;
-                                
-                                // Create a collection of all lesson screens from all modules
-                                allLessonScreens = [];
-                                screenProgressData = [];
-                                
-                                // Process each module to extract lesson screens and screen progress
-                                courseData.modules.forEach(module => {
-                                    if (module.lesson_screens && module.lesson_screens.length > 0) {
-                                        // Extract screen progress data
-                                        module.lesson_screens.forEach(screenProgress => {
-                                            // Add to screen progress data
-                                            screenProgressData.push(screenProgress);
-                                            
-                                            // Add screen details to allLessonScreens if not already there
-                                            if (screenProgress.lesson_screen) {
-                                                const existingScreen = allLessonScreens.find(
-                                                    s => s.lesson_screen_id === screenProgress.lesson_screen.lesson_screen_id
-                                                );
-                                                
-                                                if (!existingScreen) {
-                                                    allLessonScreens.push(screenProgress.lesson_screen);
-                                                }
-                                            }
-                                        });
-                                    }
-                                });
-                                
-                                return true;
-                            } else {
-                                console.log('No modules found in the response');
-                                return false;
-                            }
-                        } else {
-                            console.log('No course data found for user');
-                            return false;
-                        }
+                        // Store the complete API response in the global variable
+                        allProgressData = data;
+                        
+                        // Process the allProgressData to populate our UI data structures
+                        return processAllProgressData();
                     })
                     .then(success => {
                         if (success) {
@@ -836,6 +801,56 @@
             }
             
             /**
+             * Process the allProgressData to extract necessary information
+             */
+            function processAllProgressData() {
+                if (!allProgressData || !allProgressData.data || allProgressData.data.length === 0) {
+                    console.log('No course data found for user');
+                    return false;
+                }
+                
+                // Process the response data
+                const courseData = allProgressData.data[0]; // Get the first course
+                
+                // Extract module progress data
+                if (!courseData.modules || courseData.modules.length === 0) {
+                    console.log('No modules found in the response');
+                    return false;
+                }
+                
+                // Set module progress data from global state
+                moduleProgressData = courseData.modules;
+                
+                // Create a collection of all lesson screens from all modules
+                allLessonScreens = [];
+                screenProgressData = [];
+                
+                // Process each module to extract lesson screens and screen progress
+                courseData.modules.forEach(module => {
+                    if (module.lesson_screens && module.lesson_screens.length > 0) {
+                        // Extract screen progress data
+                        module.lesson_screens.forEach(screenProgress => {
+                            // Add to screen progress data
+                            screenProgressData.push(screenProgress);
+                            
+                            // Add screen details to allLessonScreens if not already there
+                            if (screenProgress.lesson_screen) {
+                                const existingScreen = allLessonScreens.find(
+                                    s => s.lesson_screen_id === screenProgress.lesson_screen.lesson_screen_id
+                                );
+                                
+                                if (!existingScreen) {
+                                    allLessonScreens.push(screenProgress.lesson_screen);
+                                }
+                            }
+                        });
+                    }
+                });
+                
+                return true;
+            }
+            
+            /**
              * Update lesson screen progress
              */
             function updateLessonScreenProgress(screenNumber, status, percentage, callback) {
@@ -871,6 +886,9 @@
                         screenProgress.status = status;
                         screenProgress.progress_percentage = percentage;
                         
+                        // Update the global state to keep everything in sync
+                        updateGlobalProgressData(screenProgress.screen_progress_id, status, percentage);
+                        
                         // Update UI to reflect changes
                         updateLessonScreenAccess();
                         
@@ -903,6 +921,9 @@
                         // Add to local screen progress data
                         screenProgressData.push(data.data);
                         
+                        // Update the global state with the new screen progress
+                        updateGlobalProgressData(data.data.screen_progress_id, status, percentage, true);
+                        
                         // Update UI to reflect changes
                         updateLessonScreenAccess();
                         
@@ -913,6 +934,83 @@
                         if (callback) callback();
                     });
                 }
+            }
+            
+            /**
+             * Update the global allProgressData variable for module progress changes
+             */
+            function updateGlobalModuleProgress(moduleProgressId, status, percentage) {
+                if (!allProgressData || !allProgressData.data || allProgressData.data.length === 0) {
+                    return; // No global data to update
+                }
+                
+                const courseData = allProgressData.data[0];
+                if (!courseData.modules) return;
+                
+                // Find the module in the global data and update it
+                for (let i = 0; i < courseData.modules.length; i++) {
+                    if (courseData.modules[i].progress_id === moduleProgressId) {
+                        courseData.modules[i].status = status;
+                        courseData.modules[i].progress_percentage = percentage;
+                        break;
+                    }
+                }
+            }
+            
+            /**
+             * Update the global allProgressData variable to keep it in sync with screen progress changes
+             */
+            function updateGlobalProgressData(screenProgressId, status, percentage, isNewEntry = false) {
+                if (!allProgressData || !allProgressData.data || allProgressData.data.length === 0) {
+                    return; // No global data to update
+                }
+                
+                const courseData = allProgressData.data[0];
+                if (!courseData.modules) return;
+                
+                // Loop through all modules and their lesson screens to find the matching screen progress
+                let found = false;
+                
+                for (const module of courseData.modules) {
+                    if (!module.lesson_screens) continue;
+                    
+                    for (let i = 0; i < module.lesson_screens.length; i++) {
+                        const screenProgress = module.lesson_screens[i];
+                        
+                        if (screenProgress.screen_progress_id === screenProgressId) {
+                            // Update the existing entry
+                            module.lesson_screens[i].status = status;
+                            module.lesson_screens[i].progress_percentage = percentage;
+                            found = true;
+                            break;
+                        }
+                    }
+                    
+                    if (found) break;
+                }
+                
+                // If it's a new entry and we didn't find an existing one to update
+                if (isNewEntry && !found) {
+                    // Find the module that this screen progress belongs to
+                    const currentModuleId = currentModuleProgress ? currentModuleProgress.progress_id : null;
+                    if (currentModuleId) {
+                        const targetModule = courseData.modules.find(m => m.progress_id === currentModuleId);
+                        if (targetModule) {
+                            // Find the actual progress data that was just added (we have it in screenProgressData)
+                            const newScreenProgress = screenProgressData.find(sp => sp.screen_progress_id === screenProgressId);
+                            if (newScreenProgress) {
+                                // Add it to the global state
+                                if (!targetModule.lesson_screens) {
+                                    targetModule.lesson_screens = [];
+                                }
+                                targetModule.lesson_screens.push(newScreenProgress);
+                            }
+                        }
+                    }
+                }
+                
+                // After updating screen progress, we may need to update module progress calculations
+                // This happens naturally when updateModuleProgress() is called separately
             }
             
             /**
@@ -999,6 +1097,9 @@
                     if (moduleIndex !== -1) {
                         moduleProgressData[moduleIndex] = currentModuleProgress;
                     }
+                    
+                    // Update the global data to keep it in sync
+                    updateGlobalModuleProgress(currentModuleProgress.progress_id, status, percentage);
                     
                     // Force refresh all UI elements to show new progress
                     updateProgressUI();
