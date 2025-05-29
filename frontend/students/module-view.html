@@ -499,8 +499,13 @@
             });
             
             // Handle lesson item clicks
-            $(document).on('click', '.lesson-item', function() {
-                // Removed the disabled check as per requirement
+            $(document).on('click', '.lesson-item', function(e) {
+                // Check if the item is disabled
+                if ($(this).hasClass('disabled')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
                 
                 const lessonId = $(this).attr('id');
                 const parts = lessonId.split('-');
@@ -516,15 +521,18 @@
                     const isVideoScreen = parts.includes('video') || parts[parts.length - 1] === 'video';
                     
                     // Build the screen number based on the ID parts
-                    let screenNumber = '';
+                    let screenNumber;
                     
                     if (isVideoScreen) {
                         // For video screens like "screen-3-1-video", the screen number is "3.1-video"
                         // Remove 'screen' and 'video' parts and join the middle parts with dots
                         const numberParts = parts.slice(1, parts.length - 1);
                         screenNumber = numberParts.join('.') + '-video';
+                    } else if (parts.length === 2) {
+                        // For screens like "screen-1", keep as "1"
+                        screenNumber = parts[1];
                     } else {
-                        // For regular screens, just join the number parts with dots
+                        // For regular screens, join the number parts with dots
                         // For example, "screen-3-1" becomes "3.1"
                         const numberParts = parts.slice(1);
                         screenNumber = numberParts.join('.');
@@ -537,20 +545,6 @@
                         displayLessonScreen(lessonScreen);
                     } else {
                         console.error('Lesson screen not found:', screenNumber);
-                    }
-                } else if (type === 'video') {
-                    // For backward compatibility - only used if we can't find a matching lesson screen
-                    // Look for a lesson screen with the matching module number first
-                    const screenNumber = parts[1];
-                    const lessonScreen = allLessonScreens.find(screen => screen.screen_number === screenNumber);
-                    
-                    if (lessonScreen) {
-                        // If we find a matching lesson screen, use that instead
-                        displayLessonScreen(lessonScreen);
-                    } else {
-                        // Fall back to old video handling
-                        console.log('No lesson screen found for video, using legacy video display');
-                        displayVideoContent(parts[1]);
                     }
                 }
             });
@@ -935,33 +929,23 @@
              * Update UI elements to show current progress
              */
             function updateProgressUI() {
-                // Update course progress bar and text directly from the current module progress
-                // Instead of recalculating, use the exact percentage from the database
+                // Calculate overall course progress based on all screen progress
+                let totalScreens = screenProgressData.length;
+                let completedScreens = screenProgressData.filter(screen => screen.status === 'completed').length;
+                let inProgressScreens = screenProgressData.filter(screen => screen.status === 'in_progress').length;
+                
+                // Calculate course percentage based on completed screens
                 let coursePercentage = 0;
-                
-                // If we have a current module in progress, use its percentage directly
-                if (currentModuleProgress && currentModuleProgress.progress_percentage) {
-                    coursePercentage = currentModuleProgress.progress_percentage;
-                    console.log('Using progress directly from database:', coursePercentage + '%');
-                } else {
-                    // Fallback to calculation if no current module
-                    const totalModules = moduleProgressData.length;
-                    const completedModules = moduleProgressData.filter(module => 
-                        module.status === 'completed').length;
-                    const inProgressModules = moduleProgressData.filter(module => 
-                        module.status === 'in_progress').length;
-                    
-                    if (totalModules > 0) {
-                        // Give partial credit for in-progress modules
-                        coursePercentage = Math.round(((completedModules + (inProgressModules * 0.5)) / totalModules) * 100);
-                    }
+                if (totalScreens > 0) {
+                    // Count completed screens as 100% and in-progress screens as 50%
+                    coursePercentage = Math.round(((completedScreens * 100) + (inProgressScreens * 50)) / totalScreens);
                 }
-                
-                // Update progress bar with exact percentage from the database
+
+                // Update progress bar with calculated percentage
                 $('.progress-bar').css('width', `${coursePercentage}%`);
                 $('.progress-bar').attr('aria-valuenow', coursePercentage);
                 $('.progress-text').text(`${coursePercentage}%`);
-                
+
                 // Update module headers
                 moduleProgressData.forEach(module => {
                     const moduleHeader = $(`#module-${module.module_number} .module-header`);
@@ -974,8 +958,6 @@
                         moduleHeader.addClass('completed');
                     } else if (module.status === 'in_progress') {
                         moduleHeader.addClass('active');
-                    } else {
-                        moduleHeader.addClass('locked');
                     }
                 });
             }
@@ -990,63 +972,72 @@
                     console.log('No module progress found for current module');
                     return;
                 }
-                
+
                 // Find module screen progress for this module
                 const moduleScreens = screenProgressData.filter(progress => 
                     progress.module_progress_id === currentModuleProgress.progress_id);
-                
-                // Find in-progress screen
-                const inProgressScreen = moduleScreens.find(progress => progress.status === 'in_progress');
-                
-                // Go through each lesson item and update completed/in-progress status only
+
+                // Go through each lesson item and update status and accessibility
                 $('.lesson-item').each(function() {
                     const lessonId = $(this).attr('id');
-                    const [type, moduleNum, screenNum] = lessonId.split('-');
-                    
+                    const parts = lessonId.split('-');
+                    const type = parts[0];
+
                     // Skip if not a screen
                     if (type !== 'screen') return;
-                    
-                    // Get screen number in format used in database (e.g., '1.1')
-                    const screenNumber = screenNum ? `${moduleNum}.${screenNum}` : moduleNum;
-                    
+
+                    // Get screen number in format used in database
+                    let screenNumber;
+                    if (parts.length === 2) {
+                        // For "screen-1" format
+                        screenNumber = parts[1];
+                    } else if (parts.length > 2) {
+                        // For "screen-1-2" or "screen-1-2-video" format
+                        const isVideo = parts[parts.length - 1] === 'video';
+                        if (isVideo) {
+                            // For video screens, join middle parts with dot and add -video
+                            screenNumber = parts.slice(1, -1).join('.') + '-video';
+                        } else {
+                            // For regular screens, join all number parts with dot
+                            screenNumber = parts.slice(1).join('.');
+                        }
+                    }
+
                     // Remove status classes
                     $(this).removeClass('disabled completed in-progress');
-                    
-                    // Check if this screen is completed
-                    const isCompleted = moduleScreens.some(progress => {
-                        const completedScreen = allLessonScreens.find(screen => 
-                            screen.lesson_screen_id === progress.lesson_screen_id);
-                        return progress.status === 'completed' && 
-                            completedScreen && 
-                            completedScreen.screen_number === screenNumber;
+
+                    // Find the corresponding screen progress
+                    const screenProgress = screenProgressData.find(progress => {
+                        const screen = allLessonScreens.find(s => 
+                            s.lesson_screen_id === progress.lesson_screen_id);
+                        return screen && screen.screen_number === screenNumber;
                     });
-                    
-                    // Check if this screen is in progress
-                    const isInProgress = inProgressScreen && moduleScreens.some(progress => {
-                        const inProgressScreenObj = allLessonScreens.find(screen => 
-                            screen.lesson_screen_id === progress.lesson_screen_id);
-                        return progress.status === 'in_progress' && 
-                            inProgressScreenObj && 
-                            inProgressScreenObj.screen_number === screenNumber;
-                    });
-                    
-                    if (isCompleted) {
-                        // Mark as completed
-                        $(this).addClass('completed');
-                    } else if (isInProgress) {
-                        // Mark as in-progress
-                        $(this).addClass('in-progress');
+
+                    if (screenProgress) {
+                        if (screenProgress.status === 'completed') {
+                            $(this).addClass('completed');
+                        } else if (screenProgress.status === 'in_progress') {
+                            $(this).addClass('in-progress');
+                        } else {
+                            $(this).addClass('disabled');
+                        }
+                    } else {
+                        $(this).addClass('disabled');
                     }
-                    // No disabled state - all screens are accessible
                 });
-                
-                // Update CSS styles - remove disabled styles since we don't want restrictions
+
+                // Update CSS styles
                 if (!document.getElementById('progress-styles')) {
                     const styleSheet = document.createElement('style');
                     styleSheet.id = 'progress-styles';
                     styleSheet.innerHTML = `
+                        .lesson-item {
+                            transition: all 0.2s ease;
+                        }
                         .lesson-item.completed {
                             color: #28a745;
+                            opacity: 1;
+                            cursor: pointer;
                         }
                         .lesson-item.completed i {
                             color: #28a745;
@@ -1054,6 +1045,14 @@
                         .lesson-item.in-progress {
                             color: var(--maroon);
                             font-weight: 500;
+                            opacity: 1;
+                            cursor: pointer;
+                        }
+                        .lesson-item.disabled {
+                            opacity: 0.5;
+                            cursor: not-allowed !important;
+                            pointer-events: none !important;
+                            user-select: none;
                         }
                     `;
                     document.head.appendChild(styleSheet);
