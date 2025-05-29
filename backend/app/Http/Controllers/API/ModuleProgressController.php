@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\ModuleProgress;
+use App\Models\LessonScreenProgress;
+use App\Models\Course;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -244,5 +246,105 @@ class ModuleProgressController extends Controller
             ->get();
             
         return response()->json(['data' => $moduleProgresses], Response::HTTP_OK);
+    }
+    
+    /**
+     * Get all module progress and lesson screen progress for a user.
+     * 
+     * This endpoint provides a comprehensive view of a user's progress across all modules
+     * and their associated lesson screens, organized by course and module.
+     * 
+     * @param string $userId The user ID to get progress for
+     * @return JsonResponse
+     */
+    public function getAllUserProgress(string $userId): JsonResponse
+    {
+        // Check if user exists and has any module progress
+        $moduleProgresses = ModuleProgress::where('user_id', $userId)
+            ->orderBy('course_id')
+            ->orderBy('module_number')
+            ->get();
+            
+        if ($moduleProgresses->isEmpty()) {
+            return response()->json([
+                'data' => [],
+                'message' => 'No progress found for this user'
+            ], Response::HTTP_OK);
+        }
+        
+        // Get all related course IDs to include course details
+        $courseIds = $moduleProgresses->pluck('course_id')->unique();
+        $courses = Course::whereIn('course_id', $courseIds)->get()
+            ->keyBy('course_id');
+        
+        // Get all module progress IDs to fetch related lesson screen progress
+        $moduleProgressIds = $moduleProgresses->pluck('progress_id');
+        
+        // Fetch all lesson screen progress entries for these modules
+        $lessonScreenProgress = LessonScreenProgress::with('lessonScreen')
+            ->whereIn('module_progress_id', $moduleProgressIds)
+            ->get()
+            ->groupBy('module_progress_id');
+        
+        // Organize data by course and module
+        $result = [];
+        
+        foreach ($moduleProgresses as $moduleProgress) {
+            $courseId = $moduleProgress->course_id;
+            
+            // Create course entry if it doesn't exist in result
+            if (!isset($result[$courseId])) {
+                $result[$courseId] = [
+                    'course_id' => $courseId,
+                    'course_name' => $courses[$courseId]->name ?? 'Unknown Course',
+                    'modules' => []
+                ];
+            }
+            
+            // Add module progress with its lesson screen progress
+            $moduleData = $moduleProgress->toArray();
+            $moduleData['lesson_screens'] = [];
+            
+            // Add lesson screen progress for this module if any exist
+            if (isset($lessonScreenProgress[$moduleProgress->progress_id])) {
+                foreach ($lessonScreenProgress[$moduleProgress->progress_id] as $screenProgress) {
+                    $screenData = $screenProgress->toArray();
+                    
+                    // Include lesson screen details if available
+                    if ($screenProgress->lessonScreen) {
+                        $screenData['screen_details'] = $screenProgress->lessonScreen->toArray();
+                    }
+                    
+                    $moduleData['lesson_screens'][] = $screenData;
+                }
+                
+                // Sort lesson screens by course_module_number and then by screen_number if available
+                usort($moduleData['lesson_screens'], function($a, $b) {
+                    // First sort by course_module_number
+                    if ($a['course_module_number'] !== $b['course_module_number']) {
+                        return $a['course_module_number'] - $b['course_module_number'];
+                    }
+                    
+                    // Then by screen_number if available in screen_details
+                    if (isset($a['screen_details']) && isset($b['screen_details'])) {
+                        return strnatcmp(
+                            $a['screen_details']['screen_number'] ?? '', 
+                            $b['screen_details']['screen_number'] ?? ''
+                        );
+                    }
+                    
+                    return 0;
+                });
+            }
+            
+            $result[$courseId]['modules'][] = $moduleData;
+        }
+        
+        // Convert associative array to indexed array for consistent JSON response
+        $result = array_values($result);
+        
+        return response()->json([
+            'data' => $result
+        ], Response::HTTP_OK);
     }
 }

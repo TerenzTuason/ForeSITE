@@ -101,6 +101,7 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('module-progress', ModuleProgressController::class);
     Route::get('users/{user}/module-progress', [ModuleProgressController::class, 'getProgressByUser']);
     Route::get('courses/{course}/module-progress', [ModuleProgressController::class, 'getProgressByCourse']);
+    Route::get('users/{user}/all-progress', [ModuleProgressController::class, 'getAllUserProgress']);
     
     // Lesson Screen Progress
     Route::apiResource('module-progress.screen-progress', LessonScreenProgressController::class)->shallow();

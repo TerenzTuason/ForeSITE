@@ -102,6 +102,7 @@ The API provides CRUD (Create, Read, Update, Delete) operations for the main ent
 - **GET /api/v1/module-progress**: List all module progress entries
 - **GET /api/v1/module-progress/{id}**: Get specific module progress
 - **POST /api/v1/module-progress**: Create a new module progress (supports single or bulk insert)
+- **GET /api/v1/users/{user}/all-progress**: Get all module progress and lesson screen progress for a user
 - **PUT /api/v1/module-progress/{id}**: Update a module progress
 - **DELETE /api/v1/module-progress/{id}**: Delete a module progress
 - **GET /api/v1/users/{user}/module-progress**: Get all module progress entries for a specific user
@@ -321,6 +322,81 @@ Before using the API, make sure you:
       }
     }
   ]
+}
+```
+
+### Get All User Progress
+```json
+// GET /api/v1/users/{userId}/all-progress
+{
+  "data": {
+    "courses": [
+      {
+        "course_id": 1,
+        "modules": [
+          {
+            "module_progress_id": 1,
+            "course_id": 1,
+            "module_number": 1,
+            "module_title": "Introduction to Futures Thinking",
+            "status": "in_progress",
+            "completion_percentage": 50,
+            "lesson_screen_progress": [
+              {
+                "screen_progress_id": 2,
+                "module_progress_id": 1,
+                "lesson_screen_id": 2,
+                "status": "in_progress",
+                "progress_percentage": 50,
+                "lesson_screen": {
+                  "lesson_screen_id": 2,
+                  "course_id": 1,
+                  "course_module_number": 1,
+                  "screen_number": "1.2",
+                  "screen_title": "Key Principles of Strategic Foresight",
+                  "screen_description": "Understanding the fundamental principles",
+                  "screen_content": {
+                    "content": "This is the content about key principles...",
+                    "type": "text"
+                  },
+                  "screen_url": null
+                }
+              },
+              {
+                "screen_progress_id": 1,
+                "module_progress_id": 1,
+                "lesson_screen_id": 1,
+                "status": "not_started",
+                "progress_percentage": 0,
+                "lesson_screen": {
+                  "lesson_screen_id": 1,
+                  "course_id": 1,
+                  "course_module_number": 1,
+                  "screen_number": "1.1",
+                  "screen_title": "Introduction to Futures Thinking",
+                  "screen_description": "Overview of the key concepts",
+                  "screen_content": {
+                    "content": "This is the introduction content...",
+                    "type": "text"
+                  },
+                  "screen_url": null
+                }
+              }
+            ]
+          },
+          {
+            "module_progress_id": 2,
+            "course_id": 1,
+            "module_number": 2,
+            "module_title": "Futures Process Design",
+            "status": "not_started",
+            "completion_percentage": 0,
+            "lesson_screen_progress": []
+          }
+        ]
+      }
+    ]
+  }
 }
 ```
 
