@@ -705,100 +705,56 @@
             });
             
             /**
-             * Fetch module progress for the user
+             * Fetch all progress data for the user
              */
             function fetchModuleProgress(userId) {
-                loadingText.textContent = 'Loading your module progress...';
-                fetch(`http://127.0.0.1:8000/api/v1/users/${userId}/module-progress`)
+                loadingText.textContent = 'Loading your course data...';
+                fetch(`http://127.0.0.1:8000/api/v1/users/${userId}/all-progress`)
                     .then(response => response.json())
                     .then(data => {
                         if (data.data && data.data.length > 0) {
-                            moduleProgressData = data.data;
+                            // Process the response data
+                            const courseData = data.data[0]; // Get the first course
                             
-                            // Get all lesson screens
-                            loadingText.textContent = 'Loading lesson content...';
-                            return fetch('http://127.0.0.1:8000/api/v1/lesson-screens');
-                        } else {
-                            // No module progress found - handle new user
-                            console.log('No module progress found for user');
-                            loadingText.textContent = 'Setting up your course...';
-                            
-                            // For new users, create module progress for the first module
-                            // This would typically be done when a user enrolls in a course, but for this demo
-                            // we'll create it on the fly
-                            const newModuleProgress = {
-                                user_id: userId,
-                                course_id: 1, // Default to first course
-                                module_number: 1,
-                                module_title: 'Introduction to Futures Thinking',
-                                module_focus: 'Develop an understanding of futures literacy...',
-                                status: 'in_progress',
-                                progress_percentage: 0
-                            };
-                            
-                            return fetch('http://127.0.0.1:8000/api/v1/module-progress', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify(newModuleProgress)
-                            })
-                            .then(response => response.json())
-                            .then(result => {
-                                // Store the new module progress
-                                moduleProgressData = [result.data];
-                                return fetch('http://127.0.0.1:8000/api/v1/lesson-screens');
-                            });
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.data) {
-                            allLessonScreens = data.data;
-                            
-                            // Get current module progress id
-                            const currentModuleProgressId = moduleProgressData[0].progress_id;
-                            
-                            // Fetch all screen progress for this module
-                            return fetch(`http://127.0.0.1:8000/api/v1/module-progress/${currentModuleProgressId}/screen-progress`)
-                                .then(response => response.json())
-                                .then(screenData => {
-                                    if (screenData.data) {
-                                        screenProgressData = screenData.data;
-                                    } else {
-                                        // No screen progress found - set up first screen to in_progress
-                                        const firstScreen = allLessonScreens.find(screen => 
-                                            screen.course_module_number === 1 && 
-                                            screen.screen_number === '1.1');
+                            // Extract module progress data
+                            if (courseData.modules && courseData.modules.length > 0) {
+                                moduleProgressData = courseData.modules;
+                                
+                                // Create a collection of all lesson screens from all modules
+                                allLessonScreens = [];
+                                screenProgressData = [];
+                                
+                                // Process each module to extract lesson screens and screen progress
+                                courseData.modules.forEach(module => {
+                                    if (module.lesson_screens && module.lesson_screens.length > 0) {
+                                        // Extract screen progress data
+                                        module.lesson_screens.forEach(screenProgress => {
+                                            // Add to screen progress data
+                                            screenProgressData.push(screenProgress);
                                             
-                                        if (firstScreen) {
-                                            // Create initial screen progress for first screen
-                                            const initialScreenProgress = {
-                                                module_progress_id: currentModuleProgressId,
-                                                lesson_screen_id: firstScreen.lesson_screen_id,
-                                                course_module_number: 1,
-                                                status: 'in_progress',
-                                                progress_percentage: 50
-                                            };
-                                            
-                                            return fetch(`http://127.0.0.1:8000/api/v1/module-progress/${currentModuleProgressId}/screen-progress`, {
-                                                method: 'POST',
-                                                headers: {
-                                                    'Content-Type': 'application/json'
-                                                },
-                                                body: JSON.stringify(initialScreenProgress)
-                                            })
-                                            .then(response => response.json())
-                                            .then(result => {
-                                                screenProgressData = [result.data];
-                                                return true;
-                                            });
-                                        }
+                                            // Add screen details to allLessonScreens if not already there
+                                            if (screenProgress.lesson_screen) {
+                                                const existingScreen = allLessonScreens.find(
+                                                    s => s.lesson_screen_id === screenProgress.lesson_screen.lesson_screen_id
+                                                );
+                                                
+                                                if (!existingScreen) {
+                                                    allLessonScreens.push(screenProgress.lesson_screen);
+                                                }
+                                            }
+                                        });
                                     }
-                                    return true;
                                 });
+                                
+                                return true;
+                            } else {
+                                console.log('No modules found in the response');
+                                return false;
+                            }
+                        } else {
+                            console.log('No course data found for user');
+                            return false;
                         }
-                        return false;
                     })
                     .then(success => {
                         if (success) {
