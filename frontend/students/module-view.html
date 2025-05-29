@@ -911,40 +911,11 @@
                         if (callback) callback();
                     });
                 } else {
-                    // Create new screen progress
-                    const currentModuleProgressId = currentModuleProgress.progress_id;
-                    const newScreenProgress = {
-                        module_progress_id: currentModuleProgressId,
-                        lesson_screen_id: lessonScreen.lesson_screen_id,
-                        course_module_number: lessonScreen.course_module_number || 1,
-                        status: status,
-                        progress_percentage: percentage
-                    };
-                    
-                    fetch(`http://127.0.0.1:8000/api/v1/module-progress/${currentModuleProgressId}/screen-progress`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(newScreenProgress)
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        // Add to local screen progress data
-                        screenProgressData.push(data.data);
-                        
-                        // Update the global state with the new screen progress
-                        updateGlobalProgressData(data.data.screen_progress_id, status, percentage, true);
-                        
-                        // Update UI to reflect changes
-                        updateLessonScreenAccess();
-                        
-                        if (callback) callback();
-                    })
-                    .catch(error => {
-                        console.error('Error creating screen progress:', error);
-                        if (callback) callback();
-                    });
+                    // Screen progress should already exist but was not found in local data
+                    // This is an edge case - log it and call the callback
+                    console.log('Screen progress not found for lesson screen:', lessonScreen);
+                    console.log('This is expected to exist already since screen progress is created elsewhere');
+                    if (callback) callback();
                 }
             }
             
