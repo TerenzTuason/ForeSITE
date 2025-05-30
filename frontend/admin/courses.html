@@ -266,6 +266,106 @@
                 padding: 1rem;
             }
         }
+
+        /* Active tab styles */
+        .nav-tabs .nav-link.active {
+            background-color: #f8f9fa !important;
+            border-bottom: 0 !important;
+            color: var(--maroon) !important;
+            font-weight: bold;
+            border-top: 3px solid var(--maroon) !important;
+        }
+        
+        /* Inactive tab styles */
+        .nav-tabs .nav-link:not(.active) {
+            background-color: #e9ecef !important;
+            color: #495057 !important;
+        }
+        
+        /* Hover effect for tabs */
+        .nav-tabs .nav-link:hover:not(.active) {
+            background-color: #dee2e6 !important;
+            border-color: #dee2e6 #dee2e6 #fff;
+        }
+        
+        /* Active pill styles */
+        .nav-pills .nav-link.active {
+            background-color: #0d6efd !important;
+            color: white !important;
+        }
+        
+        /* Inactive pill styles */
+        .nav-pills .nav-link:not(.active) {
+            background-color: #f8f9fa !important;
+            color: black !important;
+            border: 1px solid #dee2e6 !important;
+        }
+        
+        /* Hover effect for pills */
+        .nav-pills .nav-link:hover:not(.active) {
+            background-color: #e9ecef !important;
+        }
+        
+        /* Main tab content container */
+        .tab-content {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-top: none;
+            padding: 1rem;
+            border-radius: 0 0 0.25rem 0.25rem;
+        }
+
+        /* Custom styling for learning style tabs */
+        .nav-pills {
+            gap: 8px;
+        }
+        
+        .nav-pills .nav-item {
+            margin: 0 3px;
+        }
+        
+        .nav-pills .nav-link {
+            transition: all 0.2s ease;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .nav-pills .nav-link:hover {
+            transform: translateY(-2px);
+        }
+        
+        .nav-pills .nav-link.active {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2) !important;
+        }
+        
+        /* Style badges */
+        .style-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            color: white;
+            display: inline-block;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        
+        .style-badge-activist {
+            background-color: #dc3545;
+        }
+        
+        .style-badge-reflector {
+            background-color: #0dcaf0;
+        }
+        
+        .style-badge-theorist {
+            background-color: #198754;
+        }
+        
+        .style-badge-pragmatist {
+            background-color: #fd7e14;
+        }
     </style>
 </head>
 <body>
@@ -347,8 +447,10 @@
                 return;
             }
             
-            // Fetch courses data
+            // Fetch courses data and lesson screens
             fetchCourses();
+            fetchLessonScreens();
+            fetchLearningStyles();
             
             // Logout functionality
             document.getElementById('logoutBtn').addEventListener('click', function(e) {
@@ -356,7 +458,91 @@
                 sessionStorage.removeItem('user');
                 window.location.href = 'login.html';
             });
+            
+            // Setup event listener for Add New Course button
+            document.querySelector('.btn-add-course').addEventListener('click', function() {
+                showAddCourseModal();
+            });
+
+            // Add custom CSS for tab styling
+            const styleElement = document.createElement('style');
+            styleElement.textContent = `
+                /* Active tab styles */
+                .nav-tabs .nav-link.active {
+                    background-color: #f8f9fa !important;
+                    border-bottom: 0 !important;
+                    color: var(--maroon) !important;
+                    font-weight: bold;
+                    border-top: 3px solid var(--maroon) !important;
+                }
+                
+                /* Inactive tab styles */
+                .nav-tabs .nav-link:not(.active) {
+                    background-color: #e9ecef !important;
+                    color: #495057 !important;
+                }
+                
+                /* Hover effect for tabs */
+                .nav-tabs .nav-link:hover:not(.active) {
+                    background-color: #dee2e6 !important;
+                    border-color: #dee2e6 #dee2e6 #fff;
+                }
+                
+                /* Active pill styles */
+                .nav-pills .nav-link.active {
+                    background-color: #0d6efd !important;
+                    color: white !important;
+                }
+                
+                /* Inactive pill styles */
+                .nav-pills .nav-link:not(.active) {
+                    background-color: #f8f9fa !important;
+                    border: 1px solid #dee2e6 !important;
+                }
+                
+                /* Hover effect for pills */
+                .nav-pills .nav-link:hover:not(.active) {
+                    background-color: #e9ecef !important;
+                }
+                
+                /* Main tab content container */
+                .tab-content {
+                    background-color: #f8f9fa;
+                    border: 1px solid #dee2e6;
+                    border-top: none;
+                    padding: 1rem;
+                    border-radius: 0 0 0.25rem 0.25rem;
+                }
+            `;
+            document.head.appendChild(styleElement);
         });
+        
+        // Store data globally
+        let lessonScreensData = [];
+        let learningStylesData = [];
+        let consolidatedCourses = [];
+        
+        async function fetchLearningStyles() {
+            try {
+                console.log('Fetching learning styles from API...');
+                const response = await fetch('http://127.0.0.1:8000/api/v1/learning-styles');
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch learning styles: ${response.status} ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data && data.data) {
+                    learningStylesData = data.data;
+                    console.log('Loaded learning styles:', learningStylesData);
+                } else {
+                    console.error('Unexpected API response format for learning styles:', data);
+                }
+            } catch (error) {
+                console.error('Error fetching learning styles:', error);
+            }
+        }
         
         async function fetchCourses() {
             try {
@@ -372,7 +558,9 @@
                 console.log('API response data:', data);
                 
                 if (data && data.data) {
-                    displayCourses(data.data);
+                    // Consolidate courses by name
+                    consolidateCourses(data.data);
+                    displayConsolidatedCourses();
                 } else {
                     console.error('Unexpected API response format:', data);
                     throw new Error('Unexpected API response format');
@@ -388,20 +576,57 @@
             }
         }
         
-        function displayCourses(courses) {
+        function consolidateCourses(coursesData) {
+            // Group courses by name or a unique identifier
+            const courseGroups = {};
+            
+            coursesData.forEach(course => {
+                const courseName = course.name || 'Untitled Course';
+                
+                if (!courseGroups[courseName]) {
+                    courseGroups[courseName] = {
+                        name: courseName,
+                        description: course.description,
+                        objectives: course.objectives,
+                        structure: course.structure,
+                        styleVersions: [],
+                        uniqueModules: new Map() // Use Map to track unique modules
+                    };
+                }
+                
+                // Add this learning style version
+                courseGroups[courseName].styleVersions.push({
+                    course_id: course.course_id,
+                    learning_style: course.learning_style,
+                    name: course.name,
+                    description: course.description
+                });
+                
+                // Add unique modules (if any differences)
+                if (course.structure && Array.isArray(course.structure)) {
+                    course.structure.forEach(module => {
+                        const moduleKey = module.title || 'Untitled Module';
+                        if (!courseGroups[courseName].uniqueModules.has(moduleKey)) {
+                            courseGroups[courseName].uniqueModules.set(moduleKey, module);
+                        }
+                    });
+                }
+            });
+            
+            // Convert uniqueModules Map to array
+            Object.values(courseGroups).forEach(course => {
+                course.uniqueModules = Array.from(course.uniqueModules.values());
+            });
+            
+            // Convert to array
+            consolidatedCourses = Object.values(courseGroups);
+            console.log('Consolidated courses:', consolidatedCourses);
+        }
+        
+        function displayConsolidatedCourses() {
             const coursesContainer = document.getElementById('coursesList');
             
-            if (!Array.isArray(courses)) {
-                console.error('Expected courses to be an array, got:', typeof courses);
-                coursesContainer.innerHTML = `
-                    <div class="alert alert-danger" role="alert">
-                        Unexpected data format. Expected an array of courses.
-                    </div>
-                `;
-                return;
-            }
-            
-            if (courses.length === 0) {
+            if (consolidatedCourses.length === 0) {
                 coursesContainer.innerHTML = `
                     <div class="alert alert-info" role="alert">
                         No courses available. Click the "Add New Course" button to create one.
@@ -412,31 +637,118 @@
             
             let coursesHTML = '';
             
-            courses.forEach(course => {
-                if (!course || typeof course !== 'object') {
-                    console.error('Invalid course object:', course);
-                    return;
-                }
+            consolidatedCourses.forEach(course => {
+                // Generate a unique ID for this course's tabs
+                const courseId = 'course-' + Math.random().toString(36).substr(2, 9);
                 
+                // Create style badges for learning styles
+                const styleBadges = course.styleVersions.map(sv => 
+                    `<span class="badge bg-primary me-2">${sv.learning_style?.style_name || 'Unknown'}</span>`
+                ).join('');
+                
+                // Create main navigation tabs (Course, Modules, Lesson Screens)
+                const mainTabsHTML = `
+                    <ul class="nav nav-tabs mb-3" id="${courseId}-main-tabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active fw-bold" id="${courseId}-course-tab" 
+                                data-bs-toggle="tab" 
+                                data-bs-target="#${courseId}-course" type="button" role="tab" 
+                                aria-controls="${courseId}-course" aria-selected="true"
+                                style="background-color: #f8f9fa; border-bottom: 0; color: var(--maroon);">
+                                <i class="fas fa-book me-2"></i>Course
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link fw-bold" id="${courseId}-modules-tab" 
+                                data-bs-toggle="tab" 
+                                data-bs-target="#${courseId}-modules" type="button" role="tab" 
+                                aria-controls="${courseId}-modules" aria-selected="false"
+                                style="background-color: #e9ecef; color: #495057;">
+                                <i class="fas fa-cubes me-2"></i>Modules
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link fw-bold" id="${courseId}-lessons-tab" 
+                                data-bs-toggle="tab" 
+                                data-bs-target="#${courseId}-lessons" type="button" role="tab" 
+                                aria-controls="${courseId}-lessons" aria-selected="false"
+                                style="background-color: #e9ecef; color: #495057;">
+                                <i class="fas fa-layer-group me-2"></i>Lesson Screens
+                            </button>
+                        </li>
+                    </ul>
+                `;
+                
+                // Create learning style tabs
+                const styleTabsHTML = `
+                    <ul class="nav nav-pills nav-fill mb-3" id="${courseId}-style-tabs" role="tablist" 
+                        style="background-color: #e9ecef; padding: 10px; border-radius: 5px;">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active fw-bold" id="${courseId}-all-tab" 
+                                data-bs-toggle="pill" 
+                                data-bs-target="#${courseId}-all" type="button" role="tab" 
+                                aria-controls="${courseId}-all" aria-selected="true"
+                                style="background-color: #0d6efd; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                All Styles
+                            </button>
+                        </li>
+                        ${course.styleVersions.map((styleVersion, index) => {
+                            const styleName = styleVersion.learning_style?.style_name || 'Unknown';
+                            const styleId = styleName.toLowerCase().replace(/\s+/g, '-');
+                            
+                            // Assign different colors based on learning style
+                            let styleColor, bgColor;
+                            if (styleName.toLowerCase() === 'activist') {
+                                styleColor = '#dc3545'; // Red
+                                bgColor = '#f8d7da';
+                            } else if (styleName.toLowerCase() === 'reflector') {
+                                styleColor = '#0dcaf0'; // Cyan
+                                bgColor = '#d1ecf1';
+                            } else if (styleName.toLowerCase() === 'theorist') {
+                                styleColor = '#198754'; // Green
+                                bgColor = '#d1e7dd';
+                            } else if (styleName.toLowerCase() === 'pragmatist') {
+                                styleColor = '#fd7e14'; // Orange
+                                bgColor = '#fff3cd';
+                            } else {
+                                styleColor = '#6c757d'; // Default gray
+                                bgColor = '#e2e3e5';
+                            }
+                            
+                            return `
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link fw-bold" id="${courseId}-${styleId}-tab" 
+                                        data-bs-toggle="pill" 
+                                        data-bs-target="#${courseId}-${styleId}" type="button" role="tab" 
+                                        aria-controls="${courseId}-${styleId}" aria-selected="false"
+                                        style="background-color: ${bgColor}; color: ${styleColor}; border: 2px solid ${styleColor}; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                        ${styleName}
+                                    </button>
+                                </li>
+                            `;
+                        }).join('')}
+                    </ul>
+                `;
+                
+                // Generate objectives HTML
                 const objectivesHTML = course.objectives && Array.isArray(course.objectives) 
                     ? course.objectives.map(obj => `<li>${obj}</li>`).join('') 
                     : '<li>No objectives specified</li>';
                 
+                // Generate modules HTML
                 let modulesHTML = '';
-                if (course.structure && Array.isArray(course.structure) && course.structure.length > 0) {
-                    course.structure.forEach(module => {
-                        if (!module || typeof module !== 'object') {
-                            console.error('Invalid module object:', module);
-                            return;
-                        }
+                if (course.uniqueModules && course.uniqueModules.length > 0) {
+                    course.uniqueModules.forEach((module, moduleIndex) => {
+                        // Use moduleIndex + 1 as a fallback module number
+                        const moduleNumber = module.module || (moduleIndex + 1);
                         
                         modulesHTML += `
-                            <div class="module-card">
-                                <div class="module-title">
-                                    <span class="module-number">${module.module || '?'}</span>
-                                    ${module.title || 'Untitled Module'}
+                            <div class="module-card mb-3" data-module-number="${moduleNumber}">
+                                <div class="module-title p-3 bg-light rounded">
+                                    <span class="module-number bg-maroon text-white rounded-circle d-inline-flex align-items-center justify-content-center me-2" style="width: 30px; height: 30px;">${moduleNumber}</span>
+                                    <span class="fw-bold">${module.title || 'Untitled Module'}</span>
                                 </div>
-                                <div class="module-focus">${module.focus || 'No focus specified'}</div>
+                                <div class="module-focus p-3">${module.focus || 'No focus specified'}</div>
                             </div>
                         `;
                     });
@@ -444,35 +756,114 @@
                     modulesHTML = '<p class="text-muted">No modules available for this course.</p>';
                 }
                 
-                const courseId = course.course_id || '?';
-                const learningStyle = course.learning_style && course.learning_style.style_name 
-                    ? course.learning_style.style_name.charAt(0).toUpperCase() + course.learning_style.style_name.slice(1) 
-                    : 'Unknown Style';
-                
-                coursesHTML += `
-                    <div class="course-card">
-                        <div class="course-header">
-                            <span class="course-id">Style: ${learningStyle}</span>
-                            <h2 class="course-title">${course.name || 'Untitled Course'}</h2>
-                            <p class="course-description">${course.description || 'No description provided'}</p>
+                // Create tab content for each learning style
+                let styleTabContentsHTML = `
+                    <div class="tab-content" id="${courseId}-style-tabContent">
+                        <div class="tab-pane fade show active" id="${courseId}-all" role="tabpanel" aria-labelledby="${courseId}-all-tab">
+                            <div class="mb-3">
+                                ${styleBadges}
+                            </div>
+                            <div class="style-details bg-light p-3 rounded mb-3">
+                                <h4 class="mb-3">Course Overview</h4>
+                                <p>${course.description || 'No description provided'}</p>
+                            </div>
                         </div>
-                        <div class="course-body">
-                            <h5>Course Objectives:</h5>
+                `;
+                
+                // Add tab content for each learning style
+                course.styleVersions.forEach((styleVersion) => {
+                    const styleName = styleVersion.learning_style?.style_name || 'Unknown';
+                    const styleId = styleName.toLowerCase().replace(/\s+/g, '-');
+                    
+                    styleTabContentsHTML += `
+                        <div class="tab-pane fade" id="${courseId}-${styleId}" role="tabpanel" aria-labelledby="${courseId}-${styleId}-tab">
+                            <div class="style-details bg-light p-3 rounded mb-3">
+                                <h4 class="mb-3">Style: ${styleName}</h4>
+                                <p>${styleVersion.description || 'No description provided for this learning style version.'}</p>
+                                <div class="d-flex justify-content-end">
+                                    <button class="btn btn-sm btn-outline-primary" onclick="editStyleVersion(${styleVersion.course_id})">
+                                        <i class="fas fa-edit me-1"></i>Edit Style Details
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                styleTabContentsHTML += `</div>`;
+                
+                // Create main tab content sections
+                const mainTabContentHTML = `
+                    <div class="tab-content" id="${courseId}-main-tabContent">
+                        <!-- Course Tab Content -->
+                        <div class="tab-pane fade show active" id="${courseId}-course" role="tabpanel" aria-labelledby="${courseId}-course-tab">
+                            ${styleTabsHTML}
+                            ${styleTabContentsHTML}
+                            
+                            <h5 class="mt-4">Course Objectives:</h5>
                             <ul class="objectives-list">
                                 ${objectivesHTML}
                             </ul>
-                            
-                            <h5>Course Modules:</h5>
+                        </div>
+                        
+                        <!-- Modules Tab Content -->
+                        <div class="tab-pane fade" id="${courseId}-modules" role="tabpanel" aria-labelledby="${courseId}-modules-tab">
+                            <h5 class="mb-3">Course Modules:</h5>
                             <div class="modules-container">
                                 ${modulesHTML}
                             </div>
                         </div>
-                        <div class="course-actions">
-                            <button class="btn btn-edit" onclick="editCourse(${courseId})">
-                                <i class="fas fa-edit me-2"></i>Edit
+                        
+                        <!-- Lesson Screens Tab Content -->
+                        <div class="tab-pane fade" id="${courseId}-lessons" role="tabpanel" aria-labelledby="${courseId}-lessons-tab">
+                            <h5 class="mb-3">Lesson Screens by Module:</h5>
+                            <div class="lesson-screens-by-module">
+                                ${course.uniqueModules && course.uniqueModules.length > 0 ? 
+                                    course.uniqueModules.map((module, moduleIndex) => {
+                                        const moduleNumber = module.module || (moduleIndex + 1);
+                                        return `
+                                            <div class="module-lesson-screens mb-4">
+                                                <div class="module-header p-3 bg-light rounded d-flex justify-content-between align-items-center mb-2">
+                                                    <div>
+                                                        <span class="badge bg-maroon text-white me-2">${moduleNumber}</span>
+                                                        <span class="fw-bold">${module.title || 'Untitled Module'}</span>
+                                                    </div>
+                                                    <button class="btn btn-sm btn-outline-primary" onclick="toggleModuleLessons('module-${courseId}-${moduleNumber}-lessons')">
+                                                        <i class="fas fa-chevron-down"></i>
+                                                    </button>
+                                                </div>
+                                                <div class="module-lessons-container ps-3" id="module-${courseId}-${moduleNumber}-lessons">
+                                                    <div class="lesson-screens-list" data-module-number="${moduleNumber}">
+                                                        <!-- Will be populated after rendering -->
+                                                        <div class="placeholder-text text-muted">Loading lesson screens...</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        `;
+                                    }).join('') : 
+                                    '<p class="text-muted">No modules available to display lesson screens.</p>'
+                                }
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Construct the full course card HTML
+                coursesHTML += `
+                    <div class="course-card mb-4">
+                        <div class="course-header">
+                            <h2 class="course-title">${course.name}</h2>
+                        </div>
+                        <div class="course-body">
+                            ${mainTabsHTML}
+                            ${mainTabContentHTML}
+                        </div>
+                        <div class="course-actions bg-light p-3 rounded-bottom">
+                            <button class="btn btn-outline-primary" onclick="editSharedCourse('${course.name}')">
+                                <i class="fas fa-edit me-2"></i>Edit Shared Structure
                             </button>
-                            <button class="btn btn-delete" onclick="deleteCourse(${courseId})">
-                                <i class="fas fa-trash me-2"></i>Delete
+                            <button class="btn btn-outline-danger" onclick="deleteAllStyleVersions('${course.name}')">
+                                <i class="fas fa-trash me-2"></i>Delete All Versions
                             </button>
                         </div>
                     </div>
@@ -480,19 +871,199 @@
             });
             
             coursesContainer.innerHTML = coursesHTML;
-        }
-        
-        function editCourse(courseId) {
-            // Function to be implemented
-            alert(`Edit course with ID: ${courseId}`);
-        }
-        
-        function deleteCourse(courseId) {
-            // Function to be implemented
-            if (confirm(`Are you sure you want to delete course with ID: ${courseId}?`)) {
-                // Delete logic goes here
-                alert(`Course ${courseId} has been deleted`);
+            
+            // Update modules with lesson screens if data is available
+            if (lessonScreensData.length > 0) {
+                displayLessonScreensByModuleNumber();
             }
+        }
+        
+        function showAddCourseModal() {
+            // Here you would show a modal for adding a new course
+            alert('Add Course functionality will be implemented here');
+            // In a real implementation, this would show a modal with fields for the course name,
+            // description, objectives, and checkboxes for which learning styles to create
+        }
+        
+        function editSharedCourse(courseName) {
+            alert(`Edit shared structure for course: ${courseName}`);
+            // This would open a modal to edit the shared course structure
+            // Changes would apply to all learning style versions
+        }
+        
+        function editStyleVersion(courseId) {
+            alert(`Edit style-specific details for course ID: ${courseId}`);
+            // This would open a modal to edit style-specific metadata
+        }
+        
+        function deleteAllStyleVersions(courseName) {
+            if (confirm(`Are you sure you want to delete ALL versions of "${courseName}"?`)) {
+                alert(`All versions of "${courseName}" would be deleted`);
+                // This would delete all style versions of the course
+            }
+        }
+        
+        async function fetchLessonScreens() {
+            try {
+                console.log('Fetching lesson screens from API...');
+                const response = await fetch('http://127.0.0.1:8000/api/v1/lesson-screens');
+                console.log('Lesson screens API response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch lesson screens: ${response.status} ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('Lesson screens API response data:', data);
+                
+                if (data && data.data) {
+                    lessonScreensData = data.data;
+                    console.log('Loaded lesson screens:', lessonScreensData.length);
+                    
+                    // After lesson screens are loaded, update the UI if courses are already displayed
+                    const coursesContainer = document.getElementById('coursesList');
+                    if (!coursesContainer.querySelector('.loading-container')) {
+                        displayLessonScreensByModuleNumber();
+                    }
+                } else {
+                    console.error('Unexpected API response format for lesson screens:', data);
+                }
+            } catch (error) {
+                console.error('Error fetching lesson screens:', error);
+            }
+        }
+        
+        function toggleModuleLessons(containerId) {
+            const container = document.getElementById(containerId);
+            const button = container.previousElementSibling.querySelector('button');
+            const icon = button.querySelector('i');
+            
+            if (container.style.display === 'none') {
+                container.style.display = 'block';
+                icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
+            } else {
+                container.style.display = 'none';
+                icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
+            }
+        }
+        
+        function displayLessonScreensByModuleNumber() {
+            console.log('Displaying lesson screens by module number...');
+            
+            // Group lesson screens by screen_number (assuming first digit is module number)
+            const screensByModule = {};
+            
+            lessonScreensData.forEach(screen => {
+                // Extract module number from screen number (e.g., "1.1" -> "1")
+                let moduleNumber = 1; // Default to module 1
+                
+                if (screen.screen_number) {
+                    const parts = screen.screen_number.toString().split('.');
+                    if (parts.length > 0 && !isNaN(parts[0])) {
+                        moduleNumber = parseInt(parts[0]);
+                    }
+                } else if (screen.module_id) {
+                    moduleNumber = screen.module_id;
+                }
+                
+                // Initialize array if needed
+                if (!screensByModule[moduleNumber]) {
+                    screensByModule[moduleNumber] = [];
+                }
+                
+                // Add screen to the module's array
+                screensByModule[moduleNumber].push(screen);
+            });
+            
+            console.log('Grouped screens by module:', screensByModule);
+            
+            // Find all lesson-screens-list elements with data-module-number attribute
+            const screensLists = document.querySelectorAll('.lesson-screens-list[data-module-number]');
+            console.log('Found lesson screen lists:', screensLists.length);
+            
+            screensLists.forEach(screensList => {
+                const moduleNumber = screensList.getAttribute('data-module-number');
+                const screens = screensByModule[moduleNumber] || [];
+                
+                let screensHTML = '';
+                
+                if (screens.length === 0) {
+                    screensHTML = '<p class="text-muted">No lesson screens available for this module.</p>';
+                } else {
+                    screens.forEach(screen => {
+                        // Determine content type based on URL extension
+                        let contentType = 'content';
+                        let contentIcon = 'fa-file-alt';
+                        let contentClass = 'success';
+                        
+                        if (screen.screen_url) {
+                            const url = screen.screen_url.toLowerCase();
+                            if (url.endsWith('.mp4') || url.endsWith('.webm') || url.endsWith('.avi') || url.endsWith('.mov')) {
+                                contentType = 'video';
+                                contentIcon = 'fa-video';
+                                contentClass = 'info';
+                            } else if (url.endsWith('.jpg') || url.endsWith('.jpeg') || url.endsWith('.png') || url.endsWith('.gif') || url.endsWith('.svg')) {
+                                contentType = 'image';
+                                contentIcon = 'fa-image';
+                                contentClass = 'primary';
+                            }
+                        }
+                        
+                        screensHTML += `
+                            <div class="lesson-screen-item p-3 mb-2 border-start border-3 border-${contentClass} ps-3 bg-light rounded">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <span class="fw-bold">${screen.screen_number || '?'}: ${screen.screen_title || 'Untitled Screen'}</span>
+                                        <span class="badge bg-${contentClass} ms-2 rounded-pill">
+                                            <i class="fas ${contentIcon} me-1"></i>${contentType.charAt(0).toUpperCase() + contentType.slice(1)}
+                                        </span>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-secondary" onclick="previewLessonScreen(${screen.lesson_screen_id})">
+                                        <i class="fas fa-eye me-1"></i>Preview
+                                    </button>
+                                </div>
+                                ${screen.screen_description ? `<div class="mt-2">${screen.screen_description}</div>` : ''}
+                            </div>
+                        `;
+                    });
+                }
+                
+                // Remove any placeholder
+                screensList.innerHTML = screensHTML;
+            });
+        }
+        
+        function previewLessonScreen(screenId) {
+            const screen = lessonScreensData.find(s => s.lesson_screen_id === screenId);
+            if (!screen) return;
+            
+            let contentPreview = '';
+            
+            if (screen.screen_url) {
+                const url = screen.screen_url.toLowerCase();
+                if (url.endsWith('.mp4') || url.endsWith('.webm') || url.endsWith('.avi') || url.endsWith('.mov')) {
+                    contentPreview = `
+                        <div class="ratio ratio-16x9">
+                            <video controls>
+                                <source src="${screen.screen_url}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                    `;
+                } else if (url.endsWith('.jpg') || url.endsWith('.jpeg') || url.endsWith('.png') || url.endsWith('.gif') || url.endsWith('.svg')) {
+                    contentPreview = `<img src="${screen.screen_url}" class="img-fluid rounded" alt="${screen.screen_title}">`;
+                } else {
+                    contentPreview = `<a href="${screen.screen_url}" target="_blank" class="btn btn-primary">Open Content</a>`;
+                }
+            } else if (screen.screen_content) {
+                contentPreview = `<div class="content-preview">${screen.screen_content}</div>`;
+            } else {
+                contentPreview = '<p class="text-muted">No content available for preview.</p>';
+            }
+            
+            // In a real implementation, this would open a modal with the preview
+            alert(`Preview functionality for screen: ${screen.screen_title}`);
+            console.log('Would show preview:', contentPreview);
         }
     </script>
 </body>
