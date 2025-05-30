@@ -841,50 +841,44 @@
                 const completedScreens = moduleScreens.filter(screen => 
                     screen.status === 'completed').length;
                 
-                // Calculate percentage based on completed screens with exact values
-                // For example, with 6 screens: 16%, 33%, 50%, 66%, 83%, 100%
+                // Calculate percentage and determine status
                 let percentage = 0;
-                if (totalScreens > 0 && completedScreens > 0) {
-                    // Use integer division for exact percentage values
-                    // Round to integer to avoid floating point inconsistencies
+                let status = 'not_started';
+
+                if (totalScreens > 0) {
+                    // Calculate exact percentage
                     percentage = Math.floor((completedScreens * 100) / totalScreens);
                     
                     // If all screens are completed, ensure it shows 100%
                     if (completedScreens === totalScreens) {
                         percentage = 100;
+                        status = 'completed';
+                    } else if (completedScreens > 0) {
+                        status = 'in_progress';
+                        // For specific screen counts, use exact percentage values
+                        if (totalScreens === 6) {
+                            const exactPercentages = [0, 16, 33, 50, 66, 83, 100];
+                            percentage = exactPercentages[completedScreens];
+                        } else if (totalScreens === 3) {
+                            const exactPercentages = [0, 33, 66, 100];
+                            percentage = exactPercentages[completedScreens];
+                        }
                     }
-                    
-                    // Force to match specific values for 1/3, 2/3, etc. to match the database exactly
-                    if (totalScreens === 6) {
-                        // For 6 screens, use specific percentage values
-                        const exactPercentages = [0, 16, 33, 50, 66, 83, 100];
-                        percentage = exactPercentages[completedScreens];
-                    } else if (totalScreens === 3) {
-                        // For 3 screens, use 33%, 66%, 100%
-                        const exactPercentages = [0, 33, 66, 100];
-                        percentage = exactPercentages[completedScreens];
-                    }
-                    
-                    console.log(`Module progress: ${completedScreens}/${totalScreens} screens completed = ${percentage}%`);
                 }
-                
-                // Determine status - set to in_progress once at least one screen is completed
-                let status = 'not_started';
-                if (completedScreens > 0) {
-                    status = completedScreens === totalScreens ? 'completed' : 'in_progress';
-                }
-                if (percentage === 100) {
-                    status = 'completed';
-                } else if (percentage > 0) {
-                    status = 'in_progress';
-                }
-                
-                // Update module progress
+
+                console.log(`Module ${currentModuleProgress.module_number} progress update:`, {
+                    totalScreens,
+                    completedScreens,
+                    percentage,
+                    status
+                });
+
+                // Update module progress in the database
                 const updateData = {
                     status: status,
                     progress_percentage: percentage
                 };
-                
+
                 fetch(`http://127.0.0.1:8000/api/v1/module-progress/${currentModuleProgress.progress_id}`, {
                     method: 'PUT',
                     headers: {
@@ -894,31 +888,29 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    // Update local module progress data with the returned data from server
-                    if (data.data) {
-                        // Use the data returned from the server to ensure consistency
-                        currentModuleProgress = data.data;
-                    } else {
-                        // Fallback to manually updating if server doesn't return full data
-                        currentModuleProgress.status = status;
-                        currentModuleProgress.progress_percentage = percentage;
-                    }
-                    
+                    // Update local module progress data
+                    currentModuleProgress.status = status;
+                    currentModuleProgress.progress_percentage = percentage;
+
                     // Find module in moduleProgressData and update it
                     const moduleIndex = moduleProgressData.findIndex(module => 
                         module.progress_id === currentModuleProgress.progress_id);
                     if (moduleIndex !== -1) {
                         moduleProgressData[moduleIndex] = currentModuleProgress;
                     }
-                    
+
                     // Update the global data to keep it in sync
                     updateGlobalModuleProgress(currentModuleProgress.progress_id, status, percentage);
-                    
+
                     // Force refresh all UI elements to show new progress
                     updateProgressUI();
-                    
+
                     // Log the updated progress
-                    console.log('Module progress updated:', currentModuleProgress.progress_percentage + '%');
+                    console.log('Module progress updated:', {
+                        moduleNumber: currentModuleProgress.module_number,
+                        percentage: percentage + '%',
+                        status: status
+                    });
                 })
                 .catch(error => {
                     console.error('Error updating module progress:', error);
@@ -1391,10 +1383,22 @@
                 // Find current lesson item
                 const currentItem = $(`#${currentId}`).length ? $(`#${currentId}`) : $(`.lesson-item.active`);
                 
-                // Get previous and next items
-                const prevItem = currentItem.prev('.lesson-item');
-                const nextItem = currentItem.next('.lesson-item');
+                // Get current module number
+                const currentModuleNumber = parseInt(currentItem.closest('.module-item').attr('id').split('-')[1]);
                 
+                // Get previous and next items, considering module boundaries
+                let prevItem = currentItem.prev('.lesson-item');
+                let nextItem = currentItem.next('.lesson-item');
+                
+                // If there's no next item in current module, check the next module
+                if (!nextItem.length) {
+                    const nextModuleNumber = currentModuleNumber + 1;
+                    const nextModule = $(`#module-${nextModuleNumber}`);
+                    if (nextModule.length) {
+                        nextItem = nextModule.find('.lesson-list .lesson-item:first');
+                    }
+                }
+
                 // Enable/disable back button
                 if (prevItem.length) {
                     btnBack.prop('disabled', false);
@@ -1476,20 +1480,26 @@
                         resetInProgressScreens(function() {
                             // Update current screen to completed
                             updateLessonScreenProgress(currentScreenNumber, 'completed', 100, function() {
+                                // If we're moving to a new module, select it first
+                                const nextModuleNumber = parseInt(nextItem.closest('.module-item').attr('id').split('-')[1]);
+                                if (nextModuleNumber !== currentModuleNumber) {
+                                    selectModule(nextModuleNumber);
+                                }
+
                                 // Enable and highlight next item
                                 nextItem.removeClass('disabled').addClass('in-progress');
-                                
+
                                 // Find the next screen element in the sidebar
                                 const nextSidebarItem = $(`.lesson-item[id*="${nextItem.attr('id')}"]`);
                                 if (nextSidebarItem.length) {
                                     nextSidebarItem.removeClass('disabled').addClass('in-progress');
                                 }
-                                
+
                                 // Now update the next screen progress status (it should be the ONLY in-progress screen)
                                 updateLessonScreenProgress(nextScreenNumber, 'in_progress', 50, function() {
                                     // After progress is updated, navigate to next screen
                                     nextItem.click();
-                                    
+
                                     // Update module progress
                                     updateModuleProgress();
                                 });
