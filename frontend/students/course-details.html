@@ -401,6 +401,7 @@
                 });
 
             function fetchCourseDetails(courseId) {
+                // First fetch course details
                 fetch(`http://127.0.0.1:8000/api/v1/courses/${courseId}`)
                     .then(response => response.json())
                     .then(data => {
@@ -413,11 +414,6 @@
                         const courseName = course.name.split(': ')[0]; // Get the first part before ":"
                         document.querySelector('.welcome-message p').textContent = `You're about to begin your journey in ${courseName}. Click the button below to start your learning experience.`;
 
-                        // Update progress stats
-                        const totalModules = course.structure.length;
-                        document.querySelector('.stat-card:nth-child(1) .stat-number').textContent = `0/${totalModules}`;
-                        document.querySelector('.stat-card:nth-child(2) .stat-number').textContent = totalModules;
-
                         // Update course modules
                         const taskList = document.querySelector('.progress-section .task-list');
                         taskList.innerHTML = course.structure.map((module, index) => `
@@ -427,14 +423,85 @@
                                 </div>
                                 <div class="task-content">
                                     <h3 class="task-title">Module ${module.module}: ${module.title}</h3>
-                                    <p class="task-description">${index > 0 ? `Locked - Complete Module ${index} to unlock` : module.focus}</p>
+                                    <p class="task-description">${module.focus}</p>
                                 </div>
                             </div>
                         `).join('');
 
-                        // Update start button href to include course ID
+                        // Update start button href
                         const startButton = document.querySelector('.btn-start-course');
                         startButton.href = `module-view.html`;
+
+                        // Now fetch all progress data to calculate overall progress
+                        fetch(`http://127.0.0.1:8000/api/v1/users/${userData.user_id}/all-progress`)
+                            .then(response => response.json())
+                            .then(progressData => {
+                                if (!progressData.data || progressData.data.length === 0) {
+                                    return; // No progress data yet
+                                }
+
+                                const courseData = progressData.data[0];
+                                if (!courseData.modules) return;
+
+                                // Calculate overall progress based on screen completion
+                                let totalScreens = 0;
+                                let completedScreens = 0;
+                                let inProgressScreens = 0;
+
+                                // Count screens and their status across all modules
+                                courseData.modules.forEach(module => {
+                                    if (module.lesson_screens && module.lesson_screens.length > 0) {
+                                        totalScreens += module.lesson_screens.length;
+                                        completedScreens += module.lesson_screens.filter(screen => screen.status === 'completed').length;
+                                        inProgressScreens += module.lesson_screens.filter(screen => screen.status === 'in_progress').length;
+                                    }
+                                });
+
+                                // Calculate course percentage
+                                let coursePercentage = 0;
+                                if (totalScreens > 0) {
+                                    if (completedScreens === totalScreens) {
+                                        coursePercentage = 100;
+                                    } else {
+                                        // Count completed screens as 100% and in-progress screens as 50%
+                                        coursePercentage = Math.round(((completedScreens * 100) + (inProgressScreens * 50)) / totalScreens);
+                                    }
+                                }
+
+                                // Update progress bar and text
+                                const progressBar = document.querySelector('.progress-bar');
+                                progressBar.style.width = `${coursePercentage}%`;
+                                progressBar.setAttribute('aria-valuenow', coursePercentage);
+                                document.querySelector('.text-muted').textContent = `Overall Progress: ${coursePercentage}%`;
+
+                                // Update stats
+                                const completedModules = courseData.modules.filter(m => m.status === 'completed').length;
+                                const totalModules = courseData.modules.length;
+                                document.querySelector('.stat-card:nth-child(1) .stat-number').textContent = `${completedModules}/${totalModules}`;
+                                document.querySelector('.stat-card:nth-child(2) .stat-number').textContent = totalModules - completedModules;
+
+                                // Update module status in the list
+                                courseData.modules.forEach((module, index) => {
+                                    const moduleElement = taskList.children[index];
+                                    if (moduleElement) {
+                                        const statusIcon = moduleElement.querySelector('.task-status i');
+                                        const statusDiv = moduleElement.querySelector('.task-status');
+
+                                        if (module.status === 'completed') {
+                                            moduleElement.classList.remove('module-locked');
+                                            statusDiv.className = 'task-status status-completed';
+                                            statusIcon.className = 'fas fa-check-circle';
+                                        } else if (module.status === 'in_progress') {
+                                            moduleElement.classList.remove('module-locked');
+                                            statusDiv.className = 'task-status status-pending';
+                                            statusIcon.className = 'fas fa-clock';
+                                        }
+                                    }
+                                });
+                            })
+                            .catch(error => {
+                                console.error('Error fetching progress data:', error);
+                            });
                     })
                     .catch(error => {
                         console.error('Error fetching course details:', error);
