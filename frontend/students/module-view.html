@@ -568,56 +568,58 @@
                             // Build module list in sidebar
                             buildModuleList();
                             
-                            // Default to first module's first lesson
-                            selectModule(1);
+                            // Find the single in-progress screen across all modules
+                            const inProgressScreen = screenProgressData.find(progress => progress.status === 'in_progress');
                             
-                            // Set initial lesson screen access
-                            updateLessonScreenAccess();
-                            
-                            // Find the in-progress screen for this module, or default to first lesson
-                            const moduleId = currentModuleProgress ? currentModuleProgress.progress_id : null;
-                            if (moduleId) {
-                                // Get in-progress screen for the current module
-                                const inProgressScreen = screenProgressData.find(progress => 
-                                    progress.module_progress_id === moduleId && progress.status === 'in_progress');
+                            if (inProgressScreen) {
+                                // Find the corresponding lesson screen
+                                const lessonScreen = allLessonScreens.find(screen => 
+                                    screen.lesson_screen_id === inProgressScreen.lesson_screen_id);
                                 
-                                if (inProgressScreen) {
-                                    // Find the lesson screen with this ID
-                                    const lessonScreen = allLessonScreens.find(screen => 
-                                        screen.lesson_screen_id === inProgressScreen.lesson_screen_id);
+                                if (lessonScreen) {
+                                    // Get the module number from the screen number
+                                    const moduleNumber = parseInt(lessonScreen.screen_number.split('.')[0]);
                                     
-                                    if (lessonScreen) {
-                                        // Find the lesson item corresponding to this screen
-                                        const screenNumber = lessonScreen.screen_number;
-                                        let lessonItem;
+                                    // Select the module first
+                                    selectModule(moduleNumber);
+                                    
+                                    // Find and click the corresponding lesson item
+                                    let lessonItemId;
+                                    if (lessonScreen.screen_number.includes('-video')) {
+                                        // Handle video screens
+                                        const baseNumber = lessonScreen.screen_number.replace('-video', '');
+                                        const parts = baseNumber.split('.');
+                                        lessonItemId = `screen-${parts.join('-')}-video`;
+                                    } else {
+                                        // Handle regular screens
+                                        const parts = lessonScreen.screen_number.split('.');
+                                        lessonItemId = `screen-${parts.join('-')}`;
+                                    }
+                                    
+                                    // Find and click the lesson item
+                                    const lessonItem = $(`#${lessonItemId}`);
+                                    if (lessonItem.length) {
+                                        // Make sure the module's lesson list is visible
+                                        lessonItem.closest('.lesson-list').show();
+                                        lessonItem.closest('.module-item').find('.module-header .fa-chevron-down').addClass('fa-chevron-up');
                                         
-                                        // Handle different screen number formats (e.g., '1.2', '1')
-                                        if (screenNumber.includes('.')) {
-                                            const [moduleNum, screenNum] = screenNumber.split('.');
-                                            lessonItem = $(`#screen-${moduleNum}-${screenNum}`);
-                                        } else {
-                                            lessonItem = $(`#screen-${screenNumber}`);
-                                        }
+                                        // Click the lesson item
+                                        lessonItem.click();
                                         
-                                        if (lessonItem.length) {
-                                            // Navigate to the in-progress screen
-                                            lessonItem.click();
-                                            // Make sure continue button is clickable
-                                            $('.btn-continue').prop('disabled', false);
-                                            console.log('Navigating to in-progress screen:', screenNumber);
-                                            
-                                            // Hide loading overlay and exit this block
-                                            setTimeout(() => {
-                                                loadingOverlay.classList.remove('active');
-                                            }, 500);
-                                            return;
-                                        }
+                                        // Make sure continue button is enabled
+                                        $('.btn-continue').prop('disabled', false);
+                                        
+                                        // Hide loading overlay and exit
+                                        setTimeout(() => {
+                                            loadingOverlay.classList.remove('active');
+                                        }, 500);
+                                        return;
                                     }
                                 }
                             }
                             
-                            // If no in-progress screen found, default to first lesson
-                            console.log('No in-progress screen found, defaulting to first lesson');
+                            // If no in-progress screen found or something went wrong, default to first lesson
+                            console.log('No in-progress screen found or error occurred, defaulting to first lesson');
                             const firstLesson = $('.lesson-list:visible .lesson-item:first');
                             if (firstLesson.length) {
                                 firstLesson.click();
@@ -1481,29 +1483,105 @@
                         resetInProgressScreens(function() {
                             // Update current screen to completed
                             updateLessonScreenProgress(currentScreenNumber, 'completed', 100, function() {
-                                // If we're moving to a new module, select it first
-                                const nextModuleNumber = parseInt(nextItem.closest('.module-item').attr('id').split('-')[1]);
+                                // Check if we're moving to a new module
+                                const nextModuleNumber = nextItem.length ? parseInt(nextItem.closest('.module-item').attr('id').split('-')[1]) : null;
+                                const currentModuleNumber = parseInt(currentItem.closest('.module-item').attr('id').split('-')[1]);
+                                
+                                // If this is the last screen (no next item)
+                                if (!nextItem.length) {
+                                    // Mark current module as completed with 100%
+                                    if (currentModuleProgress) {
+                                        currentModuleProgress.status = 'completed';
+                                        currentModuleProgress.progress_percentage = 100;
+                                        
+                                        // Update module progress in database
+                                        fetch(`http://127.0.0.1:8000/api/v1/module-progress/${currentModuleProgress.progress_id}`, {
+                                            method: 'PUT',
+                                            headers: {
+                                                'Content-Type': 'application/json'
+                                            },
+                                            body: JSON.stringify({
+                                                status: 'completed',
+                                                progress_percentage: 100
+                                            })
+                                        })
+                                        .then(response => response.json())
+                                        .then(() => {
+                                            // Update UI to reflect completion
+                                            updateProgressUI();
+                                        })
+                                        .catch(error => {
+                                            console.error('Error updating final module progress:', error);
+                                        });
+                                    }
+                                    return;
+                                }
+                                
+                                // If we're moving to a new module
                                 if (nextModuleNumber !== currentModuleNumber) {
-                                    selectModule(nextModuleNumber);
+                                    // Mark current module as completed with 100%
+                                    if (currentModuleProgress) {
+                                        currentModuleProgress.status = 'completed';
+                                        currentModuleProgress.progress_percentage = 100;
+                                        
+                                        // Update module progress in database
+                                        fetch(`http://127.0.0.1:8000/api/v1/module-progress/${currentModuleProgress.progress_id}`, {
+                                            method: 'PUT',
+                                            headers: {
+                                                'Content-Type': 'application/json'
+                                            },
+                                            body: JSON.stringify({
+                                                status: 'completed',
+                                                progress_percentage: 100
+                                            })
+                                        })
+                                        .then(response => response.json())
+                                        .then(() => {
+                                            // Select the next module
+                                            selectModule(nextModuleNumber);
+                                            
+                                            // Enable and highlight next item
+                                            nextItem.removeClass('disabled').addClass('in-progress');
+                                            
+                                            // Find the next screen element in the sidebar
+                                            const nextSidebarItem = $(`.lesson-item[id*="${nextItem.attr('id')}"]`);
+                                            if (nextSidebarItem.length) {
+                                                nextSidebarItem.removeClass('disabled').addClass('in-progress');
+                                            }
+                                            
+                                            // Update the next screen progress status
+                                            updateLessonScreenProgress(nextScreenNumber, 'in_progress', 50, function() {
+                                                // After progress is updated, navigate to next screen
+                                                nextItem.click();
+                                                
+                                                // Update module progress
+                                                updateModuleProgress();
+                                            });
+                                        })
+                                        .catch(error => {
+                                            console.error('Error updating module progress:', error);
+                                        });
+                                    }
+                                } else {
+                                    // Same module, just move to next screen
+                                    // Enable and highlight next item
+                                    nextItem.removeClass('disabled').addClass('in-progress');
+                                    
+                                    // Find the next screen element in the sidebar
+                                    const nextSidebarItem = $(`.lesson-item[id*="${nextItem.attr('id')}"]`);
+                                    if (nextSidebarItem.length) {
+                                        nextSidebarItem.removeClass('disabled').addClass('in-progress');
+                                    }
+                                    
+                                    // Update the next screen progress status
+                                    updateLessonScreenProgress(nextScreenNumber, 'in_progress', 50, function() {
+                                        // After progress is updated, navigate to next screen
+                                        nextItem.click();
+                                        
+                                        // Update module progress
+                                        updateModuleProgress();
+                                    });
                                 }
-
-                                // Enable and highlight next item
-                                nextItem.removeClass('disabled').addClass('in-progress');
-
-                                // Find the next screen element in the sidebar
-                                const nextSidebarItem = $(`.lesson-item[id*="${nextItem.attr('id')}"]`);
-                                if (nextSidebarItem.length) {
-                                    nextSidebarItem.removeClass('disabled').addClass('in-progress');
-                                }
-
-                                // Now update the next screen progress status (it should be the ONLY in-progress screen)
-                                updateLessonScreenProgress(nextScreenNumber, 'in_progress', 50, function() {
-                                    // After progress is updated, navigate to next screen
-                                    nextItem.click();
-
-                                    // Update module progress
-                                    updateModuleProgress();
-                                });
                             });
                         });
                     });
