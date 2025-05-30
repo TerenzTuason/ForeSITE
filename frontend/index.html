@@ -77,53 +77,78 @@
 
         /* Hero Section Responsive Styles */
         .hero-section {
-            min-height: 80vh;
-            padding: 4rem 0;
+            background: url('assets/background/hero-section.png');
+            background-size: cover;
+            background-position: center;
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
         }
 
-        @media (max-width: 768px) {
-            .hero-section {
-                min-height: 70vh;
-                padding: 3rem 0;
-            }
-
-            .hero-title {
-                font-size: 2.5rem;
-            }
-
-            .hero-subtitle {
-                font-size: 1.5rem;
-            }
-
-            .hero-description {
-                font-size: 1.1rem;
-                padding: 0 1rem;
-            }
-
-            .hero-button {
-                padding: 0.8rem 2rem;
-                font-size: 1rem;
-            }
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 1;
         }
 
-        @media (max-width: 576px) {
-            .hero-section {
-                min-height: 60vh;
-                padding: 2rem 0;
-            }
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
 
-            .hero-title {
-                font-size: 2rem;
-            }
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
 
-            .hero-subtitle {
-                font-size: 1.25rem;
-            }
+        .hero-subtitle {
+            font-size: 2rem;
+            color: #FFD700;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
 
-            .hero-description {
-                font-size: 1rem;
-                padding: 0 0.5rem;
-            }
+        .hero-description {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 2rem;
+            line-height: 1.8;
+            font-weight: 300;
+        }
+
+        .hero-button {
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: #800000;
+            color: #ffffff;
+            border: none;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(128, 0, 0, 0.2);
+        }
+
+        .hero-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(128, 0, 0, 0.3);
+            background: #FFD700;
+            color: #800000;
         }
 
         /* Core Principle Section Responsive */
@@ -519,25 +544,39 @@
             margin: 0 auto 1.5rem;
             position: relative;
             z-index: 1;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .team-member .member-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .team-member:hover .member-avatar img {
+            transform: scale(1.1);
         }
 
         .team-member .member-avatar::before {
             content: '';
             position: absolute;
-            top: -10px;
-            left: -10px;
-            right: -10px;
-            bottom: -10px;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
             border-radius: 50%;
             background: linear-gradient(45deg, #800000, #FFD700);
-            opacity: 0.1;
+            opacity: 0.2;
             z-index: -1;
             transition: all 0.4s ease;
         }
 
         .team-member:hover .member-avatar::before {
             transform: scale(1.1);
-            opacity: 0.2;
+            opacity: 0.3;
         }
 
         .team-member i {
@@ -617,81 +656,6 @@
 
         .footer a:hover {
             color: #FFD700 !important;
-        }
-
-        /* Hero Section Styles */
-        .hero-section {
-            background: #ffffff;
-            min-height: 90vh;
-            display: flex;
-            align-items: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('assets/pattern.png') repeat;
-            opacity: 0.1;
-            z-index: 1;
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 2;
-            text-align: center;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        .hero-title {
-            font-size: 3.5rem;
-            font-weight: 700;
-            color: #800000;
-            margin-bottom: 1rem;
-            line-height: 1.2;
-        }
-
-        .hero-subtitle {
-            font-size: 2rem;
-            color: #333;
-            margin-bottom: 1.5rem;
-            font-weight: 600;
-        }
-
-        .hero-description {
-            font-size: 1.25rem;
-            color: #666;
-            margin-bottom: 2rem;
-            line-height: 1.8;
-            font-weight: 300;
-        }
-
-        .hero-button {
-            padding: 1rem 2.5rem;
-            font-size: 1.1rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            background: #800000;
-            color: #ffffff;
-            border: none;
-            border-radius: 50px;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(128, 0, 0, 0.2);
-        }
-
-        .hero-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(128, 0, 0, 0.3);
-            background: #FFD700;
-            color: #800000;
         }
 
         /* Section Titles */
@@ -1078,32 +1042,32 @@
                     <div class="team-grid">
                         <div class="team-member">
                             <div class="member-avatar">
-                                <i class="fas fa-user-circle"></i>
+                                <img src="assets/team/althea.jpg" alt="Althea Denisse D. Baltero">
                             </div>
                             <h3>Althea Denisse D. Baltero</h3>
                         </div>
                         <div class="team-member">
                             <div class="member-avatar">
-                                <i class="fas fa-user-circle"></i>
+                                <img src="assets/team/erin.jpg" alt="Erin Joy M. Comendador">
                             </div>
                             <h3>Erin Joy M. Comendador</h3>
                         </div>
                         <div class="team-member">
                             <div class="member-avatar">
-                                <i class="fas fa-user-circle"></i>
+                                <img src="assets/team/charize.jpg" alt="Charize Mikaela M. Hipona">
                             </div>
                             <h3>Charize Mikaela M. Hipona</h3>
                         </div>
                         <div class="bottom-row">
                             <div class="team-member">
                                 <div class="member-avatar">
-                                    <i class="fas fa-user-circle"></i>
+                                    <img src="assets/team/jan.jpg" alt="Jan Mc Elroy P. Tolentino">
                                 </div>
                                 <h3>Jan Mc Elroy P. Tolentino</h3>
                             </div>
                             <div class="team-member">
                                 <div class="member-avatar">
-                                    <i class="fas fa-user-circle"></i>
+                                    <img src="assets/team/janna.jpg" alt="Janna Mae M. Torres">
                                 </div>
                                 <h3>Janna Mae M. Torres</h3>
                             </div>
@@ -1119,7 +1083,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-6">
-                    <p>&copy; 2024 ForeSITE. All rights reserved.</p>
+                    <p>&copy; 2025 ForeSITE. All rights reserved.</p>
                 </div>
                 <div class="col-md-6 text-md-end">
                     <a href="#" class="me-3">Privacy Policy</a>
