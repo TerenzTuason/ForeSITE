@@ -281,12 +281,29 @@ class ModuleProgressController extends Controller
         $moduleProgressIds = $moduleProgresses->pluck('progress_id');
         
         // Fetch all lesson screen progress entries for these modules
-        $lessonScreenProgress = LessonScreenProgress::with('lessonScreen')
+        $lessonScreenProgress = LessonScreenProgress::with(['lessonScreen'])
             ->whereIn('module_progress_id', $moduleProgressIds)
-            ->get()
-            ->groupBy('module_progress_id');
+            ->get();
+
+        // Group lesson screen progress by module_progress_id and sort by screen_number
+        $lessonScreenProgress = $lessonScreenProgress->groupBy('module_progress_id')
+            ->map(function ($screens) {
+                return $screens->sortBy(function ($screen) {
+                    $screenNumber = $screen->lessonScreen->screen_number;
+                    
+                    // If it's a video screen (ends with -video), make it come before its corresponding main screen
+                    if (str_ends_with($screenNumber, '-video')) {
+                        // Remove the -video suffix and add a prefix to make it sort before the main screen
+                        $baseNumber = str_replace('-video', '', $screenNumber);
+                        return $baseNumber . '-0'; // Add -0 to make it come before the main screen
+                    }
+                    
+                    // For regular screens, add a suffix to make them come after their video
+                    return $screenNumber . '-1';
+                }, SORT_NATURAL);
+            });
         
-        // Organize data by course and module
+        // Organize data by course and module with a simplified structure
         $result = [];
         
         foreach ($moduleProgresses as $moduleProgress) {
@@ -301,50 +318,51 @@ class ModuleProgressController extends Controller
                 ];
             }
             
-            // Add module progress with its lesson screen progress
-            $moduleData = $moduleProgress->toArray();
-            $moduleData['lesson_screens'] = [];
+            // Create simplified module data
+            $moduleData = [
+                'progress_id' => $moduleProgress->progress_id,
+                'user_id' => $moduleProgress->user_id,
+                'course_id' => $moduleProgress->course_id,
+                'module_number' => $moduleProgress->module_number,
+                'module_title' => $moduleProgress->module_title,
+                'module_focus' => $moduleProgress->module_focus,
+                'status' => $moduleProgress->status,
+                'progress_percentage' => $moduleProgress->progress_percentage,
+                'started_at' => $moduleProgress->started_at,
+                'completed_at' => $moduleProgress->completed_at,
+                'time_spent_minutes' => $moduleProgress->time_spent_minutes,
+                'score' => $moduleProgress->score,
+                'lesson_screens' => []
+            ];
             
             // Add lesson screen progress for this module if any exist
             if (isset($lessonScreenProgress[$moduleProgress->progress_id])) {
                 foreach ($lessonScreenProgress[$moduleProgress->progress_id] as $screenProgress) {
-                    $screenData = $screenProgress->toArray();
-                    
-                    // Include lesson screen details if available
-                    if ($screenProgress->lessonScreen) {
-                        $screenData['screen_details'] = $screenProgress->lessonScreen->toArray();
-                    }
+                    // Create simplified screen progress data
+                    $screenData = [
+                        'screen_progress_id' => $screenProgress->screen_progress_id,
+                        'module_progress_id' => $screenProgress->module_progress_id,
+                        'lesson_screen_id' => $screenProgress->lesson_screen_id,
+                        'course_module_number' => $screenProgress->course_module_number,
+                        'status' => $screenProgress->status,
+                        'progress_percentage' => $screenProgress->progress_percentage,
+                        'lesson_screen' => [
+                            'lesson_screen_id' => $screenProgress->lessonScreen->lesson_screen_id,
+                            'screen_number' => $screenProgress->lessonScreen->screen_number,
+                            'screen_title' => $screenProgress->lessonScreen->screen_title,
+                            'screen_description' => $screenProgress->lessonScreen->screen_description,
+                            'screen_content' => $screenProgress->lessonScreen->screen_content,
+                            'screen_url' => $screenProgress->lessonScreen->screen_url
+                        ]
+                    ];
                     
                     $moduleData['lesson_screens'][] = $screenData;
                 }
-                
-                // Sort lesson screens by course_module_number and then by screen_number if available
-                usort($moduleData['lesson_screens'], function($a, $b) {
-                    // First sort by course_module_number
-                    if ($a['course_module_number'] !== $b['course_module_number']) {
-                        return $a['course_module_number'] - $b['course_module_number'];
-                    }
-                    
-                    // Then by screen_number if available in screen_details
-                    if (isset($a['screen_details']) && isset($b['screen_details'])) {
-                        return strnatcmp(
-                            $a['screen_details']['screen_number'] ?? '', 
-                            $b['screen_details']['screen_number'] ?? ''
-                        );
-                    }
-                    
-                    return 0;
-                });
             }
             
             $result[$courseId]['modules'][] = $moduleData;
         }
         
-        // Convert associative array to indexed array for consistent JSON response
-        $result = array_values($result);
-        
-        return response()->json([
-            'data' => $result
-        ], Response::HTTP_OK);
+        return response()->json(['data' => array_values($result)], Response::HTTP_OK);
     }
 }

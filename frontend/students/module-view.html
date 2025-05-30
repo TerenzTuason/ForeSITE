@@ -1066,9 +1066,6 @@
                 const moduleList = $('.module-list');
                 moduleList.empty();
                 
-                // Sort modules by module number
-                moduleProgressData.sort((a, b) => a.module_number - b.module_number);
-                
                 moduleProgressData.forEach(module => {
                     // Create module item with collapsible indicator
                     const moduleItem = $(`
@@ -1117,10 +1114,6 @@
                     // Combine all screens for this module
                     moduleScreens = moduleScreens.concat(otherScreens);
                     
-                    // Sort screens by screen number
-                    moduleScreens.sort((a, b) => {
-                        return a.screen_number.localeCompare(b.screen_number, undefined, { numeric: true });
-                    });
                     
                     // Add each screen as a lesson item
                     moduleScreens.forEach(screen => {
@@ -1524,7 +1517,6 @@
              */
             function getScreenNumberFromId(elementId) {
                 if (!elementId) {
-                    console.log('getScreenNumberFromId: Element ID is null or undefined');
                     return '1'; // Default to first screen if ID is missing
                 }
                 
@@ -1533,14 +1525,24 @@
                 
                 // Handle different element ID formats
                 if (parts[0] === 'screen' || parts[0] === 'video') {
-                    // Handle formats like 'screen-1-2' or 'video-2-1'
-                    if (parts.length === 3) {
-                        return `${parts[1]}.${parts[2]}`;
-                    } else if (parts.length === 4) {
-                        // Handle formats like 'screen-3-2-1'
-                        return `${parts[1]}.${parts[2]}.${parts[3]}`;
+                    // Check if it's a video screen (last part is 'video')
+                    const isVideo = parts[parts.length - 1] === 'video';
+                    
+                    if (isVideo) {
+                        // For video screens, combine the middle parts with dot, then add -video
+                        // Example: screen-2-1-video becomes 2.1-video
+                        return `${parts.slice(1, -1).join('.')}-video`;
                     } else {
-                        return parts[1];
+                        // For regular screens
+                        if (parts.length === 3) {
+                            // Handle formats like 'screen-1-2' -> 1.2
+                            return `${parts[1]}.${parts[2]}`;
+                        } else if (parts.length === 4) {
+                            // Handle formats like 'screen-3-2-1' -> 3.2.1
+                            return `${parts[1]}.${parts[2]}.${parts[3]}`;
+                        } else {
+                            return parts[1];
+                        }
                     }
                 }
                 
