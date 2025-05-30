@@ -415,9 +415,6 @@
     <div class="courses-container">
         <div class="section-title">
             <span>Course Management</span>
-            <button class="btn btn-add-course">
-                <i class="fas fa-plus me-2"></i>Add New Course
-            </button>
         </div>
         
         <div id="coursesList">
@@ -459,11 +456,6 @@
                 window.location.href = 'login.html';
             });
             
-            // Setup event listener for Add New Course button
-            document.querySelector('.btn-add-course').addEventListener('click', function() {
-                showAddCourseModal();
-            });
-
             // Add custom CSS for tab styling
             const styleElement = document.createElement('style');
             styleElement.textContent = `
@@ -876,13 +868,6 @@
             if (lessonScreensData.length > 0) {
                 displayLessonScreensByModuleNumber();
             }
-        }
-        
-        function showAddCourseModal() {
-            // Here you would show a modal for adding a new course
-            alert('Add Course functionality will be implemented here');
-            // In a real implementation, this would show a modal with fields for the course name,
-            // description, objectives, and checkboxes for which learning styles to create
         }
         
         function editSharedCourse(courseName) {
