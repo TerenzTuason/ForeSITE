@@ -46,6 +46,13 @@ CREATE TABLE learning_styles (
     description TEXT
 );
 
+-- Insert default learning styles based on VARK model
+INSERT INTO learning_styles (style_name) VALUES
+('activist'),
+('reflector'),
+('theorist'),
+('pragmatist');
+
 -- Student profiles table
 CREATE TABLE student_profiles (
     profile_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -859,13 +866,6 @@ INSERT INTO roles (role_name, description) VALUES
 ('student', 'Regular student user'),
 ('faculty', 'Faculty member with teaching privileges'),
 ('admin', 'System administrator with full access');
-
--- Insert default learning styles based on VARK model
-INSERT INTO learning_styles (style_name) VALUES
-('activist'),
-('reflector'),
-('theorist'),
-('pragmatist');
 
 -- Insert admin user (password should be properly hashed in production)
 INSERT INTO users (role_id, email, password, first_name, last_name) VALUES
