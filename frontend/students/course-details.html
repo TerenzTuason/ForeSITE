@@ -279,6 +279,26 @@
             font-size: 1.1rem;
             margin-bottom: 2rem;
         }
+
+        .btn-start-course[disabled] {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .course-buttons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .course-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
     </style>
 </head>
 <body>
@@ -289,9 +309,17 @@
         <div class="welcome-message">
             <h2>Welcome to Your Course!</h2>
             <p>Loading Course Details...</p>
-            <a href="module-view.html" class="btn-start-course">
-                Start Course <i class="fas fa-play"></i>
-            </a>
+            <div class="course-buttons">
+                <a href="module-view.html" class="btn-start-course me-2" id="startCourseBtn" disabled>
+                    Start Course <i class="fas fa-play"></i>
+                </a>
+                <a href="module-view.html" class="btn-start-course me-2" id="continueCourseBtn" disabled>
+                    Continue Course <i class="fas fa-forward"></i>
+                </a>
+                <a href="module-view.html" class="btn-start-course" id="completedCourseBtn" disabled>
+                    Completed Course <i class="fas fa-check"></i>
+                </a>
+            </div>
         </div>
 
         <div class="course-header">
@@ -437,36 +465,38 @@
                             .then(response => response.json())
                             .then(progressData => {
                                 if (!progressData.data || progressData.data.length === 0) {
-                                    return; // No progress data yet
+                                    // No progress data yet - enable Start Course button
+                                    document.getElementById('startCourseBtn').removeAttribute('disabled');
+                                    return;
                                 }
 
                                 const courseData = progressData.data[0];
                                 if (!courseData.modules) return;
 
-                                // Calculate overall progress based on screen completion
-                                let totalScreens = 0;
-                                let completedScreens = 0;
-                                let inProgressScreens = 0;
+                                // Check if all modules have 0% progress
+                                const allModulesZeroProgress = courseData.modules.every(module => 
+                                    module.progress_percentage === 0
+                                );
 
-                                // Count screens and their status across all modules
-                                courseData.modules.forEach(module => {
-                                    if (module.lesson_screens && module.lesson_screens.length > 0) {
-                                        totalScreens += module.lesson_screens.length;
-                                        completedScreens += module.lesson_screens.filter(screen => screen.status === 'completed').length;
-                                        inProgressScreens += module.lesson_screens.filter(screen => screen.status === 'in_progress').length;
-                                    }
-                                });
+                                // Check if all modules have 100% progress
+                                const allModulesComplete = courseData.modules.every(module => 
+                                    module.progress_percentage === 100
+                                );
 
-                                // Calculate course percentage
-                                let coursePercentage = 0;
-                                if (totalScreens > 0) {
-                                    if (completedScreens === totalScreens) {
-                                        coursePercentage = 100;
-                                    } else {
-                                        // Count completed screens as 100% and in-progress screens as 50%
-                                        coursePercentage = Math.round(((completedScreens * 100) + (inProgressScreens * 50)) / totalScreens);
-                                    }
+                                // Enable appropriate button based on progress
+                                if (allModulesZeroProgress) {
+                                    document.getElementById('startCourseBtn').removeAttribute('disabled');
+                                } else if (allModulesComplete) {
+                                    document.getElementById('completedCourseBtn').removeAttribute('disabled');
+                                } else {
+                                    document.getElementById('continueCourseBtn').removeAttribute('disabled');
                                 }
+
+                                // Calculate overall progress for progress bar
+                                const totalProgress = courseData.modules.reduce((sum, module) => 
+                                    sum + module.progress_percentage, 0
+                                );
+                                const coursePercentage = Math.round(totalProgress / courseData.modules.length);
 
                                 // Update progress bar and text
                                 const progressBar = document.querySelector('.progress-bar');
@@ -476,9 +506,8 @@
 
                                 // Update stats
                                 const completedModules = courseData.modules.filter(m => m.status === 'completed').length;
-                                const totalModules = courseData.modules.length;
-                                document.querySelector('.stat-card:nth-child(1) .stat-number').textContent = `${completedModules}/${totalModules}`;
-                                document.querySelector('.stat-card:nth-child(2) .stat-number').textContent = totalModules - completedModules;
+                                document.querySelector('.stat-card:nth-child(1) .stat-number').textContent = `${completedModules}/${courseData.modules.length}`;
+                                document.querySelector('.stat-card:nth-child(2) .stat-number').textContent = courseData.modules.length - completedModules;
 
                                 // Update module status in the list
                                 courseData.modules.forEach((module, index) => {
