@@ -934,22 +934,12 @@
              * Update UI elements to show current progress
              */
             function updateProgressUI() {
-                // Calculate overall course progress based on all screen progress
-                let totalScreens = screenProgressData.length;
-                let completedScreens = screenProgressData.filter(screen => screen.status === 'completed').length;
-                let inProgressScreens = screenProgressData.filter(screen => screen.status === 'in_progress').length;
-                
-                // Calculate course percentage based on completed screens
-                let coursePercentage = 0;
-                if (totalScreens > 0) {
-                    // If all screens are completed, show 100%
-                    if (completedScreens === totalScreens) {
-                        coursePercentage = 100;
-                    } else {
-                        // Count completed screens as 100% and in-progress screens as 50%
-                        coursePercentage = Math.round(((completedScreens * 100) + (inProgressScreens * 50)) / totalScreens);
-                    }
-                }
+                // Calculate overall course progress based on module progress percentages
+                const totalModules = moduleProgressData.length;
+                const totalProgress = moduleProgressData.reduce((sum, module) => 
+                    sum + module.progress_percentage, 0
+                );
+                const coursePercentage = Math.round(totalProgress / totalModules);
 
                 // Update progress bar with calculated percentage
                 $('.progress-bar').css('width', `${coursePercentage}%`);

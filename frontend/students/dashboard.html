@@ -831,33 +831,12 @@
                                 if (progressData.data && progressData.data.length > 0) {
                                     const courseData = progressData.data[0];
                                     
-                                    // Calculate overall progress
-                                    let totalScreens = 0;
-                                    let completedScreens = 0;
-                                    let inProgressScreens = 0;
-                                    
-                                    courseData.modules.forEach(module => {
-                                        if (module.lesson_screens) {
-                                            module.lesson_screens.forEach(screen => {
-                                                totalScreens++;
-                                                if (screen.status === 'completed') {
-                                                    completedScreens++;
-                                                } else if (screen.status === 'in_progress') {
-                                                    inProgressScreens++;
-                                                }
-                                            });
-                                        }
-                                    });
-                                    
-                                    // Calculate percentage
-                                    let coursePercentage = 0;
-                                    if (totalScreens > 0) {
-                                        if (completedScreens === totalScreens) {
-                                            coursePercentage = 100;
-                                        } else {
-                                            coursePercentage = Math.round(((completedScreens * 100) + (inProgressScreens * 50)) / totalScreens);
-                                        }
-                                    }
+                                    // Calculate overall progress based on module progress percentages
+                                    const totalModules = courseData.modules.length;
+                                    const totalProgress = courseData.modules.reduce((sum, module) => 
+                                        sum + module.progress_percentage, 0
+                                    );
+                                    const coursePercentage = Math.round(totalProgress / totalModules);
                                     
                                     // Show progress display and hide no progress message
                                     $('#no-progress-message').hide();
