@@ -15,6 +15,8 @@ use App\Http\Controllers\Api\EnrollmentController;
 use App\Http\Controllers\Api\LessonScreenController;
 use App\Http\Controllers\Api\LessonScreenProgressController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\Api\ModuleAssessmentController;
+use App\Http\Controllers\Api\ModuleAssessmentProgressController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -124,6 +126,16 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('lesson-screens', LessonScreenController::class);
     Route::get('courses/{course}/lesson-screens', [LessonScreenController::class, 'getByCourse']);
     Route::get('courses/{course}/modules/{module}/lesson-screens', [LessonScreenController::class, 'getByCourseModule']);
+    
+    // Module Assessments
+    Route::apiResource('module-assessments', ModuleAssessmentController::class);
+    Route::get('courses/{course}/module-assessments', [ModuleAssessmentController::class, 'getByCourse']);
+    Route::get('courses/{course}/modules/{module}/assessment', [ModuleAssessmentController::class, 'getByCourseModule']);
+    
+    // Module Assessment Progress
+    Route::apiResource('module-assessment-progress', ModuleAssessmentProgressController::class);
+    Route::get('users/{user}/assessment-progress', [ModuleAssessmentProgressController::class, 'getByUser']);
+    Route::get('module-assessments/{assessment}/progress', [ModuleAssessmentProgressController::class, 'getByAssessment']);
     
     // Chat functionality
     Route::get('chat/room/learning-style/{styleId}', [ChatController::class, 'getChatRoomByLearningStyle']);
