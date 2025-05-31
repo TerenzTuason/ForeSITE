@@ -532,6 +532,95 @@
             margin-bottom: 0;
             opacity: 0.8;
         }
+
+        .progress-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .progress {
+            background-color: #e9ecef;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .bg-maroon {
+            background-color: var(--maroon) !important;
+        }
+        
+        .progress-text {
+            color: var(--maroon);
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .module-progress-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-top: 1rem;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .module-progress-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .module-title {
+            color: var(--maroon);
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .module-focus {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        .module-progress {
+            height: 6px;
+            background-color: #e9ecef;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .module-progress-bar {
+            height: 100%;
+            background-color: var(--maroon);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+        
+        .module-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-top: 0.5rem;
+        }
+        
+        .status-not-started {
+            background-color: #e9ecef;
+            color: #666;
+        }
+        
+        .status-in-progress {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
     </style>
 </head>
 <body>
@@ -558,9 +647,23 @@
             <!-- Course Progress Section -->
             <section class="mt-5">
                 <h2 class="section-title">Course Progress</h2>
-                <div class="no-progress-card">
+                <div class="no-progress-card" id="no-progress-message">
                     <i class="fas fa-book-reader"></i>
                     <p>No progress yet. Enroll in a course to start your learning journey!</p>
+                </div>
+                <div class="progress-card" id="progress-display" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>Overall Progress</span>
+                        <span class="progress-text">0%</span>
+                    </div>
+                    <div class="progress" style="height: 10px;">
+                        <div class="progress-bar bg-maroon" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    
+                    <!-- Module Progress Cards -->
+                    <div class="module-progress-container mt-4" id="module-progress-container">
+                        <!-- Module cards will be added here dynamically -->
+                    </div>
                 </div>
             </section>
         </div>
@@ -720,6 +823,80 @@
                 .then(data => {
                     if (data.data && data.data.length > 0) {
                         const assessmentResult = data.data[0]; // Get the most recent result
+                        
+                        // Fetch all progress data for the user
+                        fetch(`http://127.0.0.1:8000/api/v1/users/${userData.user_id}/all-progress`)
+                            .then(response => response.json())
+                            .then(progressData => {
+                                if (progressData.data && progressData.data.length > 0) {
+                                    const courseData = progressData.data[0];
+                                    
+                                    // Calculate overall progress
+                                    let totalScreens = 0;
+                                    let completedScreens = 0;
+                                    let inProgressScreens = 0;
+                                    
+                                    courseData.modules.forEach(module => {
+                                        if (module.lesson_screens) {
+                                            module.lesson_screens.forEach(screen => {
+                                                totalScreens++;
+                                                if (screen.status === 'completed') {
+                                                    completedScreens++;
+                                                } else if (screen.status === 'in_progress') {
+                                                    inProgressScreens++;
+                                                }
+                                            });
+                                        }
+                                    });
+                                    
+                                    // Calculate percentage
+                                    let coursePercentage = 0;
+                                    if (totalScreens > 0) {
+                                        if (completedScreens === totalScreens) {
+                                            coursePercentage = 100;
+                                        } else {
+                                            coursePercentage = Math.round(((completedScreens * 100) + (inProgressScreens * 50)) / totalScreens);
+                                        }
+                                    }
+                                    
+                                    // Show progress display and hide no progress message
+                                    $('#no-progress-message').hide();
+                                    $('#progress-display').show();
+                                    
+                                    // Update progress bar and text
+                                    $('.progress-bar').css('width', `${coursePercentage}%`);
+                                    $('.progress-bar').attr('aria-valuenow', coursePercentage);
+                                    $('.progress-text').text(`${coursePercentage}%`);
+                                    
+                                    // Display module progress
+                                    const moduleContainer = $('#module-progress-container');
+                                    moduleContainer.empty();
+                                    
+                                    courseData.modules.forEach(module => {
+                                        const statusClass = `status-${module.status.replace('_', '-')}`;
+                                        const statusText = module.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+                                        
+                                        const moduleCard = `
+                                            <div class="module-progress-card">
+                                                <div class="module-title">${module.module_title}</div>
+                                                <div class="module-focus">${module.module_focus}</div>
+                                                <div class="module-progress">
+                                                    <div class="module-progress-bar" style="width: ${module.progress_percentage}%"></div>
+                                                </div>
+                                                <div class="d-flex justify-content-between align-items-center mt-2">
+                                                    <span class="module-status ${statusClass}">${statusText}</span>
+                                                    <span class="progress-text">${module.progress_percentage}%</span>
+                                                </div>
+                                            </div>
+                                        `;
+                                        
+                                        moduleContainer.append(moduleCard);
+                                    });
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error fetching progress data:', error);
+                            });
                         
                         // Fetch course details using the course_id from assessment result
                         fetch(`http://127.0.0.1:8000/api/v1/courses/${assessmentResult.course_id}`)
