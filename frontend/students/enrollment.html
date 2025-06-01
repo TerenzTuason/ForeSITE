@@ -913,6 +913,58 @@
                     }
                   }
 
+                  // Create module assessment progress
+                  loadingText.textContent = "Creating module assessment records...";
+                  loadingProgressBar.style.width = "80%";
+
+                  try {
+                    // First fetch module assessments for this course
+                    const moduleAssessmentsResponse = await fetch(
+                      `http://127.0.0.1:8000/api/v1/courses/${course.course_id}/module-assessments`
+                    );
+
+                    if (!moduleAssessmentsResponse.ok) {
+                      throw new Error("Failed to fetch module assessments");
+                    }
+
+                    const moduleAssessmentsResult = await moduleAssessmentsResponse.json();
+                    const moduleAssessments = moduleAssessmentsResult.data;
+
+                    // Create progress entries for each module assessment
+                    for (const assessment of moduleAssessments) {
+                      const moduleAssessmentProgressData = {
+                        module_assessment_id: assessment.assessment_id,
+                        user_id: userData.user_id,
+                        status: "not_started"
+                      };
+
+                      const moduleAssessmentProgressResponse = await fetch(
+                        "http://127.0.0.1:8000/api/v1/module-assessment-progress",
+                        {
+                          method: "POST",
+                          headers: {
+                            "Content-Type": "application/json",
+                          },
+                          body: JSON.stringify(moduleAssessmentProgressData),
+                        }
+                      );
+
+                      if (!moduleAssessmentProgressResponse.ok) {
+                        console.error(
+                          `Failed to create progress for module assessment ${assessment.assessment_id}:`,
+                          moduleAssessmentProgressResponse.status,
+                          moduleAssessmentProgressResponse.statusText
+                        );
+                      } else {
+                        console.log(
+                          `Successfully created progress for module assessment ${assessment.assessment_id}`
+                        );
+                      }
+                    }
+                  } catch (error) {
+                    console.error("Error creating module assessment progress:", error);
+                  }
+
                   // Update loading text for completion
                   loadingText.textContent = "Enrollment complete!";
                   loadingProgressBar.style.width = "100%";
