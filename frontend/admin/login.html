@@ -294,14 +294,12 @@
                             // Store user data in session storage
                             sessionStorage.setItem('user', JSON.stringify(data.data.user));
                             
-                            // Redirect after a short delay based on specific role
-                            setTimeout(() => {
-                                if (role === 'faculty') {
-                                    window.location.href = '../faculty/dashboard.html';
-                                } else if (role === 'admin') {
-                                    window.location.href = 'dashboard.html';
-                                }
-                            }, 1500);
+                            // Redirect immediately based on specific role
+                            if (role === 'faculty') {
+                                window.location.href = '../faculty/dashboard.html';
+                            } else if (role === 'admin') {
+                                window.location.href = 'dashboard.html';
+                            }
                         } else {
                             // Show error for unauthorized role
                             showToast('Unauthorized access. This portal is only for faculty and administrators.', 'error');
