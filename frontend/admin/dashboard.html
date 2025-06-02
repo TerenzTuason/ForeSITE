@@ -197,40 +197,40 @@
         <h1 class="section-title">System Overview</h1>
         
         <div class="stats-grid">
-            <div class="stat-card">
+            <div class="stat-card loading" id="totalUsersCard">
                 <i class="fas fa-users"></i>
-                <h2>0</h2>
+                <h2 id="totalUsers">-</h2>
                 <p>Total Users</p>
                 <small>Active in System</small>
             </div>
-            <div class="stat-card">
+            <div class="stat-card loading" id="studentsCard">
                 <i class="fas fa-user-graduate"></i>
-                <h2>0</h2>
+                <h2 id="students">-</h2>
                 <p>Students</p>
                 <small>Enrolled Learners</small>
             </div>
-            <div class="stat-card">
+            <div class="stat-card loading" id="facultyCard">
                 <i class="fas fa-chalkboard-teacher"></i>
-                <h2>0</h2>
+                <h2 id="faculty">-</h2>
                 <p>Faculty</p>
                 <small>Teaching Staff</small>
             </div>
-            <div class="stat-card">
+            <div class="stat-card loading" id="coursesCard">
                 <i class="fas fa-book"></i>
-                <h2>0</h2>
+                <h2 id="courses">-</h2>
                 <p>Total Courses</p>
                 <small>Available Courses</small>
             </div>
-            <div class="stat-card">
+            <div class="stat-card loading" id="modulesCard">
                 <i class="fas fa-tasks"></i>
-                <h2>0</h2>
+                <h2 id="modules">-</h2>
                 <p>Active Modules</p>
                 <small>Across All Courses</small>
             </div>
-            <div class="stat-card">
+            <div class="stat-card loading" id="courseProgressCard">
                 <i class="fas fa-chart-line"></i>
-                <h2>0%</h2>
-                <p>System Usage</p>
+                <h2 id="courseProgress">-</h2>
+                <p>Course Progress</p>
                 <small>Last 30 Days</small>
             </div>
         </div>
@@ -263,6 +263,210 @@
                 sessionStorage.removeItem('user');
                 window.location.href = 'login.html';
             });
+
+            // API base URL
+            const apiBaseUrl = 'http://127.0.0.1:8000/api/v1';
+            
+            // Fetch all user data
+            fetchUsers();
+            
+            // Fetch courses data
+            fetchCourses();
+            
+            // Fetch module data
+            fetchModules();
+            
+            // Calculate course progress
+            calculateCourseProgress();
+            
+            // Function to fetch all users
+            function fetchUsers() {
+                fetch(`${apiBaseUrl}/users`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data && data.data) {
+                            const users = data.data;
+                            
+                            // Count total users
+                            const totalUsers = users.length;
+                            
+                            // Count students
+                            const students = users.filter(user => 
+                                user.role && user.role.role_name === 'student'
+                            ).length;
+                            
+                            // Count faculty
+                            const faculty = users.filter(user => 
+                                user.role && user.role.role_name === 'faculty'
+                            ).length;
+                            
+                            // Update UI
+                            document.getElementById('totalUsers').textContent = totalUsers;
+                            document.getElementById('totalUsersCard').classList.remove('loading');
+                            
+                            document.getElementById('students').textContent = students;
+                            document.getElementById('studentsCard').classList.remove('loading');
+                            
+                            document.getElementById('faculty').textContent = faculty;
+                            document.getElementById('facultyCard').classList.remove('loading');
+                        } else {
+                            // Handle empty data
+                            document.getElementById('totalUsers').textContent = '0';
+                            document.getElementById('students').textContent = '0';
+                            document.getElementById('faculty').textContent = '0';
+                            
+                            document.getElementById('totalUsersCard').classList.remove('loading');
+                            document.getElementById('studentsCard').classList.remove('loading');
+                            document.getElementById('facultyCard').classList.remove('loading');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching users:', error);
+                        
+                        // Update with error message
+                        document.getElementById('totalUsers').textContent = 'Error';
+                        document.getElementById('students').textContent = 'Error';
+                        document.getElementById('faculty').textContent = 'Error';
+                        
+                        document.getElementById('totalUsersCard').classList.remove('loading');
+                        document.getElementById('studentsCard').classList.remove('loading');
+                        document.getElementById('facultyCard').classList.remove('loading');
+                    });
+            }
+            
+            // Function to fetch courses
+            function fetchCourses() {
+                fetch(`${apiBaseUrl}/courses`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Count total courses
+                        const totalCourses = data.data ? data.data.length : 0;
+                        
+                        // Update UI
+                        document.getElementById('courses').textContent = totalCourses;
+                        document.getElementById('coursesCard').classList.remove('loading');
+                    })
+                    .catch(error => {
+                        console.error('Error fetching courses:', error);
+                        
+                        // Update with error message
+                        document.getElementById('courses').textContent = 'Error';
+                        document.getElementById('coursesCard').classList.remove('loading');
+                    });
+            }
+            
+            // Function to fetch modules
+            function fetchModules() {
+                // Get module progress data to count active modules
+                fetch(`${apiBaseUrl}/module-progress`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data && data.data) {
+                            // Get unique module IDs by combining course_id and module_number
+                            const uniqueModules = new Set();
+                            
+                            data.data.forEach(module => {
+                                const moduleIdentifier = `${module.course_id}-${module.module_number}`;
+                                uniqueModules.add(moduleIdentifier);
+                            });
+                            
+                            // Count unique modules
+                            const totalModules = uniqueModules.size;
+                            
+                            // Update UI
+                            document.getElementById('modules').textContent = totalModules;
+                            document.getElementById('modulesCard').classList.remove('loading');
+                        } else {
+                            // Handle empty data
+                            document.getElementById('modules').textContent = '0';
+                            document.getElementById('modulesCard').classList.remove('loading');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching modules:', error);
+                        
+                        // Alternative approach: try to get module data from course structure
+                        fetch(`${apiBaseUrl}/courses/1`)
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error('Network response was not ok');
+                                }
+                                return response.json();
+                            })
+                            .then(courseData => {
+                                let totalModulesCount = 0;
+                                
+                                if (courseData.data && courseData.data.structure) {
+                                    totalModulesCount = courseData.data.structure.length;
+                                }
+                                
+                                // Update UI
+                                document.getElementById('modules').textContent = totalModulesCount;
+                                document.getElementById('modulesCard').classList.remove('loading');
+                            })
+                            .catch(innerError => {
+                                console.error('Error fetching course structure:', innerError);
+                                
+                                // Update with error message
+                                document.getElementById('modules').textContent = 'Error';
+                                document.getElementById('modulesCard').classList.remove('loading');
+                            });
+                    });
+            }
+            
+            // Function to calculate course progress
+            function calculateCourseProgress() {
+                // Get lesson screen progress to estimate system usage
+                fetch(`${apiBaseUrl}/module-progress`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data && data.data && data.data.length > 0) {
+                            // Count total modules and active modules
+                            const totalModules = data.data.length;
+                            const activeModules = data.data.filter(module => 
+                                module.status === 'in_progress' || module.status === 'completed'
+                            ).length;
+                            
+                            // Calculate usage percentage
+                            const usagePercentage = Math.round((activeModules / totalModules) * 100);
+                            
+                            // Update UI
+                            document.getElementById('courseProgress').textContent = `${usagePercentage}%`;
+                            document.getElementById('courseProgressCard').classList.remove('loading');
+                        } else {
+                            // Handle empty data
+                            document.getElementById('courseProgress').textContent = '0%';
+                            document.getElementById('courseProgressCard').classList.remove('loading');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error calculating course progress:', error);
+                        
+                        // Update with error message
+                        document.getElementById('courseProgress').textContent = 'Error';
+                        document.getElementById('courseProgressCard').classList.remove('loading');
+                    });
+            }
         });
     </script>
 </body>
