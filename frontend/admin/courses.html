@@ -772,11 +772,6 @@
                             <div class="style-details bg-light p-3 rounded mb-3">
                                 <h4 class="mb-3">Style: ${styleName}</h4>
                                 <p>${styleVersion.description || 'No description provided for this learning style version.'}</p>
-                                <div class="d-flex justify-content-end">
-                                    <button class="btn btn-sm btn-outline-primary" onclick="editStyleVersion(${styleVersion.course_id})">
-                                        <i class="fas fa-edit me-1"></i>Edit Style Details
-                                    </button>
-                                </div>
                             </div>
                         </div>
                     `;
@@ -849,15 +844,7 @@
                         <div class="course-body">
                             ${mainTabsHTML}
                             ${mainTabContentHTML}
-                        </div>
-                        <div class="course-actions bg-light p-3 rounded-bottom">
-                            <button class="btn btn-outline-primary" onclick="editSharedCourse('${course.name}')">
-                                <i class="fas fa-edit me-2"></i>Edit Shared Structure
-                            </button>
-                            <button class="btn btn-outline-danger" onclick="deleteAllStyleVersions('${course.name}')">
-                                <i class="fas fa-trash me-2"></i>Delete All Versions
-                            </button>
-                        </div>
+                            </div>
                     </div>
                 `;
             });
