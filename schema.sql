@@ -795,8 +795,6 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
   null
 );
 
--------------------- USER COURSE PROGRESS --------------------
-
 -- Student progress in modules
 CREATE TABLE module_progress (
     progress_id INT PRIMARY KEY AUTO_INCREMENT,
