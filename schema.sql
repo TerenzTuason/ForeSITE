@@ -237,18 +237,20 @@ CREATE TABLE lesson_screens (
     screen_title TEXT NULL,
     screen_description TEXT NULL,
     screen_content JSON NULL,
-    screen_url VARCHAR(255) NULL
+    screen_url VARCHAR(255) NULL,
+    screen_duration TEXT NULL
 );
 
-INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
+INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   "1-video",
   "Introduction to Futures Thinking",
   null,
   null,
-  "https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185804/1_Introduction_to_Futures_Thinking_egkgxg.mp4"
+  "https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185804/1_Introduction_to_Futures_Thinking_egkgxg.mp4",
+  "3 minutes 27 seconds"
 );
 
-INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
+INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   "1.1",
   "What is Futures Thinking?",
   "A strategic mindset to explore change and build resilient policy",
@@ -269,10 +271,11 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
             "Mobilize stakeholder action"
         ]
     ]',
-    null
+    null,
+    "15 minutes"
 );
 
-INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
+INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   "1.2",
   "Looking Ahead: The Three Horizons Model",
   "A tool for thinking across short, medium, and long-term futures.",
@@ -291,10 +294,11 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
         ],
         "Futures tools focus most on H2 and H3, helping policymakers stay ahead of change."
     ]',
-    "https://res.cloudinary.com/dwn5t3o4j/image/upload/v1748186077/1.2_The_Three_Horizons_Model_b7t0si.png"
+    "https://res.cloudinary.com/dwn5t3o4j/image/upload/v1748186077/1.2_The_Three_Horizons_Model_b7t0si.png",
+    "12 minutes"
 );
 
-INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
+INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   "1.3",
   "Identifying Change Drivers",
   "Understanding what shapes the future.",
@@ -313,10 +317,11 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
         "Tip: It’s better to collect too many drivers than miss a critical one.",
         "Driver identification is the foundation of most futures work."
     ]',
-    null
+    null,
+    "14 minutes"
 );
 
-INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
+INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   "1.4",
   "Identifying Weak Signals",
   "Spotting early signs of future change.",
@@ -327,10 +332,11 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
         "Even if there’s no solid data, trust your intuition — a weak signal might grow into a major shift.",
         "Example: An unusual news article today could indicate a big future trend tomorrow."
     ]',
-    null
+    null,
+    "12 minutes"
 );
 
-INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
+INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   "1.5",
   "Linking Futures Thinking to the Policy Cycle",
   "Where foresight fits in policymaking.",
@@ -351,18 +357,20 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
         "Key to impact: Involve policy teams and decision-makers early in the futures process.",
         "Use futures work to bridge long-term visioning with real policy goals."
     ]',
-    "https://res.cloudinary.com/dwn5t3o4j/image/upload/v1748186077/1.5_Illustrative_Policy_Cycle_dgw7i8.png"
+    "https://res.cloudinary.com/dwn5t3o4j/image/upload/v1748186077/1.5_Illustrative_Policy_Cycle_dgw7i8.png",
+    "15 minutes"
 );
 
-INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
+INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   "2.1-video",
   "Driver Mapping",
   null,
   null,
-  "https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185724/2.1_Driver_Mapping_lmspxt.mp4"
+  "https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185724/2.1_Driver_Mapping_lmspxt.mp4",
+  "56 seconds"
 );
 
-INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
+INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   "2.1",
   "Driver Mapping",
   "Drivers are influential forces of changes that are currently shaping or have the capacity to shape or transform a system. Driver mapping is one of the most important tools in foresight. It helps to identify the most influential forces of change in a system.",
@@ -373,7 +381,8 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
             "PESTLE includes all of those, plus an extra category for Legal drivers."
         ]
     ]',
-    "https://res.cloudinary.com/dwn5t3o4j/image/upload/v1748186077/2.1_PESTLE_i4quij.png"
+    "https://res.cloudinary.com/dwn5t3o4j/image/upload/v1748186077/2.1_PESTLE_i4quij.png",
+    "18 minutes"
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
@@ -415,15 +424,16 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
     null
 );
 
-INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
+INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   "2.2-video",
   "Horizon Scanning",
   null,
   null,
-  "https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185779/2.2_Horizon_Scanning_yhuel4.mp4"
+  "https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185779/2.2_Horizon_Scanning_yhuel4.mp4",
+  "2 minutes 4 seconds"
 );
 
-INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
+INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   "2.2",
   "Horizon scanning",
   "Horizon scanning is a foresight process focused on identifying and collating early warning signs of change, or emerging signals that may have significant impacts when they develop.",
@@ -444,7 +454,8 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
             "Even though they are faint and uncertain, weak signals are important to notice and keep an eye on because they can turn into strong, clear trends later on."
         ]
   ]',
-  "https://res.cloudinary.com/dwn5t3o4j/image/upload/v1748186078/2.2_Emerging_Issue_Analysis_blsa8e.png"
+  "https://res.cloudinary.com/dwn5t3o4j/image/upload/v1748186078/2.2_Emerging_Issue_Analysis_blsa8e.png",
+  "15 minutes"
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
@@ -484,15 +495,16 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
   null
 );
 
-INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
+INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   "2.3-video",
   "Trends Identification and Analysis",
   null,
   null,
-  "https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185774/2.3_Trends_Identification_and_Analysis_zfvxos.mp4"
+  "https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185774/2.3_Trends_Identification_and_Analysis_zfvxos.mp4",
+  "9 minutes 34 seconds"
 );
 
-INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
+INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   "2.3",
   "Trends Identification and Analysis",
   "Understanding the cascading impacts of change using structured brainstorming and visualization.",
@@ -506,7 +518,8 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
         ],
         "This tool helps us see how one initial change “seed of change” can set off a chain reaction of consequences, both good and bad, that keep going and going."
   ]',
-  "https://res.cloudinary.com/dwn5t3o4j/image/upload/v1748186078/2.3_Implications_Analysis_Considerations_fzxlyt.png"
+  "https://res.cloudinary.com/dwn5t3o4j/image/upload/v1748186078/2.3_Implications_Analysis_Considerations_fzxlyt.png",
+  "18 minutes"
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
@@ -530,15 +543,16 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
   null
 );
 
-INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
+INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   "3.1-video",
   "Causal Layered Analysis",
   null,
   null,
-  "https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185859/3.1_Causal_Layered_Analysis_u1pfwq.mp4"
+  "https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185859/3.1_Causal_Layered_Analysis_u1pfwq.mp4",
+  "19 minutes 11 seconds"
 );
 
-INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
+INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   "3.1",
   "Causal Layered Analysis",
   "It is a powerful tool that helps us understand complex issues by looking beyond the surface. It's used to reveal hidden beliefs and perspectives that shape our current reality, and then to help create new stories that can lead to a desired future.",
@@ -561,7 +575,8 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
             ["This is the very deepest level, uncovering the powerful, often unspoken, stories and fundamental ideas that shape our worldviews. These are the unconscious narratives that truly influence how we see reality."]
         ]
   ]',
-  "https://res.cloudinary.com/dwn5t3o4j/image/upload/v1748186078/3.1_CLA_Levels_of_Analysis_ooqitq.png"
+  "https://res.cloudinary.com/dwn5t3o4j/image/upload/v1748186078/3.1_CLA_Levels_of_Analysis_ooqitq.png",
+  "15 minutes"
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
@@ -615,15 +630,16 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
   "https://res.cloudinary.com/dwn5t3o4j/image/upload/v1748186079/3.1.2_Using_CLA_sfpy9p.png"
 );
 
-INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
+INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   "3.2-video",
   "Futures Triangle",
   null,
   null,
-  "https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185745/3.2_Futures_Triangle_l837ah.mp4"
+  "https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185745/3.2_Futures_Triangle_l837ah.mp4",
+  "2 minutes 59 seconds"
 );
 
-INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
+INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   "3.2",
   "Futures Triangle",
   "Futures triangle is a futures method that helps us to map the present views of the future through three dimensions that are shaping it. The three dimensions are: the images (pull) of the future, the megatrends and drivers (push) of the present and the barriers (weight) of past/history.",
@@ -654,7 +670,8 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
       "This push and pull changes where the future is likely to go."
     )
   ),
-  "https://res.cloudinary.com/dwn5t3o4j/image/upload/v1748186111/3.2_Futures_Triangle_kzo8sy.png"
+  "https://res.cloudinary.com/dwn5t3o4j/image/upload/v1748186111/3.2_Futures_Triangle_kzo8sy.png",
+  "18 minutes"
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
@@ -713,15 +730,16 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
   null
 );
 
-INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
+INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   "3.3-video",
   "Scenario Planning",
   null,
   null,
-  "https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185751/3.3_Scenario_Planning_viem5x.mp4"
+  "https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185751/3.3_Scenario_Planning_viem5x.mp4",
+  "2 minutes 15 seconds"
 );
 
-INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
+INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   "3.3",
   "Scenario",
   "A scenario is a description of how the future may unfold based on an explicit, coherent and internally consistent set of plausible assumptions about key relationships among drivers of change.",
@@ -738,7 +756,8 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
       "Change progression scenarios method"
     )
   ),
-  null
+  null,
+  "18 minutes"
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(

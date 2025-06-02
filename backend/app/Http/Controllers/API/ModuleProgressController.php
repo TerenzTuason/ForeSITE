@@ -352,7 +352,8 @@ class ModuleProgressController extends Controller
                             'screen_title' => $screenProgress->lessonScreen->screen_title,
                             'screen_description' => $screenProgress->lessonScreen->screen_description,
                             'screen_content' => $screenProgress->lessonScreen->screen_content,
-                            'screen_url' => $screenProgress->lessonScreen->screen_url
+                            'screen_url' => $screenProgress->lessonScreen->screen_url,
+                            'screen_duration' => $screenProgress->lessonScreen->screen_duration
                         ]
                     ];
                     

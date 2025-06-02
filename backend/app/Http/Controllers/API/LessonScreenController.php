@@ -34,6 +34,7 @@ class LessonScreenController extends Controller
             'screen_description' => 'nullable|string',
             'screen_content' => 'nullable|array',
             'screen_url' => 'nullable|string|max:255',
+            'screen_duration' => 'nullable|string'
         ]);
 
         if ($validator->fails()) {
@@ -57,6 +58,7 @@ class LessonScreenController extends Controller
             'screen_description' => $request->screen_description,
             'screen_content' => $request->screen_content,
             'screen_url' => $request->screen_url,
+            'screen_duration' => $request->screen_duration
         ]);
 
         return response()->json(['data' => $lessonScreen], Response::HTTP_CREATED);
@@ -94,6 +96,7 @@ class LessonScreenController extends Controller
             'screen_description' => 'nullable|string',
             'screen_content' => 'nullable|array',
             'screen_url' => 'nullable|string|max:255',
+            'screen_duration' => 'nullable|string'
         ]);
 
         if ($validator->fails()) {
@@ -120,6 +123,7 @@ class LessonScreenController extends Controller
             'screen_title',
             'screen_description',
             'screen_url',
+            'screen_duration'
         ]);
         
         // Handle screen_content separately

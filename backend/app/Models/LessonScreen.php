@@ -41,7 +41,8 @@ class LessonScreen extends Model
         'screen_title',
         'screen_description',
         'screen_content',
-        'screen_url'
+        'screen_url',
+        'screen_duration'
     ];
 
     /**

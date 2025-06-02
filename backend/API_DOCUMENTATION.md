@@ -510,7 +510,8 @@ Before using the API, make sure you:
     "content": "This is the introduction content...",
     "type": "text"
   },
-  "screen_url": null // Optional
+  "screen_url": null, // Optional
+  "screen_duration": "15 minutes" // Optional, can be null
 }
 ```
 
@@ -527,7 +528,8 @@ Before using the API, make sure you:
       "content": "This is the introduction content...",
       "type": "text"
     },
-    "screen_url": null
+    "screen_url": null,
+    "screen_duration": "15 minutes"
   }
 }
 ```
@@ -546,7 +548,8 @@ Before using the API, make sure you:
         "content": "This is the introduction content...",
         "type": "text"
       },
-      "screen_url": null
+      "screen_url": null,
+      "screen_duration": "15 minutes"
     },
     {
       "lesson_screen_id": 2,
@@ -557,7 +560,8 @@ Before using the API, make sure you:
         "content": "This is the content about key principles...",
         "type": "text"
       },
-      "screen_url": null
+      "screen_url": null,
+      "screen_duration": "12 minutes"
     }
   ]
 }
@@ -579,7 +583,8 @@ Before using the API, make sure you:
         "content": "This is the introduction content...",
         "type": "text"
       },
-      "screen_url": null
+      "screen_url": null,
+      "screen_duration": "15 minutes"
     },
     {
       "lesson_screen_id": 2,
@@ -592,7 +597,8 @@ Before using the API, make sure you:
         "content": "This is the content about key principles...",
         "type": "text"
       },
-      "screen_url": null
+      "screen_url": null,
+      "screen_duration": "12 minutes"
     },
     {
       "lesson_screen_id": 3,
@@ -605,7 +611,8 @@ Before using the API, make sure you:
         "content": "This is the content about process design...",
         "type": "text"
       },
-      "screen_url": null
+      "screen_url": null,
+      "screen_duration": "18 minutes"
     }
   ]
 }
