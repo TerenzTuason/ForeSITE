@@ -403,6 +403,26 @@
     <!-- Navigation -->
     <div id="navbar-placeholder"></div>
 
+    <!-- Add modal HTML before the loading overlay -->
+    <div class="assessment-modal modal fade" id="assessmentModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="assessmentModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="assessmentModalLabel">Module Assessment Available</h5>
+          </div>
+          <div class="modal-body">
+            <p>You have completed this module! The module assessment is now available.</p>
+            <p>Please proceed to the assessment page to complete your evaluation.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" onclick="window.location.href='assessment-view.html'">
+              Go to Assessment
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Loading Overlay -->
     <div class="loading-overlay" id="loadingOverlay">
       <div class="loading-spinner"></div>
@@ -462,6 +482,15 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
       $(document).ready(function () {
+        // Add this near the top of the $(document).ready function
+        let assessmentModal;
+        
+        // Initialize the modal once the DOM is ready
+        assessmentModal = new bootstrap.Modal(
+          document.getElementById('assessmentModal'),
+          { backdrop: 'static', keyboard: false }
+        );
+
         // Load navbar
         $("#navbar-placeholder").load("../components/navbar.html");
 
@@ -1446,6 +1475,9 @@
 
           // Update navigation buttons
           updateNavigationButtons(lessonScreen.screen_number);
+
+          // Start assessment progress checking
+          checkAssessmentProgress();
         }
 
         /**
@@ -2016,6 +2048,87 @@
           console.log("No screen number mapping for ID:", elementId);
           return "1.1"; // Default to first content screen if no mapping
         }
+
+        // Add new functions for assessment handling
+        let assessmentCheckInterval;
+
+        /**
+         * Check assessment progress for completed modules
+         */
+        function checkAssessmentProgress() {
+          // Get user data from session storage
+          const userData = JSON.parse(sessionStorage.getItem("user"));
+          if (!userData) {
+            console.log("Missing user data");
+            return;
+          }
+
+          console.log("Checking assessment progress");
+
+          fetch(`http://127.0.0.1:8000/api/v1/users/${userData.user_id}/assessment-progress`)
+            .then((response) => response.json())
+            .then((data) => {
+              console.log("Assessment progress API response:", data);
+
+              if (!data || !data.data) {
+                console.log("No assessment data received");
+                return;
+              }
+
+              // Find a module that is completed but its assessment is not started
+              const completedModuleAssessment = data.data.find(progress => 
+                progress.module_progress && 
+                progress.module_progress.status === "completed" &&
+                progress.status === "not_started"
+              );
+
+              console.log("Found completed module with not started assessment:", completedModuleAssessment);
+
+              if (completedModuleAssessment) {
+                const moduleNumber = completedModuleAssessment.module_progress.module_number;
+                console.log("Showing modal for completed module:", moduleNumber);
+
+                // Update modal content with specific module information
+                document.getElementById('assessmentModalLabel').textContent = 
+                  `Module ${moduleNumber} Assessment Available`;
+                
+                document.querySelector('#assessmentModal .modal-body').innerHTML = `
+                  <p>You have completed Module ${moduleNumber}: ${completedModuleAssessment.module_progress.module_title}!</p>
+                  <p>The module assessment "${completedModuleAssessment.assessment.assessment_title}" is now available.</p>
+                  <p>Please proceed to the assessment page to complete your evaluation.</p>
+                `;
+
+                // Show the modal
+                if (assessmentModal) {
+                  assessmentModal.show();
+                  console.log("Modal shown");
+                } else {
+                  console.log("Modal instance not found");
+                }
+              } else {
+                console.log("No completed modules with pending assessments found");
+                // Hide modal if it's showing
+                if (assessmentModal) {
+                  assessmentModal.hide();
+                }
+              }
+            })
+            .catch((error) => {
+              console.error("Error checking assessment progress:", error);
+            });
+        }
+
+        // Check when page loads
+        $(document).ready(function() {
+          checkAssessmentProgress();
+        });
+
+        // Modify displayLessonScreen to check when content changes
+        const originalDisplayLessonScreen = displayLessonScreen;
+        displayLessonScreen = function(lessonScreen) {
+          originalDisplayLessonScreen(lessonScreen);
+          checkAssessmentProgress();
+        };
       });
     </script>
   </body>
