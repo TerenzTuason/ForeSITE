@@ -136,6 +136,7 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('module-assessment-progress', ModuleAssessmentProgressController::class);
     Route::get('users/{user}/assessment-progress', [ModuleAssessmentProgressController::class, 'getByUser']);
     Route::get('module-assessments/{assessment}/progress', [ModuleAssessmentProgressController::class, 'getByAssessment']);
+    Route::get('module-progress/{moduleProgress}/assessment-progress', [ModuleAssessmentProgressController::class, 'getByModuleProgress']);
     
     // Chat functionality
     Route::get('chat/room/learning-style/{styleId}', [ChatController::class, 'getChatRoomByLearningStyle']);

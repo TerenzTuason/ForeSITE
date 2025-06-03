@@ -14,6 +14,7 @@ class ModuleAssessmentProgress extends Model
     protected $fillable = [
         'module_assessment_id',
         'user_id',
+        'module_progress_id',
         'status'
     ];
 
@@ -35,5 +36,13 @@ class ModuleAssessmentProgress extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    /**
+     * Get the module progress that owns this assessment progress.
+     */
+    public function moduleProgress(): BelongsTo
+    {
+        return $this->belongsTo(ModuleProgress::class, 'module_progress_id');
     }
 } 

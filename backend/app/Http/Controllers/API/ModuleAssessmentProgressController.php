@@ -15,7 +15,7 @@ class ModuleAssessmentProgressController extends Controller
      */
     public function index(): JsonResponse
     {
-        $progress = ModuleAssessmentProgress::with(['assessment', 'user'])->get();
+        $progress = ModuleAssessmentProgress::with(['assessment', 'user', 'moduleProgress'])->get();
         return response()->json(['data' => $progress]);
     }
 
@@ -27,6 +27,7 @@ class ModuleAssessmentProgressController extends Controller
         $validator = Validator::make($request->all(), [
             'module_assessment_id' => 'required|exists:module_assessment,assessment_id',
             'user_id' => 'required|exists:users,user_id',
+            'module_progress_id' => 'required|exists:module_progress,progress_id',
             'status' => 'required|in:not_started,in_progress,completed'
         ]);
 
@@ -44,7 +45,7 @@ class ModuleAssessmentProgressController extends Controller
     public function show(ModuleAssessmentProgress $moduleAssessmentProgress): JsonResponse
     {
         return response()->json([
-            'data' => $moduleAssessmentProgress->load(['assessment', 'user'])
+            'data' => $moduleAssessmentProgress->load(['assessment', 'user', 'moduleProgress'])
         ]);
     }
 
@@ -56,6 +57,7 @@ class ModuleAssessmentProgressController extends Controller
         $validator = Validator::make($request->all(), [
             'module_assessment_id' => 'exists:module_assessment,assessment_id',
             'user_id' => 'exists:users,user_id',
+            'module_progress_id' => 'exists:module_progress,progress_id',
             'status' => 'in:not_started,in_progress,completed'
         ]);
 
@@ -81,7 +83,7 @@ class ModuleAssessmentProgressController extends Controller
      */
     public function getByUser(int $userId): JsonResponse
     {
-        $progress = ModuleAssessmentProgress::with(['assessment'])
+        $progress = ModuleAssessmentProgress::with(['assessment', 'moduleProgress'])
             ->where('user_id', $userId)
             ->get();
         return response()->json(['data' => $progress]);
@@ -92,8 +94,19 @@ class ModuleAssessmentProgressController extends Controller
      */
     public function getByAssessment(int $assessmentId): JsonResponse
     {
-        $progress = ModuleAssessmentProgress::with(['user'])
+        $progress = ModuleAssessmentProgress::with(['user', 'moduleProgress'])
             ->where('module_assessment_id', $assessmentId)
+            ->get();
+        return response()->json(['data' => $progress]);
+    }
+
+    /**
+     * Get all progress entries for a specific module progress.
+     */
+    public function getByModuleProgress(int $moduleProgressId): JsonResponse
+    {
+        $progress = ModuleAssessmentProgress::with(['assessment', 'user'])
+            ->where('module_progress_id', $moduleProgressId)
             ->get();
         return response()->json(['data' => $progress]);
     }

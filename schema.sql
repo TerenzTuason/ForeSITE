@@ -1217,9 +1217,11 @@ CREATE TABLE module_assessment_progress (
     assessment_progress_id INT PRIMARY KEY AUTO_INCREMENT,
     module_assessment_id INT NOT NULL,
     user_id INT NOT NULL,
+    module_progress_id INT NOT NULL,
     status ENUM('not_started', 'in_progress', 'completed') DEFAULT 'not_started',
     FOREIGN KEY (module_assessment_id) REFERENCES module_assessment(assessment_id),
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (module_progress_id) REFERENCES module_progress(progress_id)
 );
 
 -- Certificates table
