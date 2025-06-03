@@ -266,6 +266,98 @@ The API provides CRUD (Create, Read, Update, Delete) operations for the main ent
 }
 ```
 
+### 17. Scores (`scores` table)
+- **GET /api/v1/scores**: List all scores
+- **GET /api/v1/scores/{id}**: Get specific score
+- **POST /api/v1/scores**: Create a new score
+- **PUT /api/v1/scores/{id}**: Update a score
+- **DELETE /api/v1/scores/{id}**: Delete a score
+- **GET /api/v1/scores/faculty/{facultyId}**: Get all scores given by a specific faculty member
+- **GET /api/v1/scores/assessment-progress/{progressId}**: Get all scores for a specific assessment progress
+
+### Score API Examples
+
+### Get Single Score
+```json
+// GET /api/v1/scores/{id}
+{
+  "data": {
+    "score_id": 1,
+    "faculty_id": 1,
+    "score": 4,
+    "module_assessment_progress_id": 1,
+    "faculty": {
+      "user_id": 1,
+      "first_name": "John",
+      "last_name": "Doe",
+      "email": "john@example.com"
+    },
+    "module_assessment_progress": {
+      "assessment_progress_id": 1,
+      "module_assessment_id": 1,
+      "user_id": 2,
+      "status": "completed"
+    }
+  }
+}
+```
+
+### Create Score
+```json
+// POST /api/v1/scores
+{
+  "faculty_id": 1,
+  "score": 4,
+  "module_assessment_progress_id": 1
+}
+```
+
+### 18. Feedback (`feedback` table)
+- **GET /api/v1/feedback**: List all feedback
+- **GET /api/v1/feedback/{id}**: Get specific feedback
+- **POST /api/v1/feedback**: Create a new feedback
+- **PUT /api/v1/feedback/{id}**: Update a feedback
+- **DELETE /api/v1/feedback/{id}**: Delete a feedback
+- **GET /api/v1/feedback/faculty/{facultyId}**: Get all feedback given by a specific faculty member
+- **GET /api/v1/feedback/assessment-progress/{progressId}**: Get all feedback for a specific assessment progress
+
+### Feedback API Examples
+
+### Get Single Feedback
+```json
+// GET /api/v1/feedback/{id}
+{
+  "data": {
+    "feedback_id": 1,
+    "faculty_id": 1,
+    "feedback": "Great work on understanding the concepts. Consider exploring more practical applications.",
+    "module_assessment_progress_id": 1,
+    "faculty": {
+      "user_id": 1,
+      "first_name": "John",
+      "last_name": "Doe",
+      "email": "john@example.com"
+    },
+    "module_assessment_progress": {
+      "assessment_progress_id": 1,
+      "module_assessment_id": 1,
+      "user_id": 2,
+      "status": "completed"
+    }
+  }
+}
+```
+
+### Create Feedback
+```json
+// POST /api/v1/feedback
+{
+  "faculty_id": 1,
+  "feedback": "Great work on understanding the concepts. Consider exploring more practical applications.",
+  "module_assessment_progress_id": 1
+}
+```
+
 ## Testing with Postman or APIdog
 
 1. Import the following cURL commands into your API client to test the API:

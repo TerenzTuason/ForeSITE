@@ -1213,6 +1213,7 @@ INSERT INTO module_assessment (course_id, module_number, assessment_title, asses
   )
 );
 
+-- Module assessment progress table
 CREATE TABLE module_assessment_progress (
     assessment_progress_id INT PRIMARY KEY AUTO_INCREMENT,
     module_assessment_id INT NOT NULL,
@@ -1235,18 +1236,24 @@ CREATE TABLE certificates (
     FOREIGN KEY (course_id) REFERENCES courses(course_id)
 );
 
+-- Scores table
+CREATE TABLE scores (
+    score_id INT PRIMARY KEY AUTO_INCREMENT,
+    faculty_id INT NOT NULL,
+    score INT NOT NULL CHECK (score BETWEEN 1 AND 5),
+    module_assessment_progress_id INT NOT NULL,
+    FOREIGN KEY (faculty_id) REFERENCES users(user_id),
+    FOREIGN KEY (module_assessment_progress_id) REFERENCES module_assessment_progress(assessment_progress_id)
+);
+
 -- Faculty feedback table
 CREATE TABLE feedback (
     feedback_id INT PRIMARY KEY AUTO_INCREMENT,
     faculty_id INT NOT NULL,
-    student_id INT NOT NULL,
-    module_id INT NOT NULL,
-    feedback_text TEXT NOT NULL,
-    rating INT CHECK (rating BETWEEN 0 AND 5),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    feedback TEXT NOT NULL,
+    module_assessment_progress_id INT NOT NULL,
     FOREIGN KEY (faculty_id) REFERENCES users(user_id),
-    FOREIGN KEY (student_id) REFERENCES users(user_id),
-    FOREIGN KEY (module_id) REFERENCES module_progress(progress_id)
+    FOREIGN KEY (module_assessment_progress_id) REFERENCES module_assessment_progress(assessment_progress_id)
 );
 
 -- System log for monitoring and auditing
