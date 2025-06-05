@@ -291,6 +291,33 @@
         line-height: 1.6;
       }
 
+      /* Floating assessment button styles */
+      .floating-assessment-btn {
+        position: fixed;
+        top: 120px;  /* Changed from 80px to 120px to move it down */
+        right: 20px;
+        z-index: 1000;
+        background-color: var(--maroon);
+        color: white;
+        padding: 10px 20px;
+        border-radius: var(--border-radius);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        display: none;
+        text-decoration: none;
+        transition: all 0.3s ease;
+      }
+
+      .floating-assessment-btn:hover {
+        background-color: #600000;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      }
+
+      .floating-assessment-btn i {
+        margin-right: 8px;
+      }
+
       /* Content type specific styles */
       .video-container {
         position: relative;
@@ -425,6 +452,12 @@
   <body>
     <!-- Navigation -->
     <div id="navbar-placeholder"></div>
+
+    <!-- Floating Assessment Button -->
+    <a href="assessment-view.html" class="floating-assessment-btn" id="assessmentButton">
+      <i class="fas fa-clipboard-check"></i>
+      Take Assessment
+    </a>
 
     <!-- Add modal HTML before the loading overlay -->
     <div class="assessment-modal modal fade" id="assessmentModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="assessmentModalLabel" aria-hidden="true">
@@ -1127,6 +1160,13 @@
             } else if (module.status === "in_progress") {
               moduleHeader.addClass("active");
             }
+
+            // Show/hide assessment button based on current module progress
+            if (currentModuleProgress && currentModuleProgress.progress_percentage >= 80) {
+              $("#assessmentButton").show();
+            } else {
+              $("#assessmentButton").hide();
+            }
           });
         }
 
@@ -1400,8 +1440,8 @@
         function displayLessonScreen(lessonScreen) {
           const contentContainer = $(".content-container");
 
-          // Scroll main content to top
-          $(".main-content").scrollTop(0);
+          // Scroll window to top
+          window.scrollTo(0, 0);
 
           // Update title
           // Check if it's a video by examining the screen_number suffix
@@ -1575,8 +1615,9 @@
         function displayVideoContent(videoId) {
           const contentContainer = $(".content-container");
 
-          // Scroll main content to top
-          $(".main-content").scrollTop(0);
+          // Scroll window to top
+          window.scrollTo(0, 0);
+
           let videoUrl;
           let videoTitle;
 
