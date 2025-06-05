@@ -349,7 +349,7 @@
                 </div>
                 <div class="text-end">
                     <h4 class="text-muted mb-2">Overall Progress</h4>
-                    <h2 style="color: var(--maroon); font-size: 3rem;">85%</h2>
+                    <h2 style="color: var(--maroon); font-size: 3rem;">0%</h2>
                 </div>
             </div>
 
@@ -357,23 +357,25 @@
             <div class="stats-grid">
                 <div class="stat-card">
                     <i class="fas fa-book"></i>
-                    <h2>3</h2>
+                    <h2>0</h2>
                     <p class="mb-0">Total Modules</p>
                     <small class="text-muted">In Current Course</small>
                 </div>
                 <div class="stat-card">
                     <i class="fas fa-check-circle"></i>
-                    <h2>1</h2>
+                    <h2>0</h2>
                     <p class="mb-0">Completed Modules</p>
                     <small class="text-muted">With Passing Score</small>
                 </div>
                 <div class="stat-card">
                     <i class="fas fa-clock"></i>
-                    <h2>2</h2>
+                    <h2>0</h2>
                     <p class="mb-0">Ongoing Modules</p>
                     <small class="text-muted">In Progress</small>
                 </div>
             </div>
+            <div id="module-progress-container"></div>
+            <div id="assessment-progress-container"></div>
         </div>
     </div>
 
@@ -571,14 +573,24 @@
                                         `No department • ${studentEmail}`;
                                 });
                                 
-                            // Fetch user's module progress
+                            // Clear content and show loading indicators
+                            const moduleContainer = document.getElementById('module-progress-container');
+                            const assessmentContainer = document.getElementById('assessment-progress-container');
+                            
+                            moduleContainer.innerHTML = `<div class="text-center p-3"><div class="spinner-border text-maroon" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2">Loading module progress...</p></div>`;
+                            assessmentContainer.innerHTML = `<div class="text-center p-3"><div class="spinner-border text-maroon" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2">Loading assessments...</p></div>`;
+
+                            // Fetch user's module progress and assessment progress
                             fetchModuleProgress(userId);
+                            fetchAssessmentProgress(userId);
                         }
                     })
                     .catch(error => {
                         console.error(`Error fetching details for user ${userId}:`, error);
                         document.getElementById('studentName').textContent = 'Error loading student';
                         document.getElementById('studentDepartment').textContent = 'Please try again';
+                        document.getElementById('module-progress-container').innerHTML = `<div class="alert alert-danger">Could not load student data.</div>`;
+                        document.getElementById('assessment-progress-container').innerHTML = '';
                     });
             }
             
@@ -687,12 +699,14 @@
                             displayModuleProgress(progressData.data);
                         } else {
                             // No progress data found
-                            resetModuleUI();
+                            const container = document.getElementById('module-progress-container');
+                            container.innerHTML = '<div class="alert alert-warning">No module data available for this student.</div>';
                         }
                     })
                     .catch(error => {
                         console.error(`Error fetching module progress for user ${userId}:`, error);
-                        resetModuleUI();
+                        const container = document.getElementById('module-progress-container');
+                        container.innerHTML = '<div class="alert alert-danger">Error loading module progress.</div>';
                     });
             }
             
@@ -731,28 +745,24 @@
             
             // Function to display module progress cards
             function displayModuleProgress(moduleProgressData) {
-                const moduleProgressContainer = document.querySelector('.main-content');
-                
-                // Keep the header section
-                const headerSection = moduleProgressContainer.querySelector('.d-flex.justify-content-between.align-items-center.mb-4');
-                const statsSection = moduleProgressContainer.querySelector('.stats-grid');
+                const container = document.getElementById('module-progress-container');
+                container.innerHTML = ''; // Clear loading/old content
+
                 const moduleTitle = document.createElement('h2');
                 moduleTitle.className = 'section-title';
                 moduleTitle.textContent = 'Module Progress';
-                
-                // Clear previous module cards
-                const elements = Array.from(moduleProgressContainer.children);
-                elements.forEach((element, index) => {
-                    if (index > 2) { // Keep header and stats sections
-                        element.remove();
-                    }
-                });
-                
-                // Add the module title back
-                moduleProgressContainer.appendChild(moduleTitle);
+                container.appendChild(moduleTitle);
                 
                 // Sort modules by module number
                 moduleProgressData.sort((a, b) => a.module_number - b.module_number);
+
+                if (moduleProgressData.length === 0) {
+                    const noModulesMessage = document.createElement('div');
+                    noModulesMessage.className = 'alert alert-info';
+                    noModulesMessage.textContent = 'No modules found for this student.';
+                    container.appendChild(noModulesMessage);
+                    return;
+                }
                 
                 // Create module cards
                 moduleProgressData.forEach(module => {
@@ -778,14 +788,6 @@
                         `Score: ${module.score}%` : 
                         `Progress: ${progressPercentage}%`;
                     
-                    // Feedback section only for in-progress or completed modules
-                    const feedbackSection = (module.status === 'in_progress' || module.status === 'completed') ? 
-                        `<div class="feedback-section">
-                            <h6>Faculty Feedback</h6>
-                            <textarea class="form-control mb-3" rows="3" placeholder="Add your feedback here..."></textarea>
-                            <button class="btn btn-primary">Submit Feedback</button>
-                        </div>` : '';
-                    
                     // Set module card HTML
                     moduleCard.innerHTML = `
                         <div class="d-flex justify-content-between align-items-center">
@@ -796,58 +798,91 @@
                             <div class="progress-bar" style="width: ${progressPercentage}%"></div>
                         </div>
                         <p class="mb-0 mt-2">${scoreText}</p>
-                        ${feedbackSection}
                     `;
                     
                     // Add to container
-                    moduleProgressContainer.appendChild(moduleCard);
+                    container.appendChild(moduleCard);
                 });
-                
-                // If no modules found
-                if (moduleProgressData.length === 0) {
-                    const noModulesMessage = document.createElement('div');
-                    noModulesMessage.className = 'alert alert-info';
-                    noModulesMessage.textContent = 'No modules found for this student.';
-                    moduleProgressContainer.appendChild(noModulesMessage);
-                }
             }
             
-            // Function to reset module UI to default state
-            function resetModuleUI() {
-                // Reset stats
-                document.querySelector('.stats-grid .stat-card:nth-child(1) h2').textContent = '0';
-                document.querySelector('.stats-grid .stat-card:nth-child(2) h2').textContent = '0';
-                document.querySelector('.stats-grid .stat-card:nth-child(3) h2').textContent = '0';
-                
-                // Reset overall progress
-                document.querySelector('.text-end h2').textContent = '0%';
-                
-                // Clear and reset module cards
-                const moduleProgressContainer = document.querySelector('.main-content');
-                
-                // Keep the header section and stats section
-                const headerSection = moduleProgressContainer.querySelector('.d-flex.justify-content-between.align-items-center.mb-4');
-                const statsSection = moduleProgressContainer.querySelector('.stats-grid');
-                const moduleTitle = document.createElement('h2');
-                moduleTitle.className = 'section-title';
-                moduleTitle.textContent = 'Module Progress';
-                
-                // Clear previous module cards
-                const elements = Array.from(moduleProgressContainer.children);
-                elements.forEach((element, index) => {
-                    if (index > 2) { // Keep header and stats sections
-                        element.remove();
+            // Function to fetch assessment progress for a student
+            function fetchAssessmentProgress(userId) {
+                fetch(`${apiBaseUrl}/users/${userId}/assessment-progress`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(progressData => {
+                        if (progressData && progressData.data) {
+                            displayAssessmentProgress(progressData.data);
+                        } else {
+                            const container = document.getElementById('assessment-progress-container');
+                            container.innerHTML = '<div class="alert alert-warning">No assessment data available.</div>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error(`Error fetching assessment progress for user ${userId}:`, error);
+                        const container = document.getElementById('assessment-progress-container');
+                        container.innerHTML = '<div class="alert alert-danger">Error loading assessment progress.</div>';
+                    });
+            }
+
+            // Function to display assessment progress cards
+            function displayAssessmentProgress(assessmentProgressData) {
+                const container = document.getElementById('assessment-progress-container');
+                container.innerHTML = ''; // Clear loading/old content
+
+                const assessmentTitleHeader = document.createElement('h2');
+                assessmentTitleHeader.className = 'section-title';
+                assessmentTitleHeader.textContent = 'Assessment Submissions';
+                container.appendChild(assessmentTitleHeader);
+
+                if (assessmentProgressData.length === 0) {
+                    const noAssessmentsMessage = document.createElement('div');
+                    noAssessmentsMessage.className = 'alert alert-info';
+                    noAssessmentsMessage.textContent = 'No assessment submissions found for this student.';
+                    container.appendChild(noAssessmentsMessage);
+                    return;
+                }
+
+                assessmentProgressData.forEach(item => {
+                    const assessmentCard = document.createElement('div');
+                    assessmentCard.className = 'module-card'; // Re-use module-card styling is safe in separate container
+
+                    let statusBadge = '';
+                    if (item.status === 'completed') {
+                        statusBadge = '<span class="badge bg-success">Completed</span>';
+                    } else if (item.status === 'in_progress' || item.status === 'submitted') {
+                        statusBadge = '<span class="badge bg-warning text-dark">In Progress</span>';
+                    } else {
+                        statusBadge = '<span class="badge bg-secondary">Not Started</span>';
                     }
+
+                    const assessmentTitle = item.assessment ? item.assessment.assessment_title : 'Untitled Assessment';
+                    const fileUrlLink = item.file_url ? 
+                        `<p class="mb-2 mt-2">Submission: <a href="${item.file_url}" target="_blank" rel="noopener noreferrer">View Submission</a></p>` : 
+                        '<p class="mb-2 mt-2 text-muted">No submission file.</p>';
+
+                    const feedbackSectionHTML = `
+                        <div class="feedback-section mt-3">
+                            <h6>Faculty Feedback</h6>
+                            <textarea class="form-control mb-3" rows="3" placeholder="Add your feedback for ${assessmentTitle}..."></textarea>
+                            <button class="btn btn-primary">Submit Feedback</button>
+                        </div>
+                    `;
+
+                    assessmentCard.innerHTML = `
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5>${assessmentTitle}</h5>
+                            ${statusBadge}
+                        </div>
+                        ${fileUrlLink}
+                        ${feedbackSectionHTML}
+                    `;
+                    container.appendChild(assessmentCard);
                 });
-                
-                // Add the module title back
-                moduleProgressContainer.appendChild(moduleTitle);
-                
-                // Add no data message
-                const noDataMessage = document.createElement('div');
-                noDataMessage.className = 'alert alert-warning';
-                noDataMessage.textContent = 'No module data available for this student.';
-                moduleProgressContainer.appendChild(noDataMessage);
             }
         });
     </script>
