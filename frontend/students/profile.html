@@ -134,12 +134,12 @@
         <div class="row">
             <div class="col-12">
                 <div class="profile-container position-relative">
-                    <!-- Edit Profile Button at top right -->
+                    <!-- Edit Profile Button at top right
                     <div class="position-absolute top-0 end-0 mt-4 me-4">
                         <button class="edit-btn" id="edit-profile-btn">
                             <i class="fas fa-edit me-2"></i>Edit Profile
                         </button>
-                    </div>
+                    </div> -->
                     <div class="profile-header">
                         <div class="profile-avatar">
                             <i class="fas fa-user"></i>
@@ -346,14 +346,30 @@
                         <div class="mt-3">
                             <p><strong>Individual Model Votes:</strong></p>
                             <ul class="list-group">`;
-                            
+                        
                         // Add each model's vote
                         for (const [model, vote] of Object.entries(result.result.individual_votes)) {
                             const formattedModel = model.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                            
+                            // Get model metrics if available
+                            let specificityHtml = '';
+                            if (result.result.model_metrics && result.result.model_metrics[model] && 
+                                result.result.model_metrics[model].specificity !== undefined) {
+                                const specificity = result.result.model_metrics[model].specificity;
+                                // Convert to percentage
+                                const specificityPercent = (specificity * 100).toFixed(2);
+                                specificityHtml = `<div class="small text-muted">Accuracy: ${specificityPercent}%</div>`;
+                            }
+                            
                             html += `
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                ${formattedModel}
-                                <span class="badge rounded-pill" style="background-color: var(--maroon); color: white;">${vote}</span>
+                            <li class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        ${formattedModel}
+                                        ${specificityHtml}
+                                    </div>
+                                    <span class="badge rounded-pill" style="background-color: var(--maroon); color: white;">${vote}</span>
+                                </div>
                             </li>`;
                         }
                         

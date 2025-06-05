@@ -86,15 +86,10 @@
 
 <script>
     // Add logout functionality
-    document.addEventListener('DOMContentLoaded', function() {
-        const logoutBtn = document.querySelector('.btn-logout');
-        if (logoutBtn) {
-            logoutBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                sessionStorage.removeItem('user');
-                window.location.href = '../login.html';
-            });
-        }
+    document.querySelector('.btn-logout').addEventListener('click', function(e) {
+        e.preventDefault();
+        sessionStorage.removeItem('user');
+        window.location.href = '../login.html';
 
         // Set active nav link based on current page
         const currentPage = window.location.pathname.split('/').pop();

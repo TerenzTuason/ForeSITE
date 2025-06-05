@@ -113,6 +113,8 @@
             background: white;
             border: none;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            margin-bottom: 10px;
+            min-width: 250px;
         }
         .toast-success {
             border-left: 4px solid #198754;
@@ -122,6 +124,7 @@
         }
         .toast-body {
             font-size: clamp(0.875rem, 2vw, 1rem);
+            padding: 12px 15px;
         }
         /* Add spacing between form groups */
         .form-group + .form-group {
@@ -191,10 +194,6 @@
         .form-check-input:focus {
             border-color: var(--maroon);
             box-shadow: 0 0 0 0.2rem rgba(128, 0, 0, 0.1);
-        }
-        .alert {
-            display: none;
-            margin-bottom: 1rem;
         }
     </style>
 </head>
@@ -433,8 +432,6 @@
             <h2>Create Account</h2>
             <p>Personalize your Futures Thinking journey based on your unique learning style. Let's get started!</p>
         </div>
-        <div class="alert alert-danger" id="errorAlert" role="alert"></div>
-        <div class="alert alert-success" id="successAlert" role="alert"></div>
         <form id="registerForm" novalidate>
             <div class="mb-3">
                 <label for="email" class="form-label">Email <span class="required">*</span></label>
@@ -492,10 +489,9 @@
             const form = document.getElementById('registerForm');
             const password = document.getElementById('password');
             const confirmPassword = document.getElementById('confirmPassword');
-            const errorAlert = document.getElementById('errorAlert');
-            const successAlert = document.getElementById('successAlert');
             const registerBtn = document.getElementById('registerBtn');
             const apiBaseUrl = 'http://127.0.0.1:8000/api/v1';
+            const toastContainer = document.querySelector('.toast-container');
             
             // Initialize Bootstrap modals
             const termsModal = new bootstrap.Modal(document.getElementById('termsModal'));
@@ -508,8 +504,7 @@
                 });
             });
 
-            function showToast(message, type = 'success') {
-                const toastContainer = document.querySelector('.toast-container');
+            function showToast(message, type) {
                 const toast = document.createElement('div');
                 toast.className = `toast toast-${type} show`;
                 toast.setAttribute('role', 'alert');
@@ -527,7 +522,14 @@
                 `;
 
                 toastContainer.appendChild(toast);
+                
+                // Set up close button functionality
+                const closeBtn = toast.querySelector('.btn-close');
+                closeBtn.addEventListener('click', function() {
+                    toast.remove();
+                });
 
+                // Auto remove toast after 5 seconds
                 setTimeout(() => {
                     toast.remove();
                 }, 5000);
@@ -535,10 +537,6 @@
 
             form.addEventListener('submit', function(event) {
                 event.preventDefault(); // Prevent form submission
-                
-                // Hide previous alerts
-                errorAlert.style.display = 'none';
-                successAlert.style.display = 'none';
                 
                 // Disable the button to prevent multiple submissions
                 registerBtn.disabled = true;
@@ -647,13 +645,19 @@
                     console.log('API response:', data);
                     
                     if (data.error) {
-                        // Show error message
+                        // Show error toast
                         const errorMsg = typeof data.error === 'object' 
                             ? Object.values(data.error).flat().join(', ') 
                             : data.error;
-                        errorAlert.textContent = errorMsg;
-                        errorAlert.style.display = 'block';
+                        showToast(errorMsg, 'error');
                     } else {
+                        // Show success toast
+                        showToast('Registration successful! Redirecting to login...', 'success');
+                        
+                        // Reset form
+                        form.reset();
+                        
+                        // Redirect to login page immediately
                         window.location.href = "login.html";
                     }
                 })
@@ -663,8 +667,7 @@
                     registerBtn.innerHTML = 'Register';
                     
                     console.error('Registration error:', error);
-                    errorAlert.textContent = 'An error occurred. Please try again.';
-                    errorAlert.style.display = 'block';
+                    showToast('An error occurred. Please try again.', 'error');
                 });
             });
 

@@ -15,6 +15,9 @@ use App\Http\Controllers\Api\EnrollmentController;
 use App\Http\Controllers\Api\LessonScreenController;
 use App\Http\Controllers\Api\LessonScreenProgressController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\Api\ModuleAssessmentController;
+use App\Http\Controllers\Api\ModuleAssessmentProgressController;
+use App\Http\Controllers\Api\ScoreController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -125,10 +128,43 @@ Route::prefix('v1')->group(function () {
     Route::get('courses/{course}/lesson-screens', [LessonScreenController::class, 'getByCourse']);
     Route::get('courses/{course}/modules/{module}/lesson-screens', [LessonScreenController::class, 'getByCourseModule']);
     
+    // Module Assessments
+    Route::apiResource('module-assessments', ModuleAssessmentController::class);
+    Route::get('courses/{course}/module-assessments', [ModuleAssessmentController::class, 'getByCourse']);
+    Route::get('courses/{course}/modules/{module}/assessment', [ModuleAssessmentController::class, 'getByCourseModule']);
+    
+    // Module Assessment Progress
+    Route::apiResource('module-assessment-progress', ModuleAssessmentProgressController::class);
+    Route::get('users/{user}/assessment-progress', [ModuleAssessmentProgressController::class, 'getByUser']);
+    Route::get('module-assessments/{assessment}/progress', [ModuleAssessmentProgressController::class, 'getByAssessment']);
+    Route::get('module-progress/{moduleProgress}/assessment-progress', [ModuleAssessmentProgressController::class, 'getByModuleProgress']);
+    
     // Chat functionality
     Route::get('chat/room/learning-style/{styleId}', [ChatController::class, 'getChatRoomByLearningStyle']);
     Route::get('chat/room/user/{userId}', [ChatController::class, 'getUserChatRoom']);
     Route::get('chat/messages/{roomId}', [ChatController::class, 'getChatMessages']);
     Route::post('chat/messages', [ChatController::class, 'sendMessage']);
     Route::get('chat/users/learning-style/{styleId}', [ChatController::class, 'getUsersWithSameLearningStyle']);
+
+    // Scores routes
+    Route::prefix('scores')->group(function () {
+        Route::get('/', [ScoreController::class, 'index']);
+        Route::get('/{id}', [ScoreController::class, 'show']);
+        Route::post('/', [ScoreController::class, 'store']);
+        Route::put('/{id}', [ScoreController::class, 'update']);
+        Route::delete('/{id}', [ScoreController::class, 'destroy']);
+        Route::get('/faculty/{facultyId}', [ScoreController::class, 'getFacultyScores']);
+        Route::get('/assessment-progress/{progressId}', [ScoreController::class, 'getAssessmentProgressScores']);
+    });
+
+    // Feedback routes
+    Route::prefix('feedback')->group(function () {
+        Route::get('/', [FeedbackController::class, 'index']);
+        Route::get('/{id}', [FeedbackController::class, 'show']);
+        Route::post('/', [FeedbackController::class, 'store']);
+        Route::put('/{id}', [FeedbackController::class, 'update']);
+        Route::delete('/{id}', [FeedbackController::class, 'destroy']);
+        Route::get('/faculty/{facultyId}', [FeedbackController::class, 'getFacultyFeedback']);
+        Route::get('/assessment-progress/{progressId}', [FeedbackController::class, 'getAssessmentProgressFeedback']);
+    });
 });

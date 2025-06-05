@@ -230,21 +230,21 @@
                 <p>Total Modules</p>
                 <small>Across All Courses</small>
             </div>
-            <div class="stat-card">
+            <div class="stat-card loading" id="averageProgressCard">
                 <i class="fas fa-chart-line"></i>
-                <h2>85%</h2>
+                <h2 id="averageProgress">-</h2>
                 <p>Average Progress</p>
                 <small>All Students</small>
             </div>
-            <div class="stat-card">
+            <div class="stat-card loading" id="completedModulesCard">
                 <i class="fas fa-check-circle"></i>
-                <h2>120</h2>
+                <h2 id="completedModules">-</h2>
                 <p>Completed Modules</p>
                 <small>By All Students</small>
             </div>
-            <div class="stat-card">
+            <div class="stat-card loading" id="ongoingModulesCard">
                 <i class="fas fa-clock"></i>
-                <h2>30</h2>
+                <h2 id="ongoingModules">-</h2>
                 <p>Ongoing Modules</p>
                 <small>Currently Active</small>
             </div>
@@ -285,6 +285,9 @@
             
             // Fetch total modules
             fetchModules();
+            
+            // Fetch module progress statistics
+            fetchModuleProgressStats();
             
             // Function to fetch students
             function fetchStudents() {
@@ -361,6 +364,80 @@
                     document.getElementById('totalModules').textContent = 'Error';
                     document.getElementById('totalModulesCard').classList.remove('loading');
                 }
+            }
+            
+            // Function to fetch module progress statistics
+            function fetchModuleProgressStats() {
+                fetch(`${apiBaseUrl}/module-progress`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data && data.data) {
+                            const moduleProgressData = data.data;
+                            
+                            // Calculate completed modules
+                            const completedModules = moduleProgressData.filter(
+                                module => module.status === 'completed'
+                            ).length;
+                            
+                            // Calculate ongoing modules
+                            const ongoingModules = moduleProgressData.filter(
+                                module => module.status === 'in_progress'
+                            ).length;
+                            
+                            // Calculate average progress
+                            let totalProgress = 0;
+                            let totalModules = moduleProgressData.length;
+                            
+                            if (totalModules > 0) {
+                                totalProgress = moduleProgressData.reduce((sum, module) => {
+                                    return sum + (module.progress_percentage || 0);
+                                }, 0);
+                                
+                                const averageProgress = Math.round(totalProgress / totalModules);
+                                
+                                // Update average progress card
+                                document.getElementById('averageProgress').textContent = `${averageProgress}%`;
+                                document.getElementById('averageProgressCard').classList.remove('loading');
+                            } else {
+                                document.getElementById('averageProgress').textContent = '0%';
+                                document.getElementById('averageProgressCard').classList.remove('loading');
+                            }
+                            
+                            // Update completed modules card
+                            document.getElementById('completedModules').textContent = completedModules;
+                            document.getElementById('completedModulesCard').classList.remove('loading');
+                            
+                            // Update ongoing modules card
+                            document.getElementById('ongoingModules').textContent = ongoingModules;
+                            document.getElementById('ongoingModulesCard').classList.remove('loading');
+                        } else {
+                            // Handle empty data
+                            document.getElementById('averageProgress').textContent = '0%';
+                            document.getElementById('completedModules').textContent = '0';
+                            document.getElementById('ongoingModules').textContent = '0';
+                            
+                            document.getElementById('averageProgressCard').classList.remove('loading');
+                            document.getElementById('completedModulesCard').classList.remove('loading');
+                            document.getElementById('ongoingModulesCard').classList.remove('loading');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching module progress statistics:', error);
+                        
+                        // Update with error message
+                        document.getElementById('averageProgress').textContent = 'Error';
+                        document.getElementById('completedModules').textContent = 'Error';
+                        document.getElementById('ongoingModules').textContent = 'Error';
+                        
+                        document.getElementById('averageProgressCard').classList.remove('loading');
+                        document.getElementById('completedModulesCard').classList.remove('loading');
+                        document.getElementById('ongoingModulesCard').classList.remove('loading');
+                    });
             }
         });
     </script>

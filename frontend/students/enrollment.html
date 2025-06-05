@@ -754,6 +754,71 @@
                         loadingText.textContent = "Fetching lesson screens...";
                         loadingProgressBar.style.width = "60%";
 
+                        // Create module assessment progress
+                        loadingText.textContent = "Creating module assessment records...";
+                        loadingProgressBar.style.width = "80%";
+
+                        try {
+                          // First fetch module assessments for this course
+                          const moduleAssessmentsResponse = await fetch(
+                            `http://127.0.0.1:8000/api/v1/courses/${course.course_id}/module-assessments`
+                          );
+
+                          if (!moduleAssessmentsResponse.ok) {
+                            throw new Error("Failed to fetch module assessments");
+                          }
+
+                          const moduleAssessmentsResult = await moduleAssessmentsResponse.json();
+                          const moduleAssessments = moduleAssessmentsResult.data;
+
+                          // Create progress entries for each module assessment
+                          for (const assessment of moduleAssessments) {
+                            // Find the corresponding module progress for this assessment
+                            const moduleProgress = moduleProgressResult.data.find(
+                              mp => mp.module_number === assessment.module_number
+                            );
+
+                            if (!moduleProgress) {
+                              console.error(
+                                `No module progress found for module number ${assessment.module_number}`
+                              );
+                              continue;
+                            }
+
+                            const moduleAssessmentProgressData = {
+                              module_assessment_id: assessment.assessment_id,
+                              user_id: userData.user_id,
+                              module_progress_id: moduleProgress.progress_id,
+                              status: "not_started"
+                            };
+
+                            const moduleAssessmentProgressResponse = await fetch(
+                              "http://127.0.0.1:8000/api/v1/module-assessment-progress",
+                              {
+                                method: "POST",
+                                headers: {
+                                  "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify(moduleAssessmentProgressData),
+                              }
+                            );
+
+                            if (!moduleAssessmentProgressResponse.ok) {
+                              console.error(
+                                `Failed to create progress for module assessment ${assessment.assessment_id}:`,
+                                moduleAssessmentProgressResponse.status,
+                                moduleAssessmentProgressResponse.statusText
+                              );
+                            } else {
+                              console.log(
+                                `Successfully created progress for module assessment ${assessment.assessment_id}`
+                              );
+                            }
+                          }
+                        } catch (error) {
+                          console.error("Error creating module assessment progress:", error);
+                        }
+
                         // Fetch all lesson screens - this is the critical part
                         console.log("Fetching lesson screens...");
 

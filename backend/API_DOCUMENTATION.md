@@ -169,6 +169,207 @@ The API provides CRUD (Create, Read, Update, Delete) operations for the main ent
   - 422 Unprocessable Entity: Validation failed (invalid/missing fields)
   - 500 Internal Server Error: Something went wrong during enrollment creation
 
+### 15. Module Assessments (`module_assessment` table)
+- **GET /api/v1/module-assessments**: List all module assessments
+- **GET /api/v1/module-assessments/{id}**: Get specific module assessment
+- **POST /api/v1/module-assessments**: Create a new module assessment
+- **PUT /api/v1/module-assessments/{id}**: Update a module assessment
+- **DELETE /api/v1/module-assessments/{id}**: Delete a module assessment
+- **GET /api/v1/courses/{course}/module-assessments**: Get all assessments for a specific course
+- **GET /api/v1/courses/{course}/modules/{module}/assessment**: Get assessment for a specific course module
+
+### Module Assessment API Examples
+
+### Get Single Module Assessment
+```json
+// GET /api/v1/module-assessments/{id}
+{
+  "data": {
+    "assessment_id": 1,
+    "course_id": 1,
+    "module_number": 1,
+    "assessment_title": "Future Shapers: Mapping Change Drivers",
+    "assessment_objective": "Work within your group. Identify and analyze change drivers and weak signals using the PESTLE framework.",
+    "assessment_scenario": null,
+    "assessment_instructions": [
+      {
+        "step_title": "Spot the Current Change Driver",
+        "step_description": "Find a current event (news, blog, tweet) that highlights a shift or trend influencing the future. Write a brief description of the change."
+      },
+      {
+        "step_title": "Categorize the PESTLE",
+        "step_description": "Classify the change using PESTLE framework."
+      }
+    ]
+  }
+}
+```
+
+### Create Module Assessment
+```json
+// POST /api/v1/module-assessments
+{
+  "course_id": 1,
+  "module_number": 1,
+  "assessment_title": "New Assessment",
+  "assessment_objective": "Assessment objective here",
+  "assessment_scenario": "Optional scenario description",
+  "assessment_instructions": [
+    {
+      "step_title": "Step 1",
+      "step_description": "Description of step 1"
+    }
+  ]
+}
+```
+
+### 16. Module Assessment Progress (`module_assessment_progress` table)
+- **GET /api/v1/module-assessment-progress**: List all assessment progress entries
+- **GET /api/v1/module-assessment-progress/{id}**: Get specific assessment progress
+- **POST /api/v1/module-assessment-progress**: Create a new assessment progress entry
+- **PUT /api/v1/module-assessment-progress/{id}**: Update assessment progress
+- **DELETE /api/v1/module-assessment-progress/{id}**: Delete assessment progress
+- **GET /api/v1/users/{user}/assessment-progress**: Get all assessment progress for a specific user
+- **GET /api/v1/module-assessments/{assessment}/progress**: Get all progress entries for a specific assessment
+
+### Module Assessment Progress API Examples
+
+### Get User's Assessment Progress
+```json
+// GET /api/v1/users/{userId}/assessment-progress
+{
+  "data": [
+    {
+      "assessment_progress_id": 1,
+      "module_assessment_id": 1,
+      "user_id": 1,
+      "status": "completed",
+      "file_url": "https://example.com/path/to/file.pdf",
+      "module_assessment": {
+        "assessment_id": 1,
+        "course_id": 1,
+        "module_number": 1,
+        "assessment_title": "Future Shapers: Mapping Change Drivers",
+        "assessment_objective": "Work within your group. Identify and analyze change drivers and weak signals using the PESTLE framework."
+      }
+    }
+  ]
+}
+```
+
+### Create Assessment Progress Entry
+```json
+// POST /api/v1/module-assessment-progress
+{
+  "module_assessment_id": 1,
+  "user_id": 1,
+  "module_progress_id": 1,
+  "status": "in_progress",
+  "file_url": "https://example.com/path/to/file.pdf"
+}
+```
+
+### Update Assessment Progress Entry
+```json
+// PUT /api/v1/module-assessment-progress/{id}
+{
+  "status": "completed",
+  "file_url": "https://example.com/path/to/updated-file.pdf"
+}
+```
+
+### 17. Scores (`scores` table)
+- **GET /api/v1/scores**: List all scores
+- **GET /api/v1/scores/{id}**: Get specific score
+- **POST /api/v1/scores**: Create a new score
+- **PUT /api/v1/scores/{id}**: Update a score
+- **DELETE /api/v1/scores/{id}**: Delete a score
+- **GET /api/v1/scores/faculty/{facultyId}**: Get all scores given by a specific faculty member
+- **GET /api/v1/scores/assessment-progress/{progressId}**: Get all scores for a specific assessment progress
+
+### Score API Examples
+
+### Get Single Score
+```json
+// GET /api/v1/scores/{id}
+{
+  "data": {
+    "score_id": 1,
+    "faculty_id": 1,
+    "score": 4,
+    "module_assessment_progress_id": 1,
+    "faculty": {
+      "user_id": 1,
+      "first_name": "John",
+      "last_name": "Doe",
+      "email": "john@example.com"
+    },
+    "module_assessment_progress": {
+      "assessment_progress_id": 1,
+      "module_assessment_id": 1,
+      "user_id": 2,
+      "status": "completed"
+    }
+  }
+}
+```
+
+### Create Score
+```json
+// POST /api/v1/scores
+{
+  "faculty_id": 1,
+  "score": 4,
+  "module_assessment_progress_id": 1
+}
+```
+
+### 18. Feedback (`feedback` table)
+- **GET /api/v1/feedback**: List all feedback
+- **GET /api/v1/feedback/{id}**: Get specific feedback
+- **POST /api/v1/feedback**: Create a new feedback
+- **PUT /api/v1/feedback/{id}**: Update a feedback
+- **DELETE /api/v1/feedback/{id}**: Delete a feedback
+- **GET /api/v1/feedback/faculty/{facultyId}**: Get all feedback given by a specific faculty member
+- **GET /api/v1/feedback/assessment-progress/{progressId}**: Get all feedback for a specific assessment progress
+
+### Feedback API Examples
+
+### Get Single Feedback
+```json
+// GET /api/v1/feedback/{id}
+{
+  "data": {
+    "feedback_id": 1,
+    "faculty_id": 1,
+    "feedback": "Great work on understanding the concepts. Consider exploring more practical applications.",
+    "module_assessment_progress_id": 1,
+    "faculty": {
+      "user_id": 1,
+      "first_name": "John",
+      "last_name": "Doe",
+      "email": "john@example.com"
+    },
+    "module_assessment_progress": {
+      "assessment_progress_id": 1,
+      "module_assessment_id": 1,
+      "user_id": 2,
+      "status": "completed"
+    }
+  }
+}
+```
+
+### Create Feedback
+```json
+// POST /api/v1/feedback
+{
+  "faculty_id": 1,
+  "feedback": "Great work on understanding the concepts. Consider exploring more practical applications.",
+  "module_assessment_progress_id": 1
+}
+```
+
 ## Testing with Postman or APIdog
 
 1. Import the following cURL commands into your API client to test the API:
@@ -413,7 +614,8 @@ Before using the API, make sure you:
     "content": "This is the introduction content...",
     "type": "text"
   },
-  "screen_url": null // Optional
+  "screen_url": null, // Optional
+  "screen_duration": "15 minutes" // Optional, can be null
 }
 ```
 
@@ -430,7 +632,8 @@ Before using the API, make sure you:
       "content": "This is the introduction content...",
       "type": "text"
     },
-    "screen_url": null
+    "screen_url": null,
+    "screen_duration": "15 minutes"
   }
 }
 ```
@@ -449,7 +652,8 @@ Before using the API, make sure you:
         "content": "This is the introduction content...",
         "type": "text"
       },
-      "screen_url": null
+      "screen_url": null,
+      "screen_duration": "15 minutes"
     },
     {
       "lesson_screen_id": 2,
@@ -460,7 +664,8 @@ Before using the API, make sure you:
         "content": "This is the content about key principles...",
         "type": "text"
       },
-      "screen_url": null
+      "screen_url": null,
+      "screen_duration": "12 minutes"
     }
   ]
 }
@@ -482,7 +687,8 @@ Before using the API, make sure you:
         "content": "This is the introduction content...",
         "type": "text"
       },
-      "screen_url": null
+      "screen_url": null,
+      "screen_duration": "15 minutes"
     },
     {
       "lesson_screen_id": 2,
@@ -495,7 +701,8 @@ Before using the API, make sure you:
         "content": "This is the content about key principles...",
         "type": "text"
       },
-      "screen_url": null
+      "screen_url": null,
+      "screen_duration": "12 minutes"
     },
     {
       "lesson_screen_id": 3,
@@ -508,7 +715,8 @@ Before using the API, make sure you:
         "content": "This is the content about process design...",
         "type": "text"
       },
-      "screen_url": null
+      "screen_url": null,
+      "screen_duration": "18 minutes"
     }
   ]
 }

@@ -111,19 +111,49 @@
             font-size: 0.9rem;
             color: #856404;
         }
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+        }
+        .toast {
+            background: white;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            margin-bottom: 10px;
+            min-width: 250px;
+        }
+        .toast-success {
+            border-left: 4px solid #198754;
+        }
+        .toast-error {
+            border-left: 4px solid var(--maroon);
+        }
+        .toast-body {
+            font-size: 0.9rem;
+            padding: 12px 15px;
+        }
         @media (max-width: 576px) {
             .login-container {
                 padding: 1.5rem;
                 margin: 1rem;
             }
-        }
-        .alert {
-            display: none;
-            margin-bottom: 1rem;
+            .toast-container {
+                width: 100%;
+                top: 0;
+                right: 0;
+                padding: 1rem;
+            }
+            .toast {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="toast-container"></div>
+    
     <div class="login-container">
         <div class="login-header">
             <h2>Admin & Faculty Portal</h2>
@@ -132,7 +162,6 @@
         <div class="security-notice">
             <strong>Secure Area:</strong> This portal is restricted to authorized personnel only. Unauthorized access attempts will be logged and reported.
         </div>
-        <div class="alert alert-danger" id="errorAlert" role="alert"></div>
         <form id="loginForm" novalidate>
             <div class="mb-3">
                 <label for="email" class="form-label">Institutional Email <span class="required">*</span></label>
@@ -157,15 +186,43 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('loginForm');
-            const errorAlert = document.getElementById('errorAlert');
             const loginBtn = document.getElementById('loginBtn');
             const apiBaseUrl = 'http://127.0.0.1:8000/api/v1';
+            const toastContainer = document.querySelector('.toast-container');
+            
+            function showToast(message, type) {
+                const toast = document.createElement('div');
+                toast.className = `toast toast-${type} show`;
+                toast.setAttribute('role', 'alert');
+                toast.setAttribute('aria-live', 'assertive');
+                toast.setAttribute('aria-atomic', 'true');
+                
+                toast.innerHTML = `
+                    <div class="toast-header">
+                        <strong class="me-auto">${type === 'success' ? 'Success' : 'Error'}</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                `;
+
+                toastContainer.appendChild(toast);
+                
+                // Set up close button functionality
+                const closeBtn = toast.querySelector('.btn-close');
+                closeBtn.addEventListener('click', function() {
+                    toast.remove();
+                });
+
+                // Auto remove toast after 5 seconds
+                setTimeout(() => {
+                    toast.remove();
+                }, 5000);
+            }
             
             form.addEventListener('submit', function(event) {
                 event.preventDefault();
-                
-                // Hide any previous error message
-                errorAlert.style.display = 'none';
                 
                 // Disable button to prevent multiple submissions
                 loginBtn.disabled = true;
@@ -224,17 +281,20 @@
                     console.log('API response:', data);
                     
                     if (data.error) {
-                        // Show error message
-                        errorAlert.textContent = Array.isArray(data.error) ? data.error.join(', ') : data.error;
-                        errorAlert.style.display = 'block';
+                        // Show error toast
+                        const errorMsg = Array.isArray(data.error) ? data.error.join(', ') : data.error;
+                        showToast(errorMsg, 'error');
                     } else {
                         // Check user role - only allow faculty and admin roles
                         const role = data.data.user.role.role_name;
                         if (role === 'faculty' || role === 'admin') {
+                            // Show success toast
+                            showToast('Login successful!', 'success');
+                            
                             // Store user data in session storage
                             sessionStorage.setItem('user', JSON.stringify(data.data.user));
                             
-                            // Redirect based on specific role
+                            // Redirect immediately based on specific role
                             if (role === 'faculty') {
                                 window.location.href = '../faculty/dashboard.html';
                             } else if (role === 'admin') {
@@ -242,8 +302,7 @@
                             }
                         } else {
                             // Show error for unauthorized role
-                            errorAlert.textContent = 'Unauthorized access. This portal is only for faculty and administrators.';
-                            errorAlert.style.display = 'block';
+                            showToast('Unauthorized access. This portal is only for faculty and administrators.', 'error');
                         }
                     }
                 })
@@ -253,8 +312,7 @@
                     loginBtn.innerHTML = 'Sign In';
                     
                     console.error('Login error:', error);
-                    errorAlert.textContent = 'An error occurred. Please try again.';
-                    errorAlert.style.display = 'block';
+                    showToast('An error occurred. Please try again.', 'error');
                 });
             });
         });

@@ -576,8 +576,8 @@
                                         `No department • ${studentEmail}`;
                                 });
                                 
-                            // For demo purposes, show mock module data
-                            displayModuleData();
+                            // Fetch user's module progress
+                            fetchModuleProgress(userId);
                         }
                     })
                     .catch(error => {
@@ -656,65 +656,190 @@
                     });
             }
             
-            // Function to display module data (mock data for now)
-            function displayModuleData() {
+            // Function to fetch module progress for a student
+            function fetchModuleProgress(userId) {
+                // First get user's enrollments to find courses
+                fetch(`${apiBaseUrl}/users/${userId}/enrollments`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(enrollmentData => {
+                        if (enrollmentData && enrollmentData.data && enrollmentData.data.length > 0) {
+                            // Get the first course user is enrolled in
+                            const courseId = enrollmentData.data[0].course_id;
+                            
+                            // Now fetch all module progress for this user
+                            return fetch(`${apiBaseUrl}/users/${userId}/module-progress`);
+                        } else {
+                            throw new Error('No enrollments found for user');
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(progressData => {
+                        if (progressData && progressData.data) {
+                            // Calculate statistics
+                            updateModuleStats(progressData.data);
+                            
+                            // Display module cards
+                            displayModuleProgress(progressData.data);
+                        } else {
+                            // No progress data found
+                            resetModuleUI();
+                        }
+                    })
+                    .catch(error => {
+                        console.error(`Error fetching module progress for user ${userId}:`, error);
+                        resetModuleUI();
+                    });
+            }
+            
+            // Function to update module statistics
+            function updateModuleStats(moduleProgressData) {
+                // Count modules
+                const totalModules = moduleProgressData.length;
+                
+                // Count completed modules
+                const completedModules = moduleProgressData.filter(
+                    module => module.status === 'completed'
+                ).length;
+                
+                // Count in-progress modules
+                const inProgressModules = moduleProgressData.filter(
+                    module => module.status === 'in_progress'
+                ).length;
+                
+                // Calculate overall progress percentage
+                let overallProgress = 0;
+                if (totalModules > 0) {
+                    const totalProgress = moduleProgressData.reduce(
+                        (sum, module) => sum + (module.progress_percentage || 0), 0
+                    );
+                    overallProgress = Math.round(totalProgress / totalModules);
+                }
+                
+                // Update UI
+                document.getElementById('totalModules').textContent = totalModules;
+                document.getElementById('completedModules').textContent = completedModules;
+                document.getElementById('ongoingModules').textContent = inProgressModules;
+                
                 // Update overall progress
-                document.getElementById('overallProgress').textContent = '85%';
-                
-                // Update module stats
-                document.getElementById('totalModules').textContent = '3';
-                document.getElementById('completedModules').textContent = '1';
-                document.getElementById('ongoingModules').textContent = '2';
-                
-                // Display module progress
+                document.getElementById('overallProgress').textContent = `${overallProgress}%`;
+            }
+            
+            // Function to display module progress cards
+            function displayModuleProgress(moduleProgressData) {
                 const moduleContainer = document.getElementById('moduleContainer');
                 
+                // Clear previous module cards
+                moduleContainer.innerHTML = '';
+                
+                // Sort modules by module number
+                moduleProgressData.sort((a, b) => a.module_number - b.module_number);
+                
+                // Create module cards
+                moduleProgressData.forEach(module => {
+                    // Create module card
+                    const moduleCard = document.createElement('div');
+                    moduleCard.className = 'module-card';
+                    
+                    // Determine status badge
+                    let statusBadge = '';
+                    if (module.status === 'completed') {
+                        statusBadge = '<span class="badge bg-success">Completed</span>';
+                    } else if (module.status === 'in_progress') {
+                        statusBadge = '<span class="badge bg-warning text-dark">In Progress</span>';
+                    } else {
+                        statusBadge = '<span class="badge bg-secondary">Not Started</span>';
+                    }
+                    
+                    // Get progress percentage
+                    const progressPercentage = module.progress_percentage || 0;
+                    
+                    // Generate score text (use placeholder if not completed)
+                    const scoreText = module.status === 'completed' && module.score !== null ? 
+                        `Score: ${module.score}%` : 
+                        `Progress: ${progressPercentage}%`;
+                    
+                    // Static feedback examples based on module status
+                    let feedbackHtml = '';
+                    if (module.status === 'completed') {
+                        feedbackHtml = `
+                            <div class="feedback-display">
+                                <h6>Faculty Feedback</h6>
+                                <div class="feedback-text">
+                                    <p class="mb-0">Excellent work on understanding the module concepts. Your discussion posts showed great insight into the methodologies.</p>
+                                </div>
+                            </div>
+                        `;
+                    } else if (module.status === 'in_progress') {
+                        feedbackHtml = `
+                            <div class="feedback-display">
+                                <h6>Faculty Feedback</h6>
+                                <div class="feedback-text">
+                                    <p class="no-feedback">No feedback provided yet.</p>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    // Set module card HTML
+                    moduleCard.innerHTML = `
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5>Module ${module.module_number}: ${module.module_title || 'Untitled Module'}</h5>
+                            ${statusBadge}
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar" style="width: ${progressPercentage}%"></div>
+                        </div>
+                        <p class="mb-0 mt-2">${scoreText}</p>
+                        ${feedbackHtml}
+                    `;
+                    
+                    // Add to container
+                    moduleContainer.appendChild(moduleCard);
+                });
+                
+                // If no modules found
+                if (moduleProgressData.length === 0) {
+                    const noModulesMessage = document.createElement('div');
+                    noModulesMessage.className = 'alert alert-info';
+                    noModulesMessage.textContent = 'No modules found for this student.';
+                    moduleContainer.appendChild(noModulesMessage);
+                }
+            }
+            
+            // Function to reset module UI to default state
+            function resetModuleUI() {
+                // Reset stats
+                document.getElementById('totalModules').textContent = '0';
+                document.getElementById('completedModules').textContent = '0';
+                document.getElementById('ongoingModules').textContent = '0';
+                
+                // Reset overall progress
+                document.getElementById('overallProgress').textContent = '0%';
+                
+                // Clear and reset module cards
+                const moduleContainer = document.getElementById('moduleContainer');
+                
+                // Add no data message
                 moduleContainer.innerHTML = `
-                    <div class="module-card">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h5>Module 1: Introduction to Foresight</h5>
-                            <span class="badge bg-success">Completed</span>
-                        </div>
-                        <div class="progress">
-                            <div class="progress-bar" style="width: 100%"></div>
-                        </div>
-                        <p class="mb-0 mt-2">Score: 92%</p>
-                        <div class="feedback-display">
-                            <h6>Faculty Feedback</h6>
-                            <div class="feedback-text">
-                                <p class="mb-0">Excellent work on understanding the basic concepts. Your discussion post showed great insight into the foresight methodologies.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="module-card">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h5>Module 2: Forecasting Techniques</h5>
-                            <span class="badge bg-warning text-dark">In Progress</span>
-                        </div>
-                        <div class="progress">
-                            <div class="progress-bar" style="width: 65%"></div>
-                        </div>
-                        <p class="mb-0 mt-2">Progress: 65%</p>
-                        <div class="feedback-display">
-                            <h6>Faculty Feedback</h6>
-                            <div class="feedback-text">
-                                <p class="no-feedback">No feedback provided yet.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="module-card">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h5>Module 3: Strategic Planning</h5>
-                            <span class="badge bg-secondary">Not Started</span>
-                        </div>
-                        <div class="progress">
-                            <div class="progress-bar" style="width: 0%"></div>
-                        </div>
-                        <p class="mb-0 mt-2">Progress: 0%</p>
+                    <div class="alert alert-warning">
+                        No module data available for this student.
                     </div>
                 `;
+            }
+            
+            // Function to display module data (mock data for now)
+            function displayModuleData() {
+                // This function is no longer used as we're fetching real data
             }
         });
     </script>

@@ -4,20 +4,20 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Feedback extends Model
+class Score extends Model
 {
-    protected $table = 'feedback';
-    protected $primaryKey = 'feedback_id';
+    protected $table = 'scores';
+    protected $primaryKey = 'score_id';
     public $timestamps = false;
 
     protected $fillable = [
         'faculty_id',
-        'feedback',
+        'score',
         'module_assessment_progress_id'
     ];
 
     /**
-     * Get the faculty that gave the feedback.
+     * Get the faculty that gave the score.
      */
     public function faculty()
     {
@@ -25,10 +25,10 @@ class Feedback extends Model
     }
 
     /**
-     * Get the module assessment progress that received the feedback.
+     * Get the module assessment progress that was scored.
      */
     public function moduleAssessmentProgress()
     {
         return $this->belongsTo(ModuleAssessmentProgress::class, 'module_assessment_progress_id', 'assessment_progress_id');
     }
-}
+} 
