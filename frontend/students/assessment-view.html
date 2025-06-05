@@ -804,6 +804,7 @@
                     )
                     .join("")}
                 </div>
+                <div class="faculty-feedback-container mt-4"></div>
               </div>
               <div class="content-footer">
                 <button class="nav-button btn-back" ${getPreviousAssessment() ? '' : 'disabled'}>
@@ -832,7 +833,86 @@
           card.find('.btn-back').click(() => navigateAssessment('prev'));
           card.find('.btn-continue').click(() => navigateAssessment('next'));
 
+          if (isCompleted) {
+            const feedbackContainer = card.find('.faculty-feedback-container');
+            loadAndDisplayFacultyFeedback(assessment, feedbackContainer);
+          }
+
           return card;
+        }
+
+        function loadAndDisplayFacultyFeedback(assessment, container) {
+            const progressId = assessment.assessment_progress_id;
+            
+            container.html(`
+                <div class="text-center p-3">
+                    <div class="spinner-border spinner-border-sm text-muted" role="status"></div>
+                    <span class="ms-2 text-muted">Loading feedback...</span>
+                </div>
+            `);
+
+            const scorePromise = fetch(`http://127.0.0.1:8000/api/v1/scores/assessment-progress/${progressId}`).then(res => res.json().catch(() => ({ data: null })));
+            const feedbackPromise = fetch(`http://127.0.0.1:8000/api/v1/feedback/assessment-progress/${progressId}`).then(res => res.json().catch(() => ({ data: null })));
+
+            Promise.all([scorePromise, feedbackPromise])
+                .then(([scoreResponse, feedbackResponse]) => {
+                    const scoreData = (scoreResponse && scoreResponse.data && scoreResponse.data.length > 0) ? scoreResponse.data[0] : null;
+                    const feedbackData = (feedbackResponse && feedbackResponse.data && feedbackResponse.data.length > 0) ? feedbackResponse.data[0] : null;
+
+                    if (scoreData || feedbackData) {
+                        let scoreStatus = '';
+                        let scoreStatusClass = '';
+
+                        if(scoreData) {
+                            if (scoreData.score <= 2) {
+                                scoreStatus = 'Failed';
+                                scoreStatusClass = 'text-danger';
+                            } else {
+                                scoreStatus = 'Passed';
+                                scoreStatusClass = 'text-success';
+                            }
+                        }
+
+                        let feedbackHTML = `
+                            <div style="background-color: #f8f9fa; border-radius: var(--border-radius); padding: 1.5rem;">
+                                <h5 class="mb-3" style="color: var(--maroon);"><i class="fas fa-user-graduate me-2"></i>Faculty Feedback</h5>`;
+                        
+                        if (scoreData) {
+                             feedbackHTML += `
+                                <p class="mb-2">
+                                    <strong>Score:</strong> ${scoreData.score}/5 
+                                    <span class="fw-bold ${scoreStatusClass}">(${scoreStatus})</span>
+                                </p>`;
+                        } else {
+                            feedbackHTML += `<p class="mb-2 text-muted">No score has been given yet.</p>`;
+                        }
+
+                        if (feedbackData) {
+                             feedbackHTML += `
+                                <p class="mb-1"><strong>Feedback:</strong></p>
+                                <blockquote class="blockquote">
+                                    <p class="mb-0 small">${feedbackData.feedback}</p>
+                                </blockquote>`;
+                        } else {
+                            feedbackHTML += `<p class="mb-1 text-muted">No feedback has been given yet.</p>`;
+                        }
+                        
+                        feedbackHTML += `</div>`;
+                        container.html(feedbackHTML);
+
+                    } else {
+                        container.html(`
+                            <div class="text-center text-muted p-3 border rounded">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Your assessment has been submitted. Feedback will appear here once it's reviewed.
+                            </div>
+                        `);
+                    }
+                })
+                .catch(error => {
+                    console.error(`Error loading feedback for assessment progress ${progressId}:`, error);
+                    container.html('<div class="alert alert-warning">Could not load feedback.</div>');
+                });
         }
 
         function getPreviousAssessment() {
