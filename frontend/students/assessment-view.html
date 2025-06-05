@@ -862,6 +862,7 @@
                     if (scoreData || feedbackData) {
                         let scoreStatus = '';
                         let scoreStatusClass = '';
+                        let isPassed = false;
 
                         if(scoreData) {
                             if (scoreData.score <= 2) {
@@ -870,6 +871,7 @@
                             } else {
                                 scoreStatus = 'Passed';
                                 scoreStatusClass = 'text-success';
+                                isPassed = true;
                             }
                         }
 
@@ -900,6 +902,13 @@
                         feedbackHTML += `</div>`;
                         container.html(feedbackHTML);
 
+                        if (isPassed) {
+                            const certificateContainer = document.createElement('div');
+                            certificateContainer.className = 'mt-3';
+                            container.append(certificateContainer);
+                            handleCertificateButton(assessment, certificateContainer);
+                        }
+
                     } else {
                         container.html(`
                             <div class="text-center text-muted p-3 border rounded">
@@ -913,6 +922,85 @@
                     console.error(`Error loading feedback for assessment progress ${progressId}:`, error);
                     container.html('<div class="alert alert-warning">Could not load feedback.</div>');
                 });
+        }
+
+        function handleCertificateButton(assessment, container) {
+            container.innerHTML = '<span><i class="fas fa-spinner fa-spin"></i> Checking certificate status...</span>';
+            const userId = userData.user_id;
+            const moduleAssessmentId = assessment.module_assessment_id;
+
+            fetch(`http://127.0.0.1:8000/api/v1/users/${userId}/certificates`)
+                .then(response => response.json())
+                .then(certData => {
+                    const existingCert = certData.data && certData.data.find(cert => cert.module_assessment_id === moduleAssessmentId);
+                    
+                    if (existingCert) {
+                        container.innerHTML = `<button class="btn btn-info"><i class="fas fa-certificate me-2"></i>View Certificate</button>`;
+                        container.querySelector('button').addEventListener('click', () => {
+                            openCertificateWindow(assessment);
+                        });
+                    } else {
+                        container.innerHTML = `<button class="btn btn-primary"><i class="fas fa-award me-2"></i>Get Certificate</button>`;
+                        container.querySelector('button').addEventListener('click', () => {
+                            createCertificate(assessment, container);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking for certificate:', error);
+                    container.innerHTML = '<span class="text-danger">Could not check certificate status.</span>';
+                });
+        }
+
+        function createCertificate(assessment, container) {
+            container.innerHTML = `<span><i class="fas fa-spinner fa-spin"></i> Generating certificate...</span>`;
+
+            const payload = {
+                user_id: userData.user_id,
+                module_assessment_id: assessment.module_assessment_id,
+                course_id: assessment.assessment.course_id
+            };
+
+            fetch('http://127.0.0.1:8000/api/v1/certificates', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to create certificate record.');
+                }
+                const contentType = response.headers.get("content-type");
+                if (contentType && contentType.indexOf("application/json") !== -1) {
+                    return response.json();
+                } else {
+                    return null; // Don't try to parse if not JSON
+                }
+            })
+            .then(newCert => {
+                container.innerHTML = `<button class="btn btn-info"><i class="fas fa-certificate me-2"></i>View Certificate</button>`;
+                container.querySelector('button').addEventListener('click', () => {
+                    openCertificateWindow(assessment);
+                });
+                openCertificateWindow(assessment);
+            })
+            .catch(error => {
+                console.error('Error creating certificate:', error);
+                container.innerHTML = '<span class="text-danger">Could not generate certificate. Please try again.</span>';
+                const button = document.createElement('button');
+                button.className = 'btn btn-primary mt-2';
+                button.innerHTML = '<i class="fas fa-award me-2"></i>Retry</button>';
+                button.onclick = () => createCertificate(assessment, container);
+                container.append(button);
+            });
+        }
+
+        function openCertificateWindow(assessment) {
+            const studentName = `${userData.first_name} ${userData.last_name}`;
+            const assessmentTitle = assessment.assessment.assessment_title;
+            const moduleNumber = assessment.assessment.module_number;
+            const url = `certificate.html?studentName=${encodeURIComponent(studentName)}&assessmentTitle=${encodeURIComponent(assessmentTitle)}&moduleNumber=${encodeURIComponent(moduleNumber)}`;
+            window.open(url, '_blank');
         }
 
         function getPreviousAssessment() {
