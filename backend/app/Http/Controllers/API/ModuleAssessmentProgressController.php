@@ -28,7 +28,8 @@ class ModuleAssessmentProgressController extends Controller
             'module_assessment_id' => 'required|exists:module_assessment,assessment_id',
             'user_id' => 'required|exists:users,user_id',
             'module_progress_id' => 'required|exists:module_progress,progress_id',
-            'status' => 'required|in:not_started,in_progress,completed'
+            'status' => 'required|in:not_started,in_progress,completed',
+            'file_url' => 'nullable|string|max:255'
         ]);
 
         if ($validator->fails()) {
@@ -58,7 +59,8 @@ class ModuleAssessmentProgressController extends Controller
             'module_assessment_id' => 'exists:module_assessment,assessment_id',
             'user_id' => 'exists:users,user_id',
             'module_progress_id' => 'exists:module_progress,progress_id',
-            'status' => 'in:not_started,in_progress,completed'
+            'status' => 'in:not_started,in_progress,completed',
+            'file_url' => 'nullable|string|max:255'
         ]);
 
         if ($validator->fails()) {

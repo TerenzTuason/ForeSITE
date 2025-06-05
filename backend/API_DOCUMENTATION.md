@@ -244,6 +244,7 @@ The API provides CRUD (Create, Read, Update, Delete) operations for the main ent
       "module_assessment_id": 1,
       "user_id": 1,
       "status": "completed",
+      "file_url": "https://example.com/path/to/file.pdf",
       "module_assessment": {
         "assessment_id": 1,
         "course_id": 1,
@@ -262,7 +263,18 @@ The API provides CRUD (Create, Read, Update, Delete) operations for the main ent
 {
   "module_assessment_id": 1,
   "user_id": 1,
-  "status": "in_progress"
+  "module_progress_id": 1,
+  "status": "in_progress",
+  "file_url": "https://example.com/path/to/file.pdf"
+}
+```
+
+### Update Assessment Progress Entry
+```json
+// PUT /api/v1/module-assessment-progress/{id}
+{
+  "status": "completed",
+  "file_url": "https://example.com/path/to/updated-file.pdf"
 }
 ```
 
