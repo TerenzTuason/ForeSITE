@@ -800,6 +800,11 @@
                     </a>
                    </div>`
                   : ''}
+                ${!isCompleted && !isModuleLocked && assessment.file_url ?
+                    `<div class="alert alert-warning mt-2 mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Please review the feedback below and resubmit your assessment.
+                    </div>`
+                : ''}
               </div>
               <div class="assessment-body">
                 ${assessment.assessment.assessment_objective
@@ -855,7 +860,7 @@
           card.find('.btn-back').click(() => navigateAssessment('prev'));
           card.find('.btn-continue').click(() => navigateAssessment('next'));
 
-          if (isCompleted) {
+          if (assessment.file_url || isCompleted) {
             const feedbackContainer = card.find('.faculty-feedback-container');
             loadAndDisplayFacultyFeedback(assessment, feedbackContainer);
           }
@@ -1152,6 +1157,55 @@
           $(".progress-text").text(`${progressPercentage}%`);
         }
 
+        async function deleteFromCloudinary(fileUrl) {
+            try {
+                if (!fileUrl) return;
+
+                const urlParts = fileUrl.split('/');
+                const uploadIndex = urlParts.indexOf('upload');
+
+                if (uploadIndex === -1 || uploadIndex < 4) {
+                    console.error('Could not parse Cloudinary URL for deletion:', fileUrl);
+                    return;
+                }
+
+                const resourceType = urlParts[uploadIndex - 1];
+                const publicIdWithFormat = urlParts.slice(uploadIndex + 2).join('/');
+                const publicId = publicIdWithFormat.substring(0, publicIdWithFormat.lastIndexOf('.')) || publicIdWithFormat;
+
+                if (!publicId || !resourceType) {
+                    console.error('Could not parse public_id or resource_type from URL:', fileUrl);
+                    return;
+                }
+
+                const timestamp = Math.round((new Date).getTime() / 1000);
+                const signatureStr = `public_id=${publicId}&timestamp=${timestamp}${CLOUDINARY_CONFIG.apiSecret}`;
+                const signature = CryptoJS.SHA1(signatureStr).toString();
+
+                const formData = new FormData();
+                formData.append('public_id', publicId);
+                formData.append('timestamp', timestamp);
+                formData.append('api_key', CLOUDINARY_CONFIG.apiKey);
+                formData.append('signature', signature);
+                
+                const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/${resourceType}/destroy`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+
+                if (response.ok && data.result === 'ok') {
+                    console.log('Successfully deleted old file from Cloudinary:', publicId);
+                } else if (data.result !== 'not found') {
+                    throw new Error(`Cloudinary delete failed: ${data.result || (data.error && data.error.message)}`);
+                }
+
+            } catch (error) {
+                console.error('Error deleting file from Cloudinary:', error);
+            }
+        }
+
         // Cloudinary configuration
         const CLOUDINARY_CONFIG = {
           cloudName: 'dwn5t3o4j',
@@ -1409,6 +1463,33 @@
             loadingOverlay.classList.add("active");
 
             try {
+              // If there's an existing file, delete it from Cloudinary first
+              if (assessment.file_url) {
+                  await deleteFromCloudinary(assessment.file_url);
+              }
+
+              // Delete existing scores before submitting new work
+              const scoresRes = await fetch(`http://127.0.0.1:8000/api/v1/scores/assessment-progress/${assessmentProgressId}`);
+              if (scoresRes.ok) {
+                  const scoresData = await scoresRes.json();
+                  if (scoresData && scoresData.data && scoresData.data.length > 0) {
+                      for (const score of scoresData.data) {
+                          await fetch(`http://127.0.0.1:8000/api/v1/scores/${score.score_id}`, { method: 'DELETE' });
+                      }
+                  }
+              }
+
+              // Delete existing feedback
+              const feedbackRes = await fetch(`http://127.0.0.1:8000/api/v1/feedback/assessment-progress/${assessmentProgressId}`);
+              if (feedbackRes.ok) {
+                  const feedbackData = await feedbackRes.json();
+                  if (feedbackData && feedbackData.data && feedbackData.data.length > 0) {
+                      for (const feedback of feedbackData.data) {
+                          await fetch(`http://127.0.0.1:8000/api/v1/feedback/${feedback.feedback_id}`, { method: 'DELETE' });
+                      }
+                  }
+              }
+              
               // Upload file to Cloudinary
               const fileUrl = await uploadToCloudinary(file);
 
