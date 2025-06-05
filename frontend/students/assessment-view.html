@@ -19,6 +19,8 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
     />
+    <!-- CryptoJS for Cloudinary signature -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <style>
       :root {
         --maroon: #800000;
@@ -448,6 +450,94 @@
       .spacer {
         flex: 1;
       }
+
+      /* Updated File Upload Styles */
+      .file-upload-container {
+        margin-top: 1rem;
+        padding: 1.5rem;
+        border: 2px dashed #ccc;
+        border-radius: var(--border-radius);
+        text-align: center;
+        transition: all 0.3s ease;
+      }
+
+      .file-upload-container.drag-over {
+        border-color: var(--maroon);
+        background-color: rgba(128, 0, 0, 0.05);
+      }
+
+      .file-upload-input {
+        display: none;
+      }
+
+      .file-upload-label {
+        cursor: pointer;
+        padding: 1rem;
+        display: block;
+      }
+
+      .file-upload-label i {
+        color: var(--maroon);
+        margin-bottom: 1rem;
+      }
+
+      .file-upload-progress {
+        margin-top: 1rem;
+        display: none;
+      }
+
+      .file-upload-preview {
+        margin-top: 1rem;
+        padding: 1rem;
+        border: 1px solid #eee;
+        border-radius: var(--border-radius);
+        display: none;
+      }
+
+      .file-preview-content {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .file-preview-icon {
+        font-size: 2.5rem;
+        color: var(--maroon);
+      }
+
+      .file-preview-image {
+        max-width: 100px;
+        max-height: 100px;
+        border-radius: var(--border-radius);
+        object-fit: cover;
+      }
+
+      .file-preview-details {
+        flex: 1;
+        text-align: left;
+      }
+
+      .file-name {
+        font-weight: 500;
+        margin-bottom: 0.25rem;
+        word-break: break-all;
+      }
+
+      .file-size {
+        color: #6c757d;
+        font-size: 0.875rem;
+      }
+
+      .file-type-icon {
+        font-size: 2.5rem;
+        width: 100px;
+        height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f8f9fa;
+        border-radius: var(--border-radius);
+      }
     </style>
   </head>
   <body>
@@ -492,6 +582,51 @@
         <div class="container-fluid">
           <div id="assessment-container">
             <!-- Current assessment will be loaded here -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Updated File Upload Modal -->
+    <div class="modal fade" id="fileUploadModal" tabindex="-1" aria-labelledby="fileUploadModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="fileUploadModalLabel">Submit Assessment File</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="file-upload-container" id="dropZone">
+              <label class="file-upload-label">
+                <i class="fas fa-cloud-upload-alt fa-3x"></i>
+                <p class="mb-1">Drag & Drop your file here</p>
+                <p class="text-muted small mb-0">or</p>
+                <button type="button" class="btn btn-outline-primary mt-2" id="browseButton">Browse Files</button>
+                <input type="file" class="file-upload-input" id="fileUpload">
+              </label>
+            </div>
+            <div class="file-upload-preview">
+              <div class="file-preview-content">
+                <div class="file-type-icon">
+                  <i class="fas fa-file"></i>
+                </div>
+                <div class="file-preview-details">
+                  <div class="file-name" id="fileName">No file selected</div>
+                  <div class="file-size" id="fileSize"></div>
+                  <div class="file-type" id="fileType"></div>
+                </div>
+              </div>
+            </div>
+            <div class="file-upload-progress">
+              <div class="progress">
+                <div class="progress-bar bg-maroon" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+              <div class="text-center mt-2" id="uploadStatus">Uploading...</div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary" id="uploadSubmitBtn" disabled>Submit</button>
           </div>
         </div>
       </div>
@@ -624,11 +759,25 @@
         }
 
         function createAssessmentCard(assessment) {
+          const isModuleLocked = !assessment.module_progress?.status || assessment.module_progress.status !== 'completed';
+          const isCompleted = assessment.status === "completed";
+          
           const card = $(`
             <div class="assessment-card" data-assessment-id="${assessment.assessment_progress_id}">
               <div class="assessment-header">
                 <h3 class="assessment-title">${assessment.assessment.assessment_title}</h3>
                 <div class="assessment-module">Module ${assessment.assessment.module_number}</div>
+                ${!isCompleted && isModuleLocked ? 
+                  '<div class="alert alert-warning mt-2 mb-0"><i class="fas fa-exclamation-triangle me-2"></i>You must complete this module before submitting the assessment.</div>' 
+                  : ''}
+                ${isCompleted && assessment.file_url ? 
+                  `<div class="alert alert-success mt-2 mb-0">
+                    <i class="fas fa-check-circle me-2"></i>Assessment completed
+                    <a href="${assessment.file_url}" target="_blank" class="btn btn-sm btn-outline-success ms-2">
+                      <i class="fas fa-download me-1"></i>View Submission
+                    </a>
+                   </div>`
+                  : ''}
               </div>
               <div class="assessment-body">
                 ${assessment.assessment.assessment_objective
@@ -661,12 +810,20 @@
                   <i class="fas fa-arrow-left"></i> Back
                 </button>
                 <div class="spacer"></div>
-                <button class="btn-complete-assessment" onclick="completeAssessment(${assessment.assessment_progress_id})" 
-                  ${assessment.status === "completed" ? "disabled" : ""}>
-                  ${assessment.status === "completed" 
-                    ? '<i class="fas fa-check"></i> Completed'
-                    : '<i class="fas fa-check"></i> Complete Assessment'}
-                </button>
+                ${isCompleted ? 
+                  `<button class="btn btn-success" disabled>
+                    <i class="fas fa-check"></i> Completed
+                   </button>
+                   ${assessment.file_url ? 
+                     `<a href="${assessment.file_url}" target="_blank" class="btn btn-outline-primary ms-2">
+                        <i class="fas fa-download me-1"></i>View Submission
+                      </a>` 
+                     : ''}`
+                  : `<button class="btn-complete-assessment" onclick="completeAssessment(${assessment.assessment_progress_id})" 
+                      ${isModuleLocked ? "disabled" : ""}>
+                      ${isModuleLocked ? '<i class="fas fa-lock"></i> Locked' : '<i class="fas fa-check"></i> Complete Assessment'}
+                     </button>`
+                }
               </div>
             </div>
           `);
@@ -744,15 +901,25 @@
                   ${isLocked ? '<span class="badge bg-secondary">Locked</span>' : ''}
                 </div>
                 <ul class="assessment-list" style="display: none;">
-                  ${moduleAssessments.map(assessment => `
-                    <li class="assessment-item p-2 ${assessment.status === 'completed' ? 'text-success' : ''} 
-                        ${assessment.assessment_progress_id === currentAssessment?.assessment_progress_id ? 'active' : ''} 
-                        ${isLocked ? 'disabled' : ''}" 
-                        data-assessment-id="${assessment.assessment_progress_id}">
-                      <i class="fas ${assessment.status === 'completed' ? 'fa-check-circle' : 'fa-file-alt'} me-2"></i>
-                      ${assessment.assessment.assessment_title}
-                    </li>
-                  `).join('')}
+                  ${moduleAssessments.map(assessment => {
+                    const isAssessmentCompleted = assessment.status === "completed";
+                    const isModuleLocked = !assessment.module_progress?.status || assessment.module_progress.status !== 'completed';
+                    const shouldDisable = !isAssessmentCompleted && isModuleLocked;
+                    
+                    return `
+                      <li class="assessment-item p-2 ${isAssessmentCompleted ? 'text-success' : ''} 
+                          ${assessment.assessment_progress_id === currentAssessment?.assessment_progress_id ? 'active' : ''} 
+                          ${shouldDisable ? 'disabled' : ''}" 
+                          data-assessment-id="${assessment.assessment_progress_id}">
+                        <i class="fas ${isAssessmentCompleted ? 'fa-check-circle' : shouldDisable ? 'fa-lock' : 'fa-file-alt'} me-2"></i>
+                        ${assessment.assessment.assessment_title}
+                        ${isAssessmentCompleted && assessment.file_url ? 
+                          '<i class="fas fa-paperclip ms-2" title="Has submission"></i>' : ''}
+                        ${!isAssessmentCompleted && isModuleLocked ? 
+                          '<span class="badge bg-warning ms-2">Complete module first</span>' : ''}
+                      </li>
+                    `;
+                  }).join('')}
                 </ul>
               </li>
             `);
@@ -771,14 +938,16 @@
 
           // Add click handlers for assessment items
           $(".assessment-item").click(function() {
-            if ($(this).hasClass('disabled')) {
-              return;
-            }
+            // Allow clicking if completed or if module is completed
             const assessmentId = $(this).data("assessment-id");
             const selectedAssessment = allAssessments.find(a => a.assessment_progress_id === assessmentId);
-            if (selectedAssessment) {
+            
+            if (selectedAssessment && (selectedAssessment.status === "completed" || 
+                (selectedAssessment.module_progress?.status === "completed"))) {
               currentAssessment = selectedAssessment;
               displayCurrentAssessment();
+            } else if ($(this).hasClass('disabled')) {
+              return;
             }
           });
         }
@@ -793,85 +962,279 @@
           $(".progress-text").text(`${progressPercentage}%`);
         }
 
-        // Add to global scope for button click handler
-        window.completeAssessment = function (assessmentProgressId) {
-          // Show loading overlay
-          const loadingOverlay = document.getElementById("loadingOverlay");
-          const loadingText = document.getElementById("loadingText");
-          loadingText.textContent = "Updating assessment status...";
-          loadingOverlay.classList.add("active");
-
-          // Scroll to top of the page
-          window.scrollTo(0, 0);
-          // Also scroll the main content area to top
-          $(".main-content").scrollTop(0);
-
-          // Update the assessment status to completed
-          fetch(`http://127.0.0.1:8000/api/v1/module-assessment-progress/${assessmentProgressId}`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              status: 'completed'
-            })
-          })
-          .then(response => {
-            if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-          })
-          .then(data => {
-            console.log("Assessment completed successfully:", data);
-            
-            // Update the current assessment status
-            currentAssessment.status = "completed";
-            
-            // Get the next assessment
-            const nextAssessment = getNextAssessment();
-            
-            // Refresh the module list and progress indicator
-            buildModuleList(allAssessments);
-            updateProgressIndicator(allAssessments);
-
-            // Hide loading overlay
-            loadingOverlay.classList.remove("active");
-
-            // If there's a next assessment, navigate to it
-            if (nextAssessment) {
-              // Update current assessment
-              currentAssessment = nextAssessment;
-              
-              // Display the next assessment
-              displayCurrentAssessment();
-
-              // Find and expand the module containing the next assessment
-              const nextModuleNumber = nextAssessment.assessment.module_number;
-              const moduleHeader = $(`#module-${nextModuleNumber} .module-header`);
-              
-              // Show the assessment list if it's hidden
-              moduleHeader.siblings(".assessment-list").slideDown();
-              moduleHeader.find(".fa-chevron-down").addClass("fa-chevron-up");
-            } else {
-              // If no next assessment, show completion message
-              const container = $("#assessment-container");
-              container.html(`
-                <div class="alert alert-success">
-                  <i class="fas fa-check-circle"></i>
-                  Congratulations! You have completed all assessments.
-                </div>
-              `);
-            }
-          })
-          .catch(error => {
-            console.error("Error completing assessment:", error);
-            loadingText.textContent = "Error updating assessment status. Please try again.";
-            setTimeout(() => {
-              loadingOverlay.classList.remove("active");
-            }, 1000);
-          });
+        // Cloudinary configuration
+        const CLOUDINARY_CONFIG = {
+          cloudName: 'dwn5t3o4j',
+          apiKey: '214461813776441',
+          apiSecret: '-3Lake60UIDCJSt7eugmk_-CRIM',
+          uploadPreset: 'ml_default'
         };
+
+        // Updated handleFile function to support all file types
+        function handleFile(file) {
+          if (!file) return;
+
+          const preview = document.querySelector('.file-upload-preview');
+          const fileTypeIcon = preview.querySelector('.file-type-icon i');
+          const submitBtn = document.getElementById('uploadSubmitBtn');
+
+          // Enable submit button
+          submitBtn.disabled = false;
+
+          // Show file details
+          document.getElementById('fileName').textContent = file.name;
+          document.getElementById('fileSize').textContent = formatFileSize(file.size);
+          document.getElementById('fileType').textContent = file.type || 'Unknown type';
+
+          // Set appropriate icon based on file type
+          fileTypeIcon.className = getFileIcon(file.type);
+
+          // Show preview
+          preview.style.display = 'block';
+        }
+
+        // Helper function to format file size
+        function formatFileSize(bytes) {
+          if (bytes === 0) return '0 Bytes';
+          const k = 1024;
+          const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+          const i = Math.floor(Math.log(bytes) / Math.log(k));
+          return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Helper function to get appropriate file icon
+        function getFileIcon(mimeType) {
+          if (!mimeType) return 'fas fa-file';
+          
+          if (mimeType.startsWith('image/')) return 'fas fa-file-image';
+          if (mimeType.startsWith('video/')) return 'fas fa-file-video';
+          if (mimeType.startsWith('audio/')) return 'fas fa-file-audio';
+          if (mimeType.startsWith('text/')) return 'fas fa-file-alt';
+          if (mimeType.includes('pdf')) return 'fas fa-file-pdf';
+          if (mimeType.includes('word') || mimeType.includes('document')) return 'fas fa-file-word';
+          if (mimeType.includes('excel') || mimeType.includes('spreadsheet')) return 'fas fa-file-excel';
+          if (mimeType.includes('powerpoint') || mimeType.includes('presentation')) return 'fas fa-file-powerpoint';
+          if (mimeType.includes('zip') || mimeType.includes('archive')) return 'fas fa-file-archive';
+          
+          return 'fas fa-file';
+        }
+
+        // Update uploadToCloudinary function to show progress
+        async function uploadToCloudinary(file) {
+          const formData = new FormData();
+          const timestamp = Math.round((new Date).getTime()/1000);
+          const uploadFolder = 'assessment_submissions';
+
+          formData.append('file', file);
+          formData.append('folder', uploadFolder);
+          formData.append('timestamp', timestamp);
+          
+          const signatureStr = `folder=${uploadFolder}&timestamp=${timestamp}${CLOUDINARY_CONFIG.apiSecret}`;
+          const signature = CryptoJS.SHA1(signatureStr).toString();
+          
+          formData.append('signature', signature);
+          formData.append('api_key', CLOUDINARY_CONFIG.apiKey);
+
+          const progressBar = document.querySelector('.file-upload-progress');
+          const progressBarInner = progressBar.querySelector('.progress-bar');
+          const uploadStatus = document.getElementById('uploadStatus');
+          
+          progressBar.style.display = 'block';
+
+          try {
+            const xhr = new XMLHttpRequest();
+            
+            // Create promise to handle upload
+            const uploadPromise = new Promise((resolve, reject) => {
+              xhr.upload.onprogress = (e) => {
+                if (e.lengthComputable) {
+                  const percentComplete = Math.round((e.loaded / e.total) * 100);
+                  progressBarInner.style.width = percentComplete + '%';
+                  progressBarInner.setAttribute('aria-valuenow', percentComplete);
+                  uploadStatus.textContent = `Uploading... ${percentComplete}%`;
+                }
+              };
+
+              xhr.onload = () => {
+                if (xhr.status === 200) {
+                  const response = JSON.parse(xhr.responseText);
+                  uploadStatus.textContent = 'Upload complete!';
+                  progressBarInner.classList.add('bg-success');
+                  resolve(response.secure_url);
+                } else {
+                  reject(new Error('Upload failed'));
+                }
+              };
+
+              xhr.onerror = () => reject(new Error('Upload failed'));
+            });
+
+            xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/auto/upload`);
+            xhr.send(formData);
+
+            return await uploadPromise;
+          } catch (error) {
+            uploadStatus.textContent = 'Upload failed';
+            progressBarInner.classList.add('bg-danger');
+            throw error;
+          }
+        }
+
+        // Add back the completeAssessment function
+        window.completeAssessment = function(assessmentProgressId) {
+          const assessment = allAssessments.find(a => a.assessment_progress_id === assessmentProgressId);
+          
+          // Check if module is completed
+          if (!assessment.module_progress?.status || assessment.module_progress.status !== 'completed') {
+            alert('You must complete the module before submitting the assessment.');
+            return;
+          }
+
+          // Show file upload modal
+          const modal = new bootstrap.Modal(document.getElementById('fileUploadModal'));
+          modal.show();
+
+          // Handle file upload and assessment completion
+          document.getElementById('uploadSubmitBtn').onclick = async function() {
+            const fileInput = document.getElementById('fileUpload');
+            const file = fileInput.files[0];
+
+            if (!file) {
+              alert('Please select a file to upload');
+              return;
+            }
+
+            // Show loading overlay
+            const loadingOverlay = document.getElementById("loadingOverlay");
+            const loadingText = document.getElementById("loadingText");
+            loadingText.textContent = "Uploading file and updating assessment status...";
+            loadingOverlay.classList.add("active");
+
+            try {
+              // Upload file to Cloudinary
+              const fileUrl = await uploadToCloudinary(file);
+
+              // Update the assessment status to completed with the file URL
+              const response = await fetch(`http://127.0.0.1:8000/api/v1/module-assessment-progress/${assessmentProgressId}`, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  status: 'completed',
+                  file_url: fileUrl
+                })
+              });
+
+              if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+              }
+
+              const data = await response.json();
+              console.log("Assessment completed successfully:", data);
+              
+              // Update the current assessment status
+              currentAssessment.status = "completed";
+              
+              // Get the next assessment
+              const nextAssessment = getNextAssessment();
+              
+              // Refresh the module list and progress indicator
+              buildModuleList(allAssessments);
+              updateProgressIndicator(allAssessments);
+
+              // Hide modals
+              modal.hide();
+              loadingOverlay.classList.remove("active");
+
+              // If there's a next assessment, navigate to it
+              if (nextAssessment) {
+                currentAssessment = nextAssessment;
+                displayCurrentAssessment();
+              } else {
+                // If no next assessment, show completion message
+                const container = $("#assessment-container");
+                container.html(`
+                  <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i>
+                    Congratulations! You have completed all assessments.
+                  </div>
+                `);
+              }
+            } catch (error) {
+              console.error("Error completing assessment:", error);
+              loadingText.textContent = "Error updating assessment status. Please try again.";
+              setTimeout(() => {
+                loadingOverlay.classList.remove("active");
+              }, 1000);
+              alert('Error uploading file: ' + error.message);
+            }
+          };
+        };
+
+        // Update drag and drop event listeners
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileUpload');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+          dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+          dropZone.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+          dropZone.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight(e) {
+          dropZone.classList.add('drag-over');
+        }
+
+        function unhighlight(e) {
+          dropZone.classList.remove('drag-over');
+        }
+
+        dropZone.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+          const dt = e.dataTransfer;
+          const file = dt.files[0];
+          handleFile(file);
+        }
+
+        fileInput.addEventListener('change', function(e) {
+          handleFile(this.files[0]);
+        });
+
+        // Reset file upload form when modal is hidden
+        document.getElementById('fileUploadModal').addEventListener('hidden.bs.modal', function () {
+          const preview = document.querySelector('.file-upload-preview');
+          const progress = document.querySelector('.file-upload-progress');
+          const progressBar = progress.querySelector('.progress-bar');
+          const uploadStatus = document.getElementById('uploadStatus');
+          const submitBtn = document.getElementById('uploadSubmitBtn');
+          
+          preview.style.display = 'none';
+          progress.style.display = 'none';
+          progressBar.style.width = '0%';
+          progressBar.classList.remove('bg-success', 'bg-danger');
+          uploadStatus.textContent = 'Uploading...';
+          submitBtn.disabled = true;
+          fileInput.value = '';
+        });
+
+        // Add click handler for browse button
+        document.getElementById('browseButton').addEventListener('click', function(e) {
+          e.preventDefault(); // Prevent form submission
+          document.getElementById('fileUpload').click();
+        });
 
         // Initialize the page
         console.log("Page initialized with user:", userData);
