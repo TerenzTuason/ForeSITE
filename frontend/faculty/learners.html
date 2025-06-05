@@ -1004,19 +1004,45 @@
                             console.error('Feedback Submission Error:', feedbackError);
                             throw new Error('An error occurred while submitting. Please check console for details.');
                         }
-                        return Promise.all([scoreRes.json(), feedbackRes.json()]);
-                    })
-                    .then(([scoreData, feedbackData]) => {
-                        alert('Feedback and score submitted successfully!');
+
+                        let needsResubmission = false;
+                        const scoreValue = parseInt(score);
+                        if (scoreValue === 1 || scoreValue === 2) {
+                            needsResubmission = true;
+                            const updateRes = await fetch(`${apiBaseUrl}/module-assessment-progress/${progressId}`, {
+                                method: 'PUT',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ status: 'not_started' })
+                            });
+                            if (!updateRes.ok) {
+                                throw new Error('Failed to update assessment status.');
+                            }
+                        }
                         
-                        const feedbackSection = button.closest('.feedback-section');
-                        feedbackSection.innerHTML = `
-                            <div class="feedback-section mt-3">
-                                <h6 class="text-success"><i class="fas fa-check-circle me-2"></i>Feedback Submitted</h6>
-                                <p class="mb-1"><strong>Score:</strong> ${score}/5</p>
-                                <p><strong>Feedback:</strong> ${feedback}</p>
-                            </div>
-                        `;
+                        const scoreData = await scoreRes.json();
+                        const feedbackData = await feedbackRes.json();
+
+                        return [scoreData, feedbackData, needsResubmission];
+                    })
+                    .then(([scoreData, feedbackData, needsResubmission]) => {
+                        if (needsResubmission) {
+                            alert('Score submitted. The student has been asked to resubmit.');
+                            const activeCard = document.querySelector('.learner-card.active');
+                            if (activeCard) {
+                                const userId = activeCard.getAttribute('data-user-id');
+                                fetchAssessmentProgress(userId);
+                            }
+                        } else {
+                            alert('Feedback and score submitted successfully!');
+                            const feedbackSection = button.closest('.feedback-section');
+                            feedbackSection.innerHTML = `
+                                <div class="feedback-section mt-3">
+                                    <h6 class="text-success"><i class="fas fa-check-circle me-2"></i>Feedback Submitted</h6>
+                                    <p class="mb-1"><strong>Score:</strong> ${score}/5</p>
+                                    <p><strong>Feedback:</strong> ${feedback}</p>
+                                </div>
+                            `;
+                        }
                     })
                     .catch(error => {
                         console.error(error);

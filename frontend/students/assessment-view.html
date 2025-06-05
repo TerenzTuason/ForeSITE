@@ -778,6 +778,11 @@
                     </a>
                    </div>`
                   : ''}
+                ${!isCompleted && !isModuleLocked && assessment.file_url ?
+                    `<div class="alert alert-warning mt-2 mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Please review the feedback below and resubmit your assessment.
+                    </div>`
+                : ''}
               </div>
               <div class="assessment-body">
                 ${assessment.assessment.assessment_objective
@@ -833,7 +838,7 @@
           card.find('.btn-back').click(() => navigateAssessment('prev'));
           card.find('.btn-continue').click(() => navigateAssessment('next'));
 
-          if (isCompleted) {
+          if (assessment.file_url || isCompleted) {
             const feedbackContainer = card.find('.faculty-feedback-container');
             loadAndDisplayFacultyFeedback(assessment, feedbackContainer);
           }
@@ -1279,6 +1284,28 @@
             loadingOverlay.classList.add("active");
 
             try {
+              // Delete existing scores before submitting new work
+              const scoresRes = await fetch(`http://127.0.0.1:8000/api/v1/scores/assessment-progress/${assessmentProgressId}`);
+              if (scoresRes.ok) {
+                  const scoresData = await scoresRes.json();
+                  if (scoresData && scoresData.data && scoresData.data.length > 0) {
+                      for (const score of scoresData.data) {
+                          await fetch(`http://127.0.0.1:8000/api/v1/scores/${score.score_id}`, { method: 'DELETE' });
+                      }
+                  }
+              }
+
+              // Delete existing feedback
+              const feedbackRes = await fetch(`http://127.0.0.1:8000/api/v1/feedback/assessment-progress/${assessmentProgressId}`);
+              if (feedbackRes.ok) {
+                  const feedbackData = await feedbackRes.json();
+                  if (feedbackData && feedbackData.data && feedbackData.data.length > 0) {
+                      for (const feedback of feedbackData.data) {
+                          await fetch(`http://127.0.0.1:8000/api/v1/feedback/${feedback.feedback_id}`, { method: 'DELETE' });
+                      }
+                  }
+              }
+              
               // Upload file to Cloudinary
               const fileUrl = await uploadToCloudinary(file);
 
