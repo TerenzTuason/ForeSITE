@@ -108,6 +108,12 @@
         color: white;
       }
 
+      .module-header.locked {
+        background-color: #e9ecef;
+        color: #6c757d;
+        cursor: not-allowed;
+      }
+
       /* Removed locked state styling as per requirements */
       .module-header,
       .lesson-item {
@@ -460,6 +466,25 @@
     </a>
 
     <!-- Add modal HTML before the loading overlay -->
+    <div class="modal fade" id="lockedModuleModal" tabindex="-1" aria-labelledby="lockedModuleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="lockedModuleModalLabel">Module Locked</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>You must pass the assessment for the previous module before you can access this one.</p>
+            <p>Please complete the required assessment to unlock this module.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="window.location.href='assessment-view.html'">Go to Assessments</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
     <div class="assessment-modal modal fade" id="assessmentModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="assessmentModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -540,12 +565,14 @@
       $(document).ready(function () {
         // Add this near the top of the $(document).ready function
         let assessmentModal;
+        let lockedModuleModal;
         
         // Initialize the modal once the DOM is ready
         assessmentModal = new bootstrap.Modal(
           document.getElementById('assessmentModal'),
           { backdrop: 'static', keyboard: false }
         );
+        lockedModuleModal = new bootstrap.Modal(document.getElementById('lockedModuleModal'));
 
         // Load navbar
         $("#navbar-placeholder").load("../components/navbar.html");
@@ -561,6 +588,8 @@
         let currentModuleProgress = null;
         let currentLessonScreenProgress = null;
         let moduleProgressData = [];
+        let assessmentProgressData = [];
+        let scoresData = [];
         let allLessonScreens = [];
         let screenProgressData = [];
         let lessonScreenProgressByModule = {};
@@ -600,12 +629,24 @@
 
         // Toggle module lists (attach as delegated event for dynamically created elements)
         $(document).on("click", ".module-header", function () {
+          if ($(this).hasClass("locked")) {
+            lockedModuleModal.show();
+            return;
+          }
           $(this).siblings(".lesson-list").slideToggle();
           $(this).find(".fa-chevron-down").toggleClass("fa-chevron-up");
         });
 
         // Handle lesson item clicks
         $(document).on("click", ".lesson-item", function (e) {
+          // Check if the module is locked
+          if ($(this).closest('.module-item').find('.module-header').hasClass('locked')) {
+            e.preventDefault();
+            e.stopPropagation();
+            lockedModuleModal.show();
+            return false;
+          }
+          
           // Check if the item is disabled
           if ($(this).hasClass("disabled")) {
             e.preventDefault();
@@ -674,90 +715,127 @@
             })
             .then((success) => {
               if (success) {
-                // Build module list in sidebar
-                buildModuleList();
+                // Fetch assessment progress after processing module data
+                loadingText.textContent = "Loading assessment scores...";
+                return fetch(`http://127.0.0.1:8000/api/v1/users/${userId}/assessment-progress`);
+              } else {
+                return Promise.reject("Failed to process module progress");
+              }
+            })
+            .then(response => response.json())
+            .then(assessmentData => {
+                assessmentProgressData = assessmentData.data || [];
+                const scorePromises = assessmentProgressData.map(progress =>
+                    fetch(`http://127.0.0.1:8000/api/v1/scores/assessment-progress/${progress.assessment_progress_id}`)
+                        .then(res => res.json())
+                        .then(scoreRes => (scoreRes.data && scoreRes.data.length > 0) ? scoreRes.data[0] : null)
+                        .catch(() => null) // Handle cases where score fetching fails for one item
+                );
+                return Promise.all(scorePromises);
+            })
+            .then((scores) => {
+              scoresData = scores.filter(s => s !== null);
 
-                // Find the single in-progress screen across all modules
-                const inProgressScreen = screenProgressData.find(
-                  (progress) => progress.status === "in_progress"
+              // Build module list in sidebar
+              buildModuleList();
+
+              // Find the single in-progress screen across all modules
+              const inProgressScreen = screenProgressData.find(
+                (progress) => progress.status === "in_progress"
+              );
+
+              if (inProgressScreen) {
+                // Find the corresponding lesson screen
+                const lessonScreen = allLessonScreens.find(
+                  (screen) =>
+                    screen.lesson_screen_id ===
+                    inProgressScreen.lesson_screen_id
                 );
 
-                if (inProgressScreen) {
-                  // Find the corresponding lesson screen
-                  const lessonScreen = allLessonScreens.find(
-                    (screen) =>
-                      screen.lesson_screen_id ===
-                      inProgressScreen.lesson_screen_id
+                if (lessonScreen) {
+                  // Get the module number from the screen number
+                  const moduleNumber = parseInt(
+                    lessonScreen.screen_number.split(".")[0]
                   );
 
-                  if (lessonScreen) {
-                    // Get the module number from the screen number
-                    const moduleNumber = parseInt(
-                      lessonScreen.screen_number.split(".")[0]
+                  // Check if module is locked
+                  if (isModuleLocked(moduleNumber)) {
+                    // If locked, show the modal and stop.
+                    lockedModuleModal.show();
+                    loadingOverlay.classList.remove("active");
+                    return;
+                  }
+
+                  // Select the module first
+                  selectModule(moduleNumber);
+
+                  // Find and click the corresponding lesson item
+                  let lessonItemId;
+                  if (lessonScreen.screen_number.includes("-video")) {
+                    // Handle video screens
+                    const baseNumber = lessonScreen.screen_number.replace(
+                      "-video",
+                      ""
                     );
+                    const parts = baseNumber.split(".");
+                    lessonItemId = `screen-${parts.join("-")}-video`;
+                  } else {
+                    // Handle regular screens
+                    const parts = lessonScreen.screen_number.split(".");
+                    lessonItemId = `screen-${parts.join("-")}`;
+                  }
 
-                    // Select the module first
-                    selectModule(moduleNumber);
+                  // Find and click the lesson item
+                  const lessonItem = $(`#${lessonItemId}`);
+                  if (lessonItem.length) {
+                    // Make sure the module's lesson list is visible
+                    lessonItem.closest(".lesson-list").show();
+                    lessonItem
+                      .closest(".module-item")
+                      .find(".module-header .fa-chevron-down")
+                      .addClass("fa-chevron-up");
 
-                    // Find and click the corresponding lesson item
-                    let lessonItemId;
-                    if (lessonScreen.screen_number.includes("-video")) {
-                      // Handle video screens
-                      const baseNumber = lessonScreen.screen_number.replace(
-                        "-video",
-                        ""
-                      );
-                      const parts = baseNumber.split(".");
-                      lessonItemId = `screen-${parts.join("-")}-video`;
-                    } else {
-                      // Handle regular screens
-                      const parts = lessonScreen.screen_number.split(".");
-                      lessonItemId = `screen-${parts.join("-")}`;
-                    }
+                    // Click the lesson item
+                    lessonItem.click();
 
-                    // Find and click the lesson item
-                    const lessonItem = $(`#${lessonItemId}`);
-                    if (lessonItem.length) {
-                      // Make sure the module's lesson list is visible
-                      lessonItem.closest(".lesson-list").show();
-                      lessonItem
-                        .closest(".module-item")
-                        .find(".module-header .fa-chevron-down")
-                        .addClass("fa-chevron-up");
+                    // Make sure continue button is enabled
+                    $(".btn-continue").prop("disabled", false);
 
-                      // Click the lesson item
-                      lessonItem.click();
-
-                      // Make sure continue button is enabled
-                      $(".btn-continue").prop("disabled", false);
-
-                      // Hide loading overlay and exit
-                      setTimeout(() => {
-                        loadingOverlay.classList.remove("active");
-                      }, 500);
-                      return;
-                    }
+                    // Hide loading overlay and exit
+                    setTimeout(() => {
+                      loadingOverlay.classList.remove("active");
+                    }, 500);
+                    return;
                   }
                 }
+              }
 
-                // If no in-progress screen found or something went wrong, default to first lesson
-                console.log(
-                  "No in-progress screen found or error occurred, defaulting to first lesson"
-                );
+              // If no in-progress screen found or something went wrong, default to first lesson
+              console.log(
+                "No in-progress screen found or error occurred, defaulting to first lesson"
+              );
+
+              // Find the first module that is not locked
+              const firstUnlockedModule = moduleProgressData.find(m => !isModuleLocked(m.module_number));
+
+              if (firstUnlockedModule) {
+                // Select the first unlocked module
+                selectModule(firstUnlockedModule.module_number);
+
                 const firstLesson = $(
-                  ".lesson-list:visible .lesson-item:first"
+                  `#module-${firstUnlockedModule.module_number}-lessons .lesson-item:first`
                 );
                 if (firstLesson.length) {
                   firstLesson.click();
                   // Make sure continue button is clickable for first screen
                   $(".btn-continue").prop("disabled", false);
                 }
-
-                // Hide loading overlay
-                setTimeout(() => {
-                  loadingOverlay.classList.remove("active");
-                }, 500);
               }
+
+              // Hide loading overlay
+              setTimeout(() => {
+                loadingOverlay.classList.remove("active");
+              }, 500);
             })
             .catch((error) => {
               console.error("Error loading module progress:", error);
@@ -1278,20 +1356,25 @@
           moduleList.empty();
 
           moduleProgressData.forEach((module) => {
+            const isLocked = isModuleLocked(module.module_number);
             // Create module item with collapsible indicator
             const moduleItem = $(`
                         <li class="module-item" id="module-${
                           module.module_number
                         }">
                             <div class="module-header ${
-                              module.status === "completed"
+                              isLocked
+                                ? "locked"
+                                : module.status === "completed"
                                 ? "completed"
                                 : module.status === "in_progress"
                                 ? "active"
                                 : ""
                             }">
                                 <i class="fas ${
-                                  module.status === "completed"
+                                  isLocked 
+                                    ? "fa-lock" 
+                                    : module.status === "completed"
                                     ? "fa-check-circle"
                                     : "fa-book"
                                 }"></i>
@@ -2351,6 +2434,46 @@
                     </div>
                 `);
             }
+        }
+
+        /**
+         * Checks if a module should be locked based on the previous module's assessment score.
+         */
+        function isModuleLocked(moduleNumber) {
+          if (moduleNumber === 1) {
+            return false; // Module 1 is never locked
+          }
+
+          const prerequisiteModuleNumber = moduleNumber - 1;
+
+          // Find the assessment progress for the prerequisite module
+          const prereqAssessmentProgress = assessmentProgressData.find(ap => 
+            ap.assessment && ap.assessment.module_number === prerequisiteModuleNumber
+          );
+
+          // If there's no assessment progress record for the prerequisite, lock the module.
+          if (!prereqAssessmentProgress) {
+            console.log(`Module ${moduleNumber} is locked because no assessment progress was found for module ${prerequisiteModuleNumber}.`);
+            return true;
+          }
+
+          // If the assessment for the prerequisite module is not completed, lock the module.
+          if (prereqAssessmentProgress.status !== 'completed') {
+            console.log(`Module ${moduleNumber} is locked because the assessment for module ${prerequisiteModuleNumber} is not completed.`);
+            return true;
+          }
+
+          // Find the score for that assessment progress
+          const score = scoresData.find(s => s.module_assessment_progress_id === prereqAssessmentProgress.assessment_progress_id);
+
+          // If there is no score or the score is not passing (<= 2), lock the module.
+          if (!score || score.score <= 2) {
+            console.log(`Module ${moduleNumber} is locked because the assessment for module ${prerequisiteModuleNumber} was not passed (Score: ${score ? score.score : 'N/A'}).`);
+            return true;
+          }
+
+          // If all checks pass, the module is unlocked.
+          return false;
         }
       });
     </script>
