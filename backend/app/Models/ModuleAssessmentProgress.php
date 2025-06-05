@@ -15,7 +15,8 @@ class ModuleAssessmentProgress extends Model
         'module_assessment_id',
         'user_id',
         'module_progress_id',
-        'status'
+        'status',
+        'file_url'
     ];
 
     protected $casts = [

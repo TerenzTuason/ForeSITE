@@ -1220,6 +1220,7 @@ CREATE TABLE module_assessment_progress (
     user_id INT NOT NULL,
     module_progress_id INT NOT NULL,
     status ENUM('not_started', 'in_progress', 'completed') DEFAULT 'not_started',
+    file_url VARCHAR(255) NOT NULL,  
     FOREIGN KEY (module_assessment_id) REFERENCES module_assessment(assessment_id),
     FOREIGN KEY (user_id) REFERENCES users(user_id),
     FOREIGN KEY (module_progress_id) REFERENCES module_progress(progress_id)
