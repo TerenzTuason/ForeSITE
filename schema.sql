@@ -242,18 +242,18 @@ CREATE TABLE lesson_screens (
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
-  "1-video",
-  "Introduction to Futures Thinking",
+  '1-video',
+  'Introduction to Futures Thinking',
   null,
   null,
-  "https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185804/1_Introduction_to_Futures_Thinking_egkgxg.mp4",
-  "3 minutes 27 seconds"
+  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185804/1_Introduction_to_Futures_Thinking_egkgxg.mp4',
+  '3 minutes 27 seconds'
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
-  "1.1",
-  "What is Futures Thinking?",
-  "A strategic mindset to explore change and build resilient policy",
+  '1.1',
+  'What is Futures Thinking?',
+  'A strategic mindset to explore change and build resilient policy',
   '[
         "Futures Thinking helps identify long-term issues and uncertainties in a policy area.",
         "It does not predict the future — it helps prepare for different possibilities.",
@@ -272,13 +272,13 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
         ]
     ]',
     null,
-    "15 minutes"
+    '15 minutes'
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
-  "1.2",
-  "Looking Ahead: The Three Horizons Model",
-  "A tool for thinking across short, medium, and long-term futures.",
+  '1.2',
+  'Looking Ahead: The Three Horizons Model',
+  'A tool for thinking across short, medium, and long-term futures.',
   '[
         "The Three Horizons Framework breaks change into three phases:",
         [
@@ -294,14 +294,14 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
         ],
         "Futures tools focus most on H2 and H3, helping policymakers stay ahead of change."
     ]',
-    "https://res.cloudinary.com/dwn5t3o4j/image/upload/v1748186077/1.2_The_Three_Horizons_Model_b7t0si.png",
-    "12 minutes"
+    'https://res.cloudinary.com/dwn5t3o4j/image/upload/v1748186077/1.2_The_Three_Horizons_Model_b7t0si.png',
+    '12 minutes'
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
-  "1.3",
-  "Identifying Change Drivers",
-  "Understanding what shapes the future.",
+  '1.3',
+  'Identifying Change Drivers',
+  'Understanding what shapes the future.',
   '[
         "Change drivers are trends or forces influencing how the future develops.",
         "Often categorized using PESTLE:",
@@ -318,13 +318,13 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
         "Driver identification is the foundation of most futures work."
     ]',
     null,
-    "14 minutes"
+    '14 minutes'
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
-  "1.4",
-  "Identifying Weak Signals",
-  "Spotting early signs of future change.",
+  '1.4',
+  'Identifying Weak Signals',
+  'Spotting early signs of future change.',
   '[
         "Weak signals are early hints of significant future changes.",
         "They are often unclear, rare, or not well understood yet.",
@@ -333,13 +333,13 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
         "Example: An unusual news article today could indicate a big future trend tomorrow."
     ]',
     null,
-    "12 minutes"
+    '12 minutes'
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
-  "1.5",
-  "Linking Futures Thinking to the Policy Cycle",
-  "Where foresight fits in policymaking.",
+  '1.5',
+  'Linking Futures Thinking to the Policy Cycle',
+  'Where foresight fits in policymaking.',
   '[
         "The policy cycle typically includes:",
         [
@@ -357,23 +357,23 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
         "Key to impact: Involve policy teams and decision-makers early in the futures process.",
         "Use futures work to bridge long-term visioning with real policy goals."
     ]',
-    "https://res.cloudinary.com/dwn5t3o4j/image/upload/v1748186077/1.5_Illustrative_Policy_Cycle_dgw7i8.png",
-    "15 minutes"
+    'https://res.cloudinary.com/dwn5t3o4j/image/upload/v1748186077/1.5_Illustrative_Policy_Cycle_dgw7i8.png',
+    '15 minutes'
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
-  "2.1-video",
-  "Driver Mapping",
+  '2.1-video',
+  'Driver Mapping',
   null,
   null,
-  "https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185724/2.1_Driver_Mapping_lmspxt.mp4",
-  "56 seconds"
+  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185724/2.1_Driver_Mapping_lmspxt.mp4',
+  '56 seconds'
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
-  "2.1",
-  "Driver Mapping",
-  "Drivers are influential forces of changes that are currently shaping or have the capacity to shape or transform a system. Driver mapping is one of the most important tools in foresight. It helps to identify the most influential forces of change in a system.",
+  '2.1',
+  'Driver Mapping',
+  'Drivers are influential forces of changes that are currently shaping or have the capacity to shape or transform a system. Driver mapping is one of the most important tools in foresight. It helps to identify the most influential forces of change in a system.',
   '[
         "To find these drivers, we often use tools like the STEEP or PESTLE frameworks. Think of these frameworks as ways to get a \'big picture\' view of everything influencing a situation. They help us explore many different types of drivers by sorting them into categories:",
         [
@@ -381,14 +381,14 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
             "PESTLE includes all of those, plus an extra category for Legal drivers."
         ]
     ]',
-    "https://res.cloudinary.com/dwn5t3o4j/image/upload/v1748186077/2.1_PESTLE_i4quij.png",
-    "18 minutes"
+    'https://res.cloudinary.com/dwn5t3o4j/image/upload/v1748186077/2.1_PESTLE_i4quij.png',
+    '18 minutes'
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
-  "2.1.1",
-  "Why Use Driver Mapping?",
-  "Understanding the core reasons for identifying and analyzing key forces of change.",
+  '2.1.1',
+  'Why Use Driver Mapping?',
+  'Understanding the core reasons for identifying and analyzing key forces of change.',
   '[
         "When we use Drive Mapping, we\'re aiming to achieve a few important things:",
         [
@@ -401,9 +401,9 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
-  "2.1.2",
-  "How to do Driver Mapping?",
-  "Drive Mapping is a practical exercise to figure out what forces are really shaping your topic of interest. Think of it like a detective's checklist to understand the big picture!",
+  '2.1.2',
+  'How to do Driver Mapping?',
+  'Drive Mapping is a practical exercise to figure out what forces are really shaping your topic of interest. Think of it like a detective`s checklist to understand the big picture!',
   '[
         "How to Drive Mapping:",
         [
@@ -425,18 +425,18 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
-  "2.2-video",
-  "Horizon Scanning",
+  '2.2-video',
+  'Horizon Scanning',
   null,
   null,
-  "https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185779/2.2_Horizon_Scanning_yhuel4.mp4",
-  "2 minutes 4 seconds"
+  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185779/2.2_Horizon_Scanning_yhuel4.mp4',
+  '2 minutes 4 seconds'
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
-  "2.2",
-  "Horizon scanning",
-  "Horizon scanning is a foresight process focused on identifying and collating early warning signs of change, or emerging signals that may have significant impacts when they develop.",
+  '2.2',
+  'Horizon scanning',
+  'Horizon scanning is a foresight process focused on identifying and collating early warning signs of change, or emerging signals that may have significant impacts when they develop.',
   '[
         "Scanning for signals of change",
         ["Actively looking for early clues about what might happen in the future. We\'re searching for potential problems, new chances, and things that are likely to develop."],
@@ -454,14 +454,14 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
             "Even though they are faint and uncertain, weak signals are important to notice and keep an eye on because they can turn into strong, clear trends later on."
         ]
   ]',
-  "https://res.cloudinary.com/dwn5t3o4j/image/upload/v1748186078/2.2_Emerging_Issue_Analysis_blsa8e.png",
-  "15 minutes"
+  'https://res.cloudinary.com/dwn5t3o4j/image/upload/v1748186078/2.2_Emerging_Issue_Analysis_blsa8e.png',
+  '15 minutes'
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
-  "2.2.1",
-  "Why Use Horizon Scanning?",
-  "Discover how Horizon Scanning helps you spot future risks and opportunities early, preparing you for what's ahead.",
+  '2.2.1',
+  'Why Use Horizon Scanning?',
+  'Discover how Horizon Scanning helps you spot future risks and opportunities early, preparing you for what`s ahead.',
   '[
         "Horizon Scanning is a vital tool because it helps us to:",
         [
@@ -474,9 +474,9 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
-  "2.2.2",
-  "How to do Horizon Scanning?",
-  "Horizon Scanning helps you spot early signs of future changes so you can prepare. Think of it as looking ahead for clues!",
+  '2.2.2',
+  'How to do Horizon Scanning?',
+  'Horizon Scanning helps you spot early signs of future changes so you can prepare. Think of it as looking ahead for clues!',
   '[
         "The 5 Steps:",
         [
@@ -496,18 +496,18 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
-  "2.3-video",
-  "Trends Identification and Analysis",
+  '2.3-video',
+  'Trends Identification and Analysis',
   null,
   null,
-  "https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185774/2.3_Trends_Identification_and_Analysis_zfvxos.mp4",
-  "9 minutes 34 seconds"
+  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185774/2.3_Trends_Identification_and_Analysis_zfvxos.mp4',
+  '9 minutes 34 seconds'
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
-  "2.3",
-  "Trends Identification and Analysis",
-  "Understanding the cascading impacts of change using structured brainstorming and visualization.",
+  '2.3',
+  'Trends Identification and Analysis',
+  'Understanding the cascading impacts of change using structured brainstorming and visualization.',
   '[
         "The Futures Wheel (also called the Implications Wheel) is a simple but powerful way to think about the future.",
         "It helps us map out all the possible effects that a major change or event could have.",
@@ -518,14 +518,14 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
         ],
         "This tool helps us see how one initial change “seed of change” can set off a chain reaction of consequences, both good and bad, that keep going and going."
   ]',
-  "https://res.cloudinary.com/dwn5t3o4j/image/upload/v1748186078/2.3_Implications_Analysis_Considerations_fzxlyt.png",
-  "18 minutes"
+  'https://res.cloudinary.com/dwn5t3o4j/image/upload/v1748186078/2.3_Implications_Analysis_Considerations_fzxlyt.png',
+  '18 minutes'
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
-  "2.3.1",
-  "How to do Futures Wheel Analysis?",
-  "Explore the ripple effects of a change! The Futures Wheel helps you map out all the possible consequences of a trend or event.",
+  '2.3.1',
+  'How to do Futures Wheel Analysis?',
+  'Explore the ripple effects of a change! The Futures Wheel helps you map out all the possible consequences of a trend or event.',
   '[
         "Choose Your Change",
         ["Pick the main trend, issue, or event you want to explore (this goes in the middle)."],
@@ -544,18 +544,18 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
-  "3.1-video",
-  "Causal Layered Analysis",
+  '3.1-video',
+  'Causal Layered Analysis',
   null,
   null,
-  "https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185859/3.1_Causal_Layered_Analysis_u1pfwq.mp4",
-  "19 minutes 11 seconds"
+  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185859/3.1_Causal_Layered_Analysis_u1pfwq.mp4',
+  '19 minutes 11 seconds'
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
-  "3.1",
-  "Causal Layered Analysis",
-  "It is a powerful tool that helps us understand complex issues by looking beyond the surface. It's used to reveal hidden beliefs and perspectives that shape our current reality, and then to help create new stories that can lead to a desired future.",
+  '3.1',
+  'Causal Layered Analysis',
+  'It is a powerful tool that helps us understand complex issues by looking beyond the surface. It`s used to reveal hidden beliefs and perspectives that shape our current reality, and then to help create new stories that can lead to a desired future.',
   '[
         "The Four Levels of CLA:",
         [
@@ -575,14 +575,14 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
             ["This is the very deepest level, uncovering the powerful, often unspoken, stories and fundamental ideas that shape our worldviews. These are the unconscious narratives that truly influence how we see reality."]
         ]
   ]',
-  "https://res.cloudinary.com/dwn5t3o4j/image/upload/v1748186078/3.1_CLA_Levels_of_Analysis_ooqitq.png",
-  "15 minutes"
+  'https://res.cloudinary.com/dwn5t3o4j/image/upload/v1748186078/3.1_CLA_Levels_of_Analysis_ooqitq.png',
+  '15 minutes'
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
-  "3.1.1",
-  "Why Use Causal Layered Analysis?",
-  "Discover how Causal Layered Analysis helps you dig deeper into a problem, finding hidden beliefs and creating clearer paths forward.",
+  '3.1.1',
+  'Why Use Causal Layered Analysis?',
+  'Discover how Causal Layered Analysis helps you dig deeper into a problem, finding hidden beliefs and creating clearer paths forward.',
   '[
       "Causal Layered Analysis (CLA) is a powerful tool used for several key reasons:",
       [
@@ -598,9 +598,9 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
-  "3.1.2",
-  "How to do Causal Layered Analysis?",
-  "Learn to dig deep into any issue by exploring its surface, systems, beliefs, and hidden stories.",
+  '3.1.2',
+  'How to do Causal Layered Analysis?',
+  'Learn to dig deep into any issue by exploring its surface, systems, beliefs, and hidden stories.',
   '[
     "Causal Layered Analysis (CLA) helps you understand a problem or topic by looking at it through four different levels, like peeling an onion. First, pick an issue you want to explore (like a new plan, a problem, or a topic of interest):",
     "The 4 Levels of CLA:",
@@ -627,188 +627,188 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
       ]
     ]
   ]',
-  "https://res.cloudinary.com/dwn5t3o4j/image/upload/v1748186079/3.1.2_Using_CLA_sfpy9p.png"
+  'https://res.cloudinary.com/dwn5t3o4j/image/upload/v1748186079/3.1.2_Using_CLA_sfpy9p.png'
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
-  "3.2-video",
-  "Futures Triangle",
+  '3.2-video',
+  'Futures Triangle',
   null,
   null,
-  "https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185745/3.2_Futures_Triangle_l837ah.mp4",
-  "2 minutes 59 seconds"
+  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185745/3.2_Futures_Triangle_l837ah.mp4',
+  '2 minutes 59 seconds'
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
-  "3.2",
-  "Futures Triangle",
-  "Futures triangle is a futures method that helps us to map the present views of the future through three dimensions that are shaping it. The three dimensions are: the images (pull) of the future, the megatrends and drivers (push) of the present and the barriers (weight) of past/history.",
+  '3.2',
+  'Futures Triangle',
+  'Futures triangle is a futures method that helps us to map the present views of the future through three dimensions that are shaping it. The three dimensions are: the images (pull) of the future, the megatrends and drivers (push) of the present and the barriers (weight) of past/history.',
   JSON_ARRAY(
-    "The Futures Triangle is a quick and easy way to understand how the future might play out. It's built on three main forces constantly pushing and pulling on things:",
+    'The Futures Triangle is a quick and easy way to understand how the future might play out. It`s built on three main forces constantly pushing and pulling on things:',
     JSON_ARRAY(
-      "The \"Pull\" of the Future (Your Visions):",
+      'The "Pull" of the Future (Your Visions):',
       JSON_ARRAY(
-        "This is about the images we have in our minds of what the future could or should be like.",
-        "Think of it as the dreams, hopes, and even fears that push us forward.",
-        "These visions can come from anywhere: books, movies, political goals, religious ideas, or even advertisements. They're basically what people or groups strongly desire or dread for the future."
+        'This is about the images we have in our minds of what the future could or should be like.',
+        'Think of it as the dreams, hopes, and even fears that push us forward.',
+        'These visions can come from anywhere: books, movies, political goals, religious ideas, or even advertisements. They`re basically what people or groups strongly desire or dread for the future.'
       )
     ),
-    "The \"Push\" of the Present (Current Trends):",
+    'The "Push" of the Present (Current Trends):',
     JSON_ARRAY(
-      "These are the ongoing trends and major forces happening right now that are actively shaping what's coming next.",
-      "Things like new technologies, economic changes, or shifts in how people live and interact."
+      'These are the ongoing trends and major forces happening right now that are actively shaping what`s coming next.',
+      'Things like new technologies, economic changes, or shifts in how people live and interact.'
     ),
-    "The \"Weight\" of the Past (Historical Barriers):",
+    'The "Weight" of the Past (Historical Barriers):',
     JSON_ARRAY(
-      "This represents the old ways of doing things, traditions, established systems, and historical events that can slow down or block changes we want to see.",
-      "It's like a heavy anchor from history that makes it harder to move in a new direction."
+      'This represents the old ways of doing things, traditions, established systems, and historical events that can slow down or block changes we want to see.',
+      'It`s like a heavy anchor from history that makes it harder to move in a new direction.'
     ),
-    "Putting It All Together:",
+    'Putting It All Together:',
     JSON_ARRAY(
-      "The Futures Triangle shows that these three forces are always interacting and changing.",
-      "If one force gets stronger, it affects the others. For example, if the \"Weight of the Past\" gets heavier (meaning old ways become more stubborn), it might weaken the \"Pull of the Future\" or slow down the \"Push of the Present.\"",
-      "This push and pull changes where the future is likely to go."
+      'The Futures Triangle shows that these three forces are always interacting and changing.',
+      'If one force gets stronger, it affects the others. For example, if the "Weight of the Past" gets heavier (meaning old ways become more stubborn), it might weaken the "Pull of the Future" or slow down the "Push of the Present."',
+      'This push and pull changes where the future is likely to go.'
     )
   ),
-  "https://res.cloudinary.com/dwn5t3o4j/image/upload/v1748186111/3.2_Futures_Triangle_kzo8sy.png",
-  "18 minutes"
+  'https://res.cloudinary.com/dwn5t3o4j/image/upload/v1748186111/3.2_Futures_Triangle_kzo8sy.png',
+  '18 minutes'
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
-  "3.2.1",
-  "Why Use the Futures Triangle?",
-  "Learn how this tool helps you understand the forces shaping the future – from the past, present, and your hopes for tomorrow.",
+  '3.2.1',
+  'Why Use the Futures Triangle?',
+  'Learn how this tool helps you understand the forces shaping the future – from the past, present, and your hopes for tomorrow.',
   JSON_ARRAY(
-        "The Futures Triangle is a handy tool that helps us:",
-        JSON_ARRAY(
-          "Understand how the past, what's happening now, and future possibilities all connect and influence each other.",
-          "Discover various believable futures by looking at how the forces from the past, present, and your future visions interact.",
-          "Use it as a foundation for creating detailed \"what if\" stories about the future.",
-          "Develop more effective actions and strategies that consider these powerful forces."
-        )
+    'The Futures Triangle is a handy tool that helps us:',
+    JSON_ARRAY(
+      'Understand how the past, what`s happening now, and future possibilities all connect and influence each other.',
+      'Discover various believable futures by looking at how the forces from the past, present, and your future visions interact.',
+      'Use it as a foundation for creating detailed "what if" stories about the future.',
+      'Develop more effective actions and strategies that consider these powerful forces.'
+    )
   ),
   null
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
-  "3.2.2",
-  "How to Use the Futures Triangle?",
-  "Understand the forces shaping your future by exploring your visions, current trends, and past influences.",
+  '3.2.2',
+  'How to Use the Futures Triangle?',
+  'Understand the forces shaping your future by exploring your visions, current trends, and past influences.',
   JSON_ARRAY(
-    "The Futures Triangle helps you map out how different forces — your hopes for the future, what's happening now, and lessons from the past — are all pushing and pulling on each other. It's about understanding the big picture to see where things might go.",
-    "Here's how to use it, by exploring three key areas:",
+    'The Futures Triangle helps you map out how different forces — your hopes for the future, what`s happening now, and lessons from the past — are all pushing and pulling on each other. It`s about understanding the big picture to see where things might go.',
+    'Here`s how to use it, by exploring three key areas:',
     JSON_ARRAY(
-      "The \"Pull\" of the Future (Your Hopes)",
+      'The "Pull" of the Future (Your Hopes)',
       JSON_ARRAY(
-        "What it is: Your vision for what you want the future to be.",
-        "Ask yourself:",
-        JSON_ARRAY("What's your ideal future?"),
-        "What resources help you get there?"
+        'What it is: Your vision for what you want the future to be.',
+        'Ask yourself:',
+        JSON_ARRAY('What`s your ideal future?'),
+        'What resources help you get there?'
       ),
-      "The \"Push\" of the Present (Today's Trends)",
+      'The "Push" of the Present (Today`s Trends)',
       JSON_ARRAY(
-        "What it is: The forces and changes happening right now that are shaping tomorrow.",
-        "Ask yourself:",
+        'What it is: The forces and changes happening right now that are shaping tomorrow.',
+        'Ask yourself:',
         JSON_ARRAY(
-          "What big trends are happening?",
-          "How are they moving us forward?"
+          'What big trends are happening?',
+          'How are they moving us forward?'
         ),
-        "What resources help you get there?"
+        'What resources help you get there?'
       ),
-      "The \"Weight\" of the Past (Old Influences)",
+      'The "Weight" of the Past (Old Influences)',
       JSON_ARRAY(
-        "What it is: History, traditions, and old ways of doing things that might slow change.",
-        "Ask yourself:",
+        'What it is: History, traditions, and old ways of doing things that might slow change.',
+        'Ask yourself:',
         JSON_ARRAY(
-          "What's holding things back?",
-          "Who benefits if nothing changes?"
+          'What`s holding things back?',
+          'Who benefits if nothing changes?'
         )
       )
     ),
-    "By thinking through these questions for each of the three points of the triangle, you'll start to see how they interact. This helps you understand the likely direction things are headed, imagine different possible futures, and develop clearer actions."
+    'By thinking through these questions for each of the three points of the triangle, you`ll start to see how they interact. This helps you understand the likely direction things are headed, imagine different possible futures, and develop clearer actions.'
   ),
   null
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
-  "3.3-video",
-  "Scenario Planning",
+  '3.3-video',
+  'Scenario Planning',
   null,
   null,
-  "https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185751/3.3_Scenario_Planning_viem5x.mp4",
-  "2 minutes 15 seconds"
+  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185751/3.3_Scenario_Planning_viem5x.mp4',
+  '2 minutes 15 seconds'
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
-  "3.3",
-  "Scenario",
-  "A scenario is a description of how the future may unfold based on an explicit, coherent and internally consistent set of plausible assumptions about key relationships among drivers of change.",
+  '3.3',
+  'Scenario Planning',
+  'A scenario is a description of how the future may unfold based on an explicit, coherent and internally consistent set of plausible assumptions about key relationships among drivers of change.',
   JSON_ARRAY(
-    "Scenario planning is a special tool that helps us imagine and prepare for different possible futures. It's not about predicting one exact future, but rather creating several \"what if\" stories based on big trends and uncertainties we see today.",
-    "A scenario is simply a detailed story about how the future could unfold. Each story is realistic, makes sense internally, and is based on clear ideas about how different changes might connect.",
-    "Types of scenarios methods",
+    'Scenario planning is a special tool that helps us imagine and prepare for different possible futures. It`s not about predicting one exact future, but rather creating several "what if" stories based on big trends and uncertainties we see today.',
+    'A scenario is simply a detailed story about how the future could unfold. Each story is realistic, makes sense internally, and is based on clear ideas about how different changes might connect.',
+    'Types of scenarios methods',
     JSON_ARRAY(
-      "2x2 scenarios",
-      "Organizational scenarios",
-      "Integrated scenarios",
-      "Manoa scenarios",
-      "Transformative scenarios",
-      "Change progression scenarios method"
+      '2x2 scenarios',
+      'Organizational scenarios',
+      'Integrated scenarios',
+      'Manoa scenarios',
+      'Transformative scenarios',
+      'Change progression scenarios method'
     )
   ),
   null,
-  "18 minutes"
+  '18 minutes'
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
-  "3.3.1",
-  "Why Use Scenario Planning?",
-  "Learn how scenarios help you explore different possible futures, challenge your thinking, and prepare for anything.",
+  '3.3.1',
+  'Why Use Scenario Planning?',
+  'Learn how scenarios help you explore different possible futures, challenge your thinking, and prepare for anything.',
   JSON_ARRAY(
-    "Using Scenarios is super helpful because it allows us to:",
+    'Using Scenarios is super helpful because it allows us to:',
     JSON_ARRAY(
-      "It makes us think beyond what we expect to happen, by exploring many different ways a plan, policy, or strategy could unfold in the future.",
-      "It helps us imagine how key issues, partners, and other people might act in various future situations.",
-      "It's a great way to create \"what if\" plans (contingency plans) for our programs, policies, and strategies, making us ready for different possible futures."
+      'It makes us think beyond what we expect to happen, by exploring many different ways a plan, policy, or strategy could unfold in the future.',
+      'It helps us imagine how key issues, partners, and other people might act in various future situations.',
+      'It`s a great way to create "what if" plans (contingency plans) for our programs, policies, and strategies, making us ready for different possible futures.'
     )
   ),
   null
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
-  "3.3.2",
-  "How to Build Scenarios?",
-  "Learn to create different 'what if' stories about the future to better understand and prepare for change.",
+  '3.3.2',
+  'How to Build Scenarios?',
+  'Learn to create different "what if" stories about the future to better understand and prepare for change.',
   JSON_ARRAY(
-    "Define Your Focus & Time",
+    'Define Your Focus & Time',
     JSON_ARRAY(
-      "What issue are you exploring? (e.g., \"The future of digital access.\")",
-      "How far into the future? Pick a specific time (e.g., 5, 10, or 20 years from now)."
+      'What issue are you exploring? (e.g., "The future of digital access.")',
+      'How far into the future? Pick a specific time (e.g., 5, 10, or 20 years from now).'
     ),
-    "Pick Your Key Drivers",
+    'Pick Your Key Drivers',
     JSON_ARRAY(
-      "Identify the most important forces of change (drivers) that will shape your future.",
-      "These drivers become your \"critical uncertainties\" (for a 2x2 scenario) or help explore \"colliding impacts\" (for a Manoa scenario)."
+      'Identify the most important forces of change (drivers) that will shape your future.',
+      'These drivers become your "critical uncertainties" (for a 2x2 scenario) or help explore "colliding impacts" (for a Manoa scenario).'
     ),
-    "Build Your Scenarios",
+    'Build Your Scenarios',
     JSON_ARRAY(
-      "For 2x2 Scenarios: Take your two most uncertain and impactful drivers. Imagine them as axes on a graph (like X and Y). This creates four unique future \"corners\" or stories.",
-      "For Manoa Scenarios: Explore how your chosen drivers might collide or interact in surprising ways. Think about how their impacts would combine."
+      'For 2x2 Scenarios: Take your two most uncertain and impactful drivers. Imagine them as axes on a graph (like X and Y). This creates four unique future "corners" or stories.',
+      'For Manoa Scenarios: Explore how your chosen drivers might collide or interact in surprising ways. Think about how their impacts would combine.'
     ),
-    "Develop Stories & Images",
+    'Develop Stories & Images',
     JSON_ARRAY(
-      "For each scenario you've built, create a clear story. What does this future look like?",
-      "Think about creating a catchy title and even a visual image for each one to make it memorable."
+      'For each scenario you`ve built, create a clear story. What does this future look like?',
+      'Think about creating a catchy title and even a visual image for each one to make it memorable.'
     ),
-    "Review & Discuss",
+    'Review & Discuss',
     JSON_ARRAY(
-      "Share your scenarios with others.",
-      "Ask: Does this scenario make sense? What are the biggest surprises? How would this future affect different people or groups?"
+      'Share your scenarios with others.',
+      'Ask: Does this scenario make sense? What are the biggest surprises? How would this future affect different people or groups?'
     ),
-    "Find Your Message",
+    'Find Your Message',
     JSON_ARRAY(
-      "What key insights or messages do you want people to take away from these scenarios?",
-      "What actions should be considered today based on these possible futures?"
+      'What key insights or messages do you want people to take away from these scenarios?',
+      'What actions should be considered today based on these possible futures?'
     )
   ),
   null
@@ -856,103 +856,104 @@ CREATE TABLE module_assessment (
 
 INSERT INTO module_assessment (course_id, module_number, assessment_title, assessment_objective, assessment_scenario, assessment_instructions) VALUES (
   1, 1, 
-  "Future Shapers: Mapping Change Drivers", "Work within your group. Identify and analyze change drivers and weak signals using the PESTLE framework.", 
+  'Future Shapers: Mapping Change Drivers', 
+  'Work within your group. Identify and analyze change drivers and weak signals using the PESTLE framework.', 
   null, 
   JSON_ARRAY(
     JSON_OBJECT(
-      "step_title", "Spot the Current Change Driver",
-      "step_description", "Find a current event (news, blog, tweet) that highlights a shift or trend influencing the future. Write a brief description of the change."
+      'step_title', 'Spot the Current Change Driver',
+      'step_description', 'Find a current event (news, blog, tweet) that highlights a shift or trend influencing the future. Write a brief description of the change.'
     ),
     JSON_OBJECT(
-      "step_title", "Categorize the PESTLE",
-      "step_description", "Classify the change using PESTLE framework."
+      'step_title', 'Categorize the PESTLE',
+      'step_description', 'Classify the change using PESTLE framework.'
     ),
     JSON_OBJECT(
-      "step_title", "Identify a Weak Signal",
-      "step_description", "Find a subtle early sign within your example that could lead to future change."
+      'step_title', 'Identify a Weak Signal',
+      'step_description', 'Find a subtle early sign within your example that could lead to future change.'
     ),
     JSON_OBJECT(
-      "step_title", "Reflect",
-      "step_description", "How might the change driver or signal impact the future? Who could be affected if it grows?"
+      'step_title', 'Reflect',
+      'step_description', 'How might the change driver or signal impact the future? Who could be affected if it grows?'
     )
   )
 );
 
 INSERT INTO module_assessment (course_id, module_number, assessment_title, assessment_objective, assessment_scenario, assessment_instructions) VALUES (
   1, 2, 
-  "Future Force Field: Solving Tomorrow's Challenges", 
-  "Collaborate with your team to apply Futures Thinking tools to solve a shared future challenge.", 
-  "Your team is a group of policy advisors preparing your city for a major shift in AI automation. The goal is to develop a strategy that helps the community adapt without negatively impacting jobs or social systems.", 
+  'Future Force Field: Solving Tomorrow`s Challenges', 
+  'Collaborate with your team to apply Futures Thinking tools to solve a shared future challenge.', 
+  'Your team is a group of policy advisors preparing your city for a major shift in AI automation. The goal is to develop a strategy that helps the community adapt without negatively impacting jobs or social systems.', 
   JSON_ARRAY(
     JSON_OBJECT(
-      "step_title", "Identify Key Drivers",
-      "step_description", "As a team, use the PESTLE framework to collectively identify three key drivers (e.g., technological, political, social) influencing the shift. Discuss and assign each driver to a team member to research and explain its impact."
+      'step_title', 'Identify Key Drivers',
+      'step_description', 'As a team, use the PESTLE framework to collectively identify three key drivers (e.g., technological, political, social) influencing the shift. Discuss and assign each driver to a team member to research and explain its impact.'
     ),
     JSON_OBJECT(
-      "step_title", "Horizon Scanning",
-      "step_description", "Each team member will choose one weak signal (early hint) related to their assigned driver. The team will discuss how these weak signals could evolve into major trends."
+      'step_title', 'Horizon Scanning',
+      'step_description', 'Each team member will choose one weak signal (early hint) related to their assigned driver. The team will discuss how these weak signals could evolve into major trends.'
     ),
     JSON_OBJECT(
-      "step_title", "Trend Identification",
-      "step_description", "Use the Futures Wheel as a team to map out the first, second, and third-order impacts of the technological shift on sectors like employment, economy, and society."
+      'step_title', 'Trend Identification',
+      'step_description', 'Use the Futures Wheel as a team to map out the first, second, and third-order impacts of the technological shift on sectors like employment, economy, and society.'
     ),
     JSON_OBJECT(
-      "step_title", "Brainstorm Solutions",
-      "step_description", "As a group, develop three policy solutions that address the challenges of the shift. Focus on: Mitigating negative impacts, supporting vulnerable groups, encouraging public-private collaboration."
+      'step_title', 'Brainstorm Solutions',
+      'step_description', 'As a group, develop three policy solutions that address the challenges of the shift. Focus on: Mitigating negative impacts, supporting vulnerable groups, encouraging public-private collaboration.'
     ),
     JSON_OBJECT(
-      "step_title", "Reflection",
-      "step_description", "Write a 150-300 word reflection on what you learned about identifying future drivers and solving problems based on future trends."
+      'step_title', 'Reflection',
+      'step_description', 'Write a 150-300 word reflection on what you learned about identifying future drivers and solving problems based on future trends.'
     )
   )
 );
 
 INSERT INTO module_assessment (course_id, module_number, assessment_title, assessment_objective, assessment_scenario, assessment_instructions) VALUES (
   1, 3, 
-  "Futures Quest: Scenario Building Game", 
-  "Engage students in creating alternative futures using Causal Layered Analysis (CLA) and Scenario Planning to explore future challenges.", 
+  'Futures Quest: Scenario Building Game', 
+  'Engage students in creating alternative futures using Causal Layered Analysis (CLA) and Scenario Planning to explore future challenges.', 
   null, 
   JSON_ARRAY(
     JSON_OBJECT(
-      "step_title", "Select an issue",
-      "step_description", "As a group, choose an issue to explore. Each member can suggest one issue, and you'll vote on the final choice."
+      'step_title', 'Select an issue',
+      'step_description', 'As a group, choose an issue to explore. Each member can suggest one issue, and you`ll vote on the final choice.'
     ),
     JSON_OBJECT(
-      "step_title", "CLA Exploration",
-      "step_description", "Use Causal Layered Analysis as a group to explore: • Litany: The visible facts (e.g., trends, headlines) • Systemic Causes: The deeper causes (e.g., policies, economic systems) • Worldviews: The cultural beliefs influencing the issue • Myths/Metaphors: The deep, often unspoken narratives"
+      'step_title', 'CLA Exploration',
+      'step_description', 'Use Causal Layered Analysis as a group to explore: • Litany: The visible facts (e.g., trends, headlines) • Systemic Causes: The deeper causes (e.g., policies, economic systems) • Worldviews: The cultural beliefs influencing the issue • Myths/Metaphors: The deep, often unspoken narratives'
     ),
     JSON_OBJECT(
-      "step_title", "Build Scenarios",
-      "step_description", "As a group, create four future scenarios for your issue: • Best Case: Ideal future • Worst Case: Worst possible future • Middle Ground: Plausible future • Wildcard: Unlikely but possible future"
+      'step_title', 'Build Scenarios',
+      'step_description', 'As a group, create four future scenarios for your issue: • Best Case: Ideal future • Worst Case: Worst possible future • Middle Ground: Plausible future • Wildcard: Unlikely but possible future'
     ),
     JSON_OBJECT(
-      "step_title", "Group Discussion",
-      "step_description", "Discuss your scenarios and consolidate your ideas into one cohesive group submission."
+      'step_title', 'Group Discussion',
+      'step_description', 'Discuss your scenarios and consolidate your ideas into one cohesive group submission.'
     ),
     JSON_OBJECT(
-      "step_title", "Reflection",
-      "step_description", "Write a 150–300-word group reflection on what you learned from this activity."
+      'step_title', 'Reflection',
+      'step_description', 'Write a 150–300-word group reflection on what you learned from this activity.'
     )
   )
 );
 
 INSERT INTO module_assessment (course_id, module_number, assessment_title, assessment_objective, assessment_scenario, assessment_instructions) VALUES (
   4, 1, 
-  "Futures Thinking Challenge: Testing Your Understanding", 
+  'Futures Thinking Challenge: Testing Your Understanding', 
   null,
   null, 
   JSON_ARRAY(
     JSON_OBJECT(
-      "step_title", "Short Answer Questions",
-      "step_description", "As a group, discuss the following questions and create a collective response. One group member will write down the answers.
+      'step_title', 'Short Answer Questions',
+      'step_description', 'As a group, discuss the following questions and create a collective response. One group member will write down the answers.
       1. What is Futures Thinking?
       2. What is the Three Horizons Model?
       3. What are Change Drivers?
-      4. What are Weak Signals?"
+      4. What are Weak Signals?'
     ),
     JSON_OBJECT(
-      "step_title", "Multiple-Choice Questions",
-      "step_description", "As a group, answer the following questions. Discuss each one and come to a collective agreement on the answers.
+      'step_title', 'Multiple-Choice Questions',
+      'step_description', 'As a group, answer the following questions. Discuss each one and come to a collective agreement on the answers.
       1. Which of the following is NOT a category in the PESTLE framework?
         a. Technological
         b. Ethical
@@ -967,248 +968,248 @@ INSERT INTO module_assessment (course_id, module_number, assessment_title, asses
         a. It helps predict exact future outcomes
         b. It allows us to respond to immediate problems
         c. It provides early warning of changes that may impact long-term strategies
-        d. It focuses on solving current challenges"
+        d. It focuses on solving current challenges'
     ),
     JSON_OBJECT(
-      "step_title", "Scenario Application",
-      "step_description", "Given the global pandemic scenario, work together to:
+      'step_title', 'Scenario Application',
+      'step_description', 'Given the global pandemic scenario, work together to:
       • Identify at least three drivers influencing the future of global supply chains. Categorize them using the PESTLE framework.
-      • Identify two weak signals in the context of supply chain disruptions and discuss how these signals might grow into major trends."
+      • Identify two weak signals in the context of supply chain disruptions and discuss how these signals might grow into major trends.'
     ),
     JSON_OBJECT(
-      "step_title", "Reflection",
-      "step_description", "After completing the task, each group member will write a 150-300-word individual reflection on the activity. Focus on:
+      'step_title', 'Reflection',
+      'step_description', 'After completing the task, each group member will write a 150-300-word individual reflection on the activity. Focus on:
       • How you worked together to identify key trends and signals.
-      • The role of Futures Thinking in planning for long-term challenges in your field of interest."
+      • The role of Futures Thinking in planning for long-term challenges in your field of interest.'
     )
   )
 );
 
 INSERT INTO module_assessment (course_id, module_number, assessment_title, assessment_objective, assessment_scenario, assessment_instructions) VALUES (
   4, 2, 
-  "Futures Exploration: Case Study on Technological Disruption", 
+  'Futures Exploration: Case Study on Technological Disruption', 
   null,
-  "Imagine a major global retailer has implemented a new AI-driven automation system in its supply chain, which has led to significant changes in the workforce and job opportunities. Some employees have lost jobs due to automation, while new job categories are emerging, demanding new skills and expertise. As a policy advisor, your goal is to assess how this change will affect the company, employees, and the broader labor market.", 
+  'Imagine a major global retailer has implemented a new AI-driven automation system in its supply chain, which has led to significant changes in the workforce and job opportunities. Some employees have lost jobs due to automation, while new job categories are emerging, demanding new skills and expertise. As a policy advisor, your goal is to assess how this change will affect the company, employees, and the broader labor market.', 
   JSON_ARRAY(
     JSON_OBJECT(
-      "step_title", "Identify Key Drivers",
-      "step_description", "As a group, use the PESTLE framework to identify three key drivers affecting workforce automation. Discuss their potential impacts on the workforce and society."
+      'step_title', 'Identify Key Drivers',
+      'step_description', 'As a group, use the PESTLE framework to identify three key drivers affecting workforce automation. Discuss their potential impacts on the workforce and society.'
     ),
     JSON_OBJECT(
-      "step_title", "Horizon Scanning",
-      "step_description", "Each team member will identify one weak signal related to workforce changes and automation. Discuss how these weak signals might evolve into major trends."
+      'step_title', 'Horizon Scanning',
+      'step_description', 'Each team member will identify one weak signal related to workforce changes and automation. Discuss how these weak signals might evolve into major trends.'
     ),
     JSON_OBJECT(
-      "step_title", "Trends Identification and Analysis",
-      "step_description", "As a group, use the Futures Wheel to identify first, second, and third-order impacts of automation on the workforce, economy, and society. Discuss how these trends might shape future outcomes."
+      'step_title', 'Trends Identification and Analysis',
+      'step_description', 'As a group, use the Futures Wheel to identify first, second, and third-order impacts of automation on the workforce, economy, and society. Discuss how these trends might shape future outcomes.'
     ),
     JSON_OBJECT(
-      "step_title", "Brainstorm Solutions",
-      "step_description", "As a group, propose three strategic solutions to address workforce challenges created by automation. Focus on: Upskilling and reskilling strategies, Policy solutions for displaced workers, Strategies to adapt to a more automated workforce."
+      'step_title', 'Brainstorm Solutions',
+      'step_description', 'As a group, propose three strategic solutions to address workforce challenges created by automation. Focus on: Upskilling and reskilling strategies, Policy solutions for displaced workers, Strategies to adapt to a more automated workforce.'
     ),
     JSON_OBJECT(
-      "step_title", "Reflect",
-      "step_description", "Write a 150-300-word reflection on how you applied Futures Thinking tools to assess the impacts of technological disruption."
+      'step_title', 'Reflect',
+      'step_description', 'Write a 150-300-word reflection on how you applied Futures Thinking tools to assess the impacts of technological disruption.'
     )
   )
 );
 
 INSERT INTO module_assessment (course_id, module_number, assessment_title, assessment_objective, assessment_scenario, assessment_instructions) VALUES (
   4, 3, 
-  "Solving Future Challenges: A Pragmatist Approach", 
-  "To enhance problem-solving skills by applying Futures Thinking concepts, particularly Causal Layered Analysis and Futures Triangle, in crafting potential solutions to future challenges.",
+  'Solving Future Challenges: A Pragmatist Approach', 
+  'To enhance problem-solving skills by applying Futures Thinking concepts, particularly Causal Layered Analysis and Futures Triangle, in crafting potential solutions to future challenges.',
   null, 
   JSON_ARRAY(
     JSON_OBJECT(
-      "step_title", "Choose a Current Issue or Trend",
-      "step_description", "Select one significant issue or trend that may affect the future (e.g., climate change, technology advancement, geopolitical tensions). Write a brief description of the issue (3-5 sentences)."
+      'step_title', 'Choose a Current Issue or Trend',
+      'step_description', 'Select one significant issue or trend that may affect the future (e.g., climate change, technology advancement, geopolitical tensions). Write a brief description of the issue (3-5 sentences).'
     ),
     JSON_OBJECT(
-      "step_title", "Divide the Task",
-      "step_description", "Each member of the group will work on a different part of the task:
+      'step_title', 'Divide the Task',
+      'step_description', 'Each member of the group will work on a different part of the task:
       • CLA (Litany, Systemic Causes, Worldviews, Myths/Metaphors): One member will handle the Litany and Systemic Causes, while another will explore Worldviews and Myths/Metaphors.
-      • Futures Triangle: One member will focus on defining the Pull of the Future, another on the Push of the Present, and another on the Weight of the Past."
+      • Futures Triangle: One member will focus on defining the Pull of the Future, another on the Push of the Present, and another on the Weight of the Past.'
     ),
     JSON_OBJECT(
-      "step_title", "Collaborative Problem-Solving",
-      "step_description", "Once the individual parts are completed, come together as a group to discuss and integrate the findings. Then, collectively propose one or more solutions based on the CLA and Futures Triangle analysis."
+      'step_title', 'Collaborative Problem-Solving',
+      'step_description', 'Once the individual parts are completed, come together as a group to discuss and integrate the findings. Then, collectively propose one or more solutions based on the CLA and Futures Triangle analysis.'
     ),
     JSON_OBJECT(
-      "step_title", "Problem-Solving",
-      "step_description", "Based on the insights from CLA and the Futures Triangle, propose one concrete solution to address the issue and move closer to your envisioned future. Outline the steps involved in implementing this solution."
+      'step_title', 'Problem-Solving',
+      'step_description', 'Based on the insights from CLA and the Futures Triangle, propose one concrete solution to address the issue and move closer to your envisioned future. Outline the steps involved in implementing this solution.'
     )
   )
 );
 
 INSERT INTO module_assessment (course_id, module_number, assessment_title, assessment_objective, assessment_scenario, assessment_instructions) VALUES (
   3, 1, 
-  "Futures Thinking Framework Creation", 
-  "To formalize the understanding of Futures Thinking by developing a structured framework that identifies key components from the module and applies them in a scenario planning context.",
+  'Futures Thinking Framework Creation', 
+  'To formalize the understanding of Futures Thinking by developing a structured framework that identifies key components from the module and applies them in a scenario planning context.',
   null, 
   JSON_ARRAY(
     JSON_OBJECT(
-      "step_title", "Group Framework Development",
-      "step_description", "In your group, work together to create a detailed Futures Thinking framework using a shared digital tool (like Google Docs or Miro). Each member should contribute to the sections: Overview, Tools, Horizon Model, and Change Drivers."
+      'step_title', 'Group Framework Development',
+      'step_description', 'In your group, work together to create a detailed Futures Thinking framework using a shared digital tool (like Google Docs or Miro). Each member should contribute to the sections: Overview, Tools, Horizon Model, and Change Drivers.'
     ),
     JSON_OBJECT(
-      "step_title", "Group Discussion",
-      "step_description", "After creating the framework, each group member should share their thoughts on how Futures Thinking tools could influence a policy area of their choice. Have a discussion on which tools are most beneficial for anticipating change and guiding policy."
+      'step_title', 'Group Discussion',
+      'step_description', 'After creating the framework, each group member should share their thoughts on how Futures Thinking tools could influence a policy area of their choice. Have a discussion on which tools are most beneficial for anticipating change and guiding policy.'
     )
   )
 );
 
 INSERT INTO module_assessment (course_id, module_number, assessment_title, assessment_objective, assessment_scenario, assessment_instructions) VALUES (
   3, 2, 
-  "Generalizing Futures Thinking Tools Using a Venn Diagram", 
-  "To help students generalize and visualize the connections between Horizon Scanning, Trends Identification and Analysis, and Key Drivers using a Venn Diagram, showing how they collectively contribute to understanding and preparing for future changes.",
+  'Generalizing Futures Thinking Tools Using a Venn Diagram', 
+  'To help students generalize and visualize the connections between Horizon Scanning, Trends Identification and Analysis, and Key Drivers using a Venn Diagram, showing how they collectively contribute to understanding and preparing for future changes.',
   null, 
   JSON_ARRAY(
     JSON_OBJECT(
-      "step_title", "Review and identify components of each Futures Thinking Tool",
-      "step_description", "• For Key Drivers, identify three significant drivers shaping the future (e.g., climate change, AI advancements).
+      'step_title', 'Review and identify components of each Futures Thinking Tool',
+      'step_description', '• For Key Drivers, identify three significant drivers shaping the future (e.g., climate change, AI advancements).
       • For Horizon Scanning, identify two early signals that might indicate future changes (e.g., social media trends, shifts in consumer behavior).
-      • For Trends Identification and Analysis, identify two emerging trends (e.g., remote work, renewable energy)."
+      • For Trends Identification and Analysis, identify two emerging trends (e.g., remote work, renewable energy).'
     ),
     JSON_OBJECT(
-      "step_title", "Create a Venn Diagram",
-      "step_description", "Draw a three-circle Venn Diagram, with each circle representing one of the three tools: Key Drivers, Horizon Scanning, and Trends Identification and Analysis."
+      'step_title', 'Create a Venn Diagram',
+      'step_description', 'Draw a three-circle Venn Diagram, with each circle representing one of the three tools: Key Drivers, Horizon Scanning, and Trends Identification and Analysis.'
     ),
     JSON_OBJECT(
-      "step_title", "In the non-overlapping parts of each circle, list the unique elements for each tool",
-      "step_description", "(e.g., for Horizon Scanning, list the weak signals you identified). In the overlapping sections, identify and list how elements from each tool might interact or contribute to one another. For example, how a Key Driver (e.g., climate change) might influence Trends (e.g., increased use of renewable energy) or how Horizon Scanning signals (e.g., early signs of climate policy changes) align with identified Key Drivers."
+      'step_title', 'In the non-overlapping parts of each circle, list the unique elements for each tool',
+      'step_description', '(e.g., for Horizon Scanning, list the weak signals you identified). In the overlapping sections, identify and list how elements from each tool might interact or contribute to one another. For example, how a Key Driver (e.g., climate change) might influence Trends (e.g., increased use of renewable energy) or how Horizon Scanning signals (e.g., early signs of climate policy changes) align with identified Key Drivers.'
     ),
     JSON_OBJECT(
-      "step_title", "Generalization",
-      "step_description", "After completing the diagram, write a brief explanation (150-200 words) generalizing how these three tools work together to shape future possibilities. Focus on how identifying drivers, scanning for early signals, and analyzing trends create a comprehensive understanding of future changes."
+      'step_title', 'Generalization',
+      'step_description', 'After completing the diagram, write a brief explanation (150-200 words) generalizing how these three tools work together to shape future possibilities. Focus on how identifying drivers, scanning for early signals, and analyzing trends create a comprehensive understanding of future changes.'
     )
   )
 );
 
 INSERT INTO module_assessment (course_id, module_number, assessment_title, assessment_objective, assessment_scenario, assessment_instructions) VALUES (
   3, 3, 
-  "Comparative Analysis of Future Scenarios", 
-  "To understand and compare different future scenarios based on key drivers of change, exploring how variations in these drivers could shape the future through teamwork and collective analysis. As a team, you will compare two future scenarios using the Futures Triangle  or Causal Layered Analysis methods. Together, you will analyze how different trends and  drivers can shape the future, focusing on the collective impact of these drivers on society, technology, and the environment.",
+  'Comparative Analysis of Future Scenarios', 
+  'To understand and compare different future scenarios based on key drivers of change, exploring how variations in these drivers could shape the future through teamwork and collective analysis. As a team, you will compare two future scenarios using the Futures Triangle  or Causal Layered Analysis methods. Together, you will analyze how different trends and  drivers can shape the future, focusing on the collective impact of these drivers on society, technology, and the environment.',
   null, 
   JSON_ARRAY(
     JSON_OBJECT(
-      "step_title", "Form Teams & Select Two Scenarios",
-      "step_description", "Work together to choose two distinct scenarios based on a key issue. One scenario could focus on technological advancement, and the other could address environmental or policy constraints."
+      'step_title', 'Form Teams & Select Two Scenarios',
+      'step_description', 'Work together to choose two distinct scenarios based on a key issue. One scenario could focus on technological advancement, and the other could address environmental or policy constraints.'
     ),
     JSON_OBJECT(
-      "step_title", "Assign Drivers to Team Members",
-      "step_description", "Assign each team member to research and analyze specific key drivers (e.g., technology, economy, climate). Ensure that everyone has a driver to explore in detail."
+      'step_title', 'Assign Drivers to Team Members',
+      'step_description', 'Assign each team member to research and analyze specific key drivers (e.g., technology, economy, climate). Ensure that everyone has a driver to explore in detail.'
     ),
     JSON_OBJECT(
-      "step_title", "Create a Comparison Chart",
-      "step_description", "Using the table below, collaborate to compare how each driver influences the future in both scenarios. Each member should contribute their findings for the chart.
+      'step_title', 'Create a Comparison Chart',
+      'step_description', 'Using the table below, collaborate to compare how each driver influences the future in both scenarios. Each member should contribute their findings for the chart.
       | Key Drivers | Scenario 1: Tech-Driven Future | Scenario 2: Environmentally Constrained Future |
       |-------------|-------------------------------|--------------------------------------------|
       | Technology Advancement | Positive Impact | Neutral Impact |
       | Economic Growth | Strong Growth | Slower Growth |
       | Climate Change | Neutral Impact | Significant Negative Impact |
-      | Global Policy Shifts | Positive Impact | Mixed Impact |"
+      | Global Policy Shifts | Positive Impact | Mixed Impact |'
     ),
     JSON_OBJECT(
-      "step_title", "Group Discussion",
-      "step_description", "After completing the comparison chart, hold a discussion to analyze how these drivers interact in each scenario. How does each driver influence the future? What insights did you gain from comparing the scenarios? Each member should share their perspective on the drivers they researched."
+      'step_title', 'Group Discussion',
+      'step_description', 'After completing the comparison chart, hold a discussion to analyze how these drivers interact in each scenario. How does each driver influence the future? What insights did you gain from comparing the scenarios? Each member should share their perspective on the drivers they researched.'
     ),
     JSON_OBJECT(
-      "step_title", "Write a Collaborative Reflection",
-      "step_description", "After the discussion, write a joint reflection summarizing the group's findings. Address how the interaction between drivers influences the scenarios and discuss the broader implications for future planning."
+      'step_title', 'Write a Collaborative Reflection',
+      'step_description', 'After the discussion, write a joint reflection summarizing the group`s findings. Address how the interaction between drivers influences the scenarios and discuss the broader implications for future planning.'
     )
   )
 );
 
 INSERT INTO module_assessment (course_id, module_number, assessment_title, assessment_objective, assessment_scenario, assessment_instructions) VALUES (
   2, 1, 
-  "Classifying Futures Thinking Concepts", 
-  "Reflect on and classify the core elements of Futures Thinking based on the introduction. This activity will help you categorize and organize your understanding of the concepts discussed.",
+  'Classifying Futures Thinking Concepts', 
+  'Reflect on and classify the core elements of Futures Thinking based on the introduction. This activity will help you categorize and organize your understanding of the concepts discussed.',
   null, 
   JSON_ARRAY(
     JSON_OBJECT(
-      "step_title", "Classify key concepts",
-      "step_description", "As a group, classify the key concepts into three categories (as defined above). Discuss each concept in the categories. Consider:
+      'step_title', 'Classify key concepts',
+      'step_description', 'As a group, classify the key concepts into three categories (as defined above). Discuss each concept in the categories. Consider:
       • How do these concepts intersect with your community or professional experiences?
-      • Which concepts might be most challenging to apply, and why?"
+      • Which concepts might be most challenging to apply, and why?'
     ),
     JSON_OBJECT(
-      "step_title", "Create a shared list",
-      "step_description", "Create a shared list of questions or points for further exploration."
+      'step_title', 'Create a shared list',
+      'step_description', 'Create a shared list of questions or points for further exploration.'
     ),
     JSON_OBJECT(
-      "step_title", "Individual reflection",
-      "step_description", "After discussion, each participant should individually reflect on the classification and note their personal insights."
+      'step_title', 'Individual reflection',
+      'step_description', 'After discussion, each participant should individually reflect on the classification and note their personal insights.'
     )
   )
 );
 
 INSERT INTO module_assessment (course_id, module_number, assessment_title, assessment_objective, assessment_scenario, assessment_instructions) VALUES (
   2, 2, 
-  "Reflective Futures Exploration", 
-  "To reflect on the key concepts of Futures Thinking, identify change drivers, understand horizon scanning, and analyze trends through a reflective approach.",
+  'Reflective Futures Exploration', 
+  'To reflect on the key concepts of Futures Thinking, identify change drivers, understand horizon scanning, and analyze trends through a reflective approach.',
   null, 
   JSON_ARRAY(
     JSON_OBJECT(
-      "step_title", "Futures Thinking Reflection (Group Discussion)",
-      "step_description", "As a group, discuss your personal understandings of Futures Thinking. Share how you each interpret the concept and its importance. Afterward, summarize your group's collective thoughts on: What does Futures Thinking mean for your community or area of interest?"
+      'step_title', 'Futures Thinking Reflection (Group Discussion)',
+      'step_description', 'As a group, discuss your personal understandings of Futures Thinking. Share how you each interpret the concept and its importance. Afterward, summarize your group`s collective thoughts on: What does Futures Thinking mean for your community or area of interest?'
     ),
     JSON_OBJECT(
-      "step_title", "Driver Mapping (Group PESTLE Analysis)",
-      "step_description", "In your group, choose a current global issue (e.g., COVID-19 recovery, technological advancements, or climate change). Use the PESTLE Framework to collaboratively identify potential drivers affecting this issue. Afterward, collectively discuss:
-      • Which drivers do you think will shape the future most significantly, and why?"
+      'step_title', 'Driver Mapping (Group PESTLE Analysis)',
+      'step_description', 'In your group, choose a current global issue (e.g., COVID-19 recovery, technological advancements, or climate change). Use the PESTLE Framework to collaboratively identify potential drivers affecting this issue. Afterward, collectively discuss:
+      • Which drivers do you think will shape the future most significantly, and why?'
     ),
     JSON_OBJECT(
-      "step_title", "Horizon Scanning (Group Signal Exploration)",
-      "step_description", "Each member of the group finds a weak signal in a news article, blog post, or tweet related to a global issue. Share your findings and discuss:
-      • What signals did you find, and why might they be important?"
+      'step_title', 'Horizon Scanning (Group Signal Exploration)',
+      'step_description', 'Each member of the group finds a weak signal in a news article, blog post, or tweet related to a global issue. Share your findings and discuss:
+      • What signals did you find, and why might they be important?'
     ),
     JSON_OBJECT(
-      "step_title", "Trends Identification and Futures Wheel (Group Mapping)",
-      "step_description", "Together, select a trend affecting your group (e.g., social media's influence, remote work, or environmental sustainability). As a group, create a Futures Wheel to analyze the trend's impact. Reflect on:
-      • Which ripple effect was most unexpected, and how might it impact future developments?"
+      'step_title', 'Trends Identification and Futures Wheel (Group Mapping)',
+      'step_description', 'Together, select a trend affecting your group (e.g., social media`s influence, remote work, or environmental sustainability). As a group, create a Futures Wheel to analyze the trend`s impact. Reflect on:
+      • Which ripple effect was most unexpected, and how might it impact future developments?'
     ),
     JSON_OBJECT(
-      "step_title", "Final Reflection (Group Reflection and Discussion)",
-      "step_description", "As a group, discuss how Futures Thinking can influence your chosen issue. Reflect on how you might incorporate Futures Thinking into your professional or academic practices. Summarize your group's final thoughts."
+      'step_title', 'Final Reflection (Group Reflection and Discussion)',
+      'step_description', 'As a group, discuss how Futures Thinking can influence your chosen issue. Reflect on how you might incorporate Futures Thinking into your professional or academic practices. Summarize your group`s final thoughts.'
     )
   )
 );
 
 INSERT INTO module_assessment (course_id, module_number, assessment_title, assessment_objective, assessment_scenario, assessment_instructions) VALUES (
   2, 3, 
-  "Mapping the Future: A Reflective Exploration of Change and Possibility", 
-  "The objective of the activity is to engage learners in reflecting on current issues through Futures Thinking techniques, including Causal Layered Analysis, Horizon Scanning, the Futures Triangle, and Scenario Planning. Learners will analyze drivers of change, identify emerging trends, and explore potential future outcomes while reflecting on how past, present, and future forces shape alternative futures.",
+  'Mapping the Future: A Reflective Exploration of Change and Possibility', 
+  'The objective of the activity is to engage learners in reflecting on current issues through Futures Thinking techniques, including Causal Layered Analysis, Horizon Scanning, the Futures Triangle, and Scenario Planning. Learners will analyze drivers of change, identify emerging trends, and explore potential future outcomes while reflecting on how past, present, and future forces shape alternative futures.',
   null, 
   JSON_ARRAY(
     JSON_OBJECT(
-      "step_title", "Group Selection",
-      "step_description", "As a group, choose a common issue that interests everyone (e.g., global health, urban development, digital privacy)."
+      'step_title', 'Group Selection',
+      'step_description', 'As a group, choose a common issue that interests everyone (e.g., global health, urban development, digital privacy).'
     ),
     JSON_OBJECT(
-      "step_title", "Causal Layered Analysis (CLA)",
-      "step_description", "Each group member will take one of the CLA layers and analyze the chosen issue from that perspective:
+      'step_title', 'Causal Layered Analysis (CLA)',
+      'step_description', 'Each group member will take one of the CLA layers and analyze the chosen issue from that perspective:
       • Litany: What are the visible symptoms or headlines surrounding this issue?
       • Systemic Causes: What are the systemic or structural factors that contribute to this issue?
       • Worldview: What beliefs or ideologies are shaping this issue? 
-      • Myth/Metaphor: What deeper narratives or collective metaphors influence this issue?"
+      • Myth/Metaphor: What deeper narratives or collective metaphors influence this issue?'
     ),
     JSON_OBJECT(
-      "step_title", "Futures Triangle",
-      "step_description", "Discuss and agree on the Pulls of the Future, Pushes of the Present, and Weights of the Past as a group. Identify how these elements interact with each other."
+      'step_title', 'Futures Triangle',
+      'step_description', 'Discuss and agree on the Pulls of the Future, Pushes of the Present, and Weights of the Past as a group. Identify how these elements interact with each other.'
     ),
     JSON_OBJECT(
-      "step_title", "Scenario Planning",
-      "step_description", "As a team, develop 3 different scenarios for the future:
+      'step_title', 'Scenario Planning',
+      'step_description', 'As a team, develop 3 different scenarios for the future:
       • Exploratory Scenario: Based on current trends.
       • Normative Scenario: A future you wish to see and how to achieve it.
-      • Wildcard Scenario: An unlikely but impactful event that could change the course."
+      • Wildcard Scenario: An unlikely but impactful event that could change the course.'
     ),
     JSON_OBJECT(
-      "step_title", "Group Reflection",
-      "step_description", "Write a 300-word reflection on:
+      'step_title', 'Group Reflection',
+      'step_description', 'Write a 300-word reflection on:
       • Discuss the most plausible and impactful scenario.
       • Share insights on how the past and present have shaped the future possibilities.
-      • Reflect on the insights gained from each member's contribution and how collaboration shaped the final scenarios."
+      • Reflect on the insights gained from each member`s contribution and how collaboration shaped the final scenarios.'
     )
   )
 );
