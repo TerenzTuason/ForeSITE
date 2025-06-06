@@ -587,28 +587,6 @@
       </div>
     </div>
 
-    <!-- Co-Learner Wait Modal -->
-    <div class="modal fade" id="coLearnerWaitModal" tabindex="-1" aria-labelledby="coLearnerWaitModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="coLearnerWaitModalLabel"><i class="fas fa-users me-2"></i>Waiting for Co-Learners</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <p>You cannot submit this assessment yet. All co-learners in your group must be ready to access this assessment (at least 80% module progress).</p>
-            <p><strong>You are currently waiting for:</strong></p>
-            <ul class="list-group" id="coLearnerWaitList">
-              <!-- Co-learners will be listed here dynamically -->
-            </ul>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- Updated File Upload Modal -->
     <div class="modal fade" id="fileUploadModal" tabindex="-1" aria-labelledby="fileUploadModalLabel" aria-hidden="true">
       <div class="modal-dialog">
@@ -1325,97 +1303,6 @@
         }
 
         // Add back the completeAssessment function
-        async function checkCoLearnerProgress(assessment) {
-            const currentUserId = userData.user_id;
-            const courseId = assessment.assessment.course_id;
-            const moduleNumber = assessment.assessment.module_number;
-
-            console.log(`Checking co-learner progress for user ${currentUserId}, course ${courseId}, module ${moduleNumber}`);
-
-            try {
-                // Step 1: Fetch all module progress data.
-                const allProgressRes = await fetch('http://127.0.0.1:8000/api/v1/module-progress');
-                if (!allProgressRes.ok) throw new Error('Failed to fetch module progress data.');
-                const allProgressPayload = await allProgressRes.json();
-                const allProgress = allProgressPayload.data;
-
-                // Step 2: Filter for progress in the same course and module.
-                const relevantProgress = allProgress.filter(p =>
-                    p.course_id === courseId &&
-                    p.module_number === moduleNumber
-                );
-
-                const coLearnersProgress = relevantProgress.filter(p => p.user_id !== currentUserId);
-
-                if (coLearnersProgress.length === 0) {
-                    console.log("No other learners found in this course module.");
-                    return { allowed: true };
-                }
-
-                // Step 3: Fetch user data to get names for the log/alert.
-                const allUsersRes = await fetch(`http://127.0.0.1:8000/api/v1/users`);
-                if (!allUsersRes.ok) throw new Error('Failed to fetch user data for names.');
-                const allUsersPayload = await allUsersRes.json();
-                const userMap = new Map(allUsersPayload.data.map(u => [u.user_id, `${u.first_name} ${u.last_name}`]));
-                
-                // Step 4: Check progress for each co-learner.
-                const waitingFor = [];
-                const coLearnerProgressDetails = [];
-
-                for (const progress of coLearnersProgress) {
-                    const userName = userMap.get(progress.user_id) || `User ${progress.user_id}`;
-                    const userProgress = progress.progress_percentage || 0;
-
-                    coLearnerProgressDetails.push({
-                        'Co-Learner': `${userName} (ID: ${progress.user_id})`,
-                        'Module Progress (%)': userProgress,
-                        'Sufficient Progress (>=80%)': userProgress >= 80 ? 'Yes' : 'No'
-                    });
-
-                    if (userProgress < 80) {
-                        waitingFor.push(userName);
-                    }
-                }
-
-                // Log the progress table
-                console.log("--- Co-Learner Module Progress Check ---");
-                console.table(coLearnerProgressDetails);
-                console.log("----------------------------------------");
-
-                if (waitingFor.length > 0) {
-                    return { allowed: false, waitingFor: waitingFor };
-                }
-
-                console.log("All co-learners have sufficient progress.");
-                return { allowed: true };
-
-            } catch (error) {
-                console.error(`Error during co-learner check: ${error.message}`);
-                
-                // Use the modal for the error message
-                const waitList = document.getElementById('coLearnerWaitList');
-                const modalTitle = document.getElementById('coLearnerWaitModalLabel');
-                const modalBodyParagraphs = document.querySelectorAll('#coLearnerWaitModal .modal-body p');
-                
-                modalTitle.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i>Information';
-                modalBodyParagraphs[0].textContent = 'Could not verify co-learner progress due to a system error. You may proceed with your submission.';
-                modalBodyParagraphs[1].style.display = 'none'; // Hide "You are currently waiting for"
-                waitList.innerHTML = ''; // Clear the list
-
-                const coLearnerModal = new bootstrap.Modal(document.getElementById('coLearnerWaitModal'));
-                coLearnerModal.show();
-
-                // Reset modal content when it's hidden
-                $(document.getElementById('coLearnerWaitModal')).one('hidden.bs.modal', function () {
-                    modalTitle.innerHTML = '<i class="fas fa-users me-2"></i>Waiting for Co-Learners';
-                    modalBodyParagraphs[0].textContent = 'You cannot submit this assessment yet. All co-learners in your group must be ready to access this assessment (at least 80% module progress).';
-                    modalBodyParagraphs[1].style.display = 'block';
-                });
-
-                return { allowed: true }; // Allow to proceed on error
-            }
-        }
-        
         window.completeAssessment = async function(assessmentProgressId) {
           const assessment = allAssessments.find(a => a.assessment_progress_id === assessmentProgressId);
           
@@ -1423,23 +1310,6 @@
           if (!assessment.module_progress?.status || assessment.module_progress.status !== 'completed') {
             alert('You must complete the module before submitting the assessment.');
             return;
-          }
-
-          const loadingOverlay = document.getElementById("loadingOverlay");
-          const loadingText = document.getElementById("loadingText");
-          loadingText.textContent = "Checking co-learners' progress...";
-          loadingOverlay.classList.add("active");
-
-          const checkResult = await checkCoLearnerProgress(assessment);
-          loadingOverlay.classList.remove("active");
-
-          if (!checkResult.allowed) {
-              const waitList = document.getElementById('coLearnerWaitList');
-              waitList.innerHTML = checkResult.waitingFor.map(name => `<li class="list-group-item">${name}</li>`).join('');
-              
-              const coLearnerModal = new bootstrap.Modal(document.getElementById('coLearnerWaitModal'));
-              coLearnerModal.show();
-              return; // Stop execution
           }
 
           // Show file upload modal only if check is allowed
