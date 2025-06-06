@@ -754,6 +754,62 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
       'Manoa scenarios',
       'Transformative scenarios',
       'Change progression scenarios method'
+    ),
+    '1. 2x2 Scenarios Method',
+    JSON_ARRAY(
+        'Step 1: Identify the two most uncertain and impactful drivers (variables) relevant to your policy or issue. These are the axes of the 2x2 matrix.',
+        'Step 2: Define the two critical uncertainties for each axis (e.g., technological advancement vs. regulatory constraints).',
+        'Step 3: Create four scenarios by considering all possible combinations of the two variables. This will form your 2x2 matrix.',
+        JSON_ARRAY(
+            'Example: If your axes are "regulation" and "technology," your four scenarios could be:',
+            JSON_ARRAY(
+              '1. High regulation, High technology',
+              '2. High regulation, Low technology',
+              '3. Low regulation, High technology',
+              '4. Low regulation, Low technology.'
+            )
+        ),
+        'Step 4: Develop detailed narratives for each of the four scenarios and explore their impacts on your strategy or policy.'
+    ),
+    '2. Organizational Scenarios Method',
+    JSON_ARRAY(
+        'Step 1: Focus on specific organizational challenges, such as leadership, workforce trends, or market competition.',
+        'Step 2: Identify key drivers within the organization that could affect its future, such as employee engagement or technological adoption.',
+        'Step 3: Develop scenarios around how these organizational drivers might evolve, considering both internal and external factors.',
+        JSON_ARRAY('Example: Scenario 1 could be "rapid technological innovation leads to restructuring," while Scenario 2 could be "slow technology adoption leads to stagnation in growth."'),
+        'Step 4: Map out each scenario with a clear story and visual aids to highlight the impact on the organization`s future.'
+    ),
+    '3. Integrated Scenarios Method',
+    JSON_ARRAY(
+        'Step 1: Identify multiple systems or sectors that interact within your scenario planning (e.g., economy, environment, social systems).',
+        'Step 2: Map out how these different systems might evolve based on key drivers and uncertainties.',
+        'Step 3: Explore how changes in one system might impact others. The integrated scenario method helps you understand interdependencies between systems.',
+        JSON_ARRAY('Example: Consider how a technological breakthrough in AI might affect the economy, labor markets, and ethical considerations.'),
+        'Step 4: Create scenarios that reflect these integrated changes and their consequences across multiple systems.'
+    ),
+    '4. Manoa Scenarios Method',
+    JSON_ARRAY(
+        'Step 1: Select two key drivers that have high uncertainty but significant impact on the issue you are studying.',
+        'Step 2: Explore the potential interactions between these drivers, including how they might collide in unexpected ways.',
+        'Step 3: Develop scenarios based on how these drivers might influence each other.',
+        JSON_ARRAY('Example: If the two drivers are "climate change" and "policy response," consider how changes in one could intensify or mitigate the effects of the other.'),
+        'Step 4: Focus on surprises and unexpected outcomes to challenge conventional thinking and explore alternative futures.'
+    ),
+    '5. Transformative Scenarios Method',
+    JSON_ARRAY(
+        'Step 1: Identify the forces that drive transformational change in your field or sector.',
+        'Step 2: Examine both the driving forces (e.g., technological advancements, cultural shifts) and the resisting forces (e.g., regulatory barriers, existing power structures).',
+        'Step 3: Develop scenarios that show how transformational changes could unfold in different directions, considering the clash between driving and resisting forces.',
+        JSON_ARRAY('Example: Scenario 1 could be "The rise of automation leads to mass job displacement," while Scenario 2 could be "Automation is embraced and creates new industries."'),
+        'Step 4: Explore what actions would need to be taken to either harness or mitigate the impacts of transformational changes.'
+    ),
+    '6. Change Progression Scenarios Method',
+    JSON_ARRAY(
+        'Step 1: Identify a trend or phenomenon that is currently unfolding in your area of interest.',
+        'Step 2: Track the potential progression of this trend over time, from its current state to various potential future states.',
+        'Step 3: Develop multiple scenarios based on how the trend could evolve, considering both slow and rapid progressions.',
+        JSON_ARRAY('Example: If the trend is "increased use of renewable energy," scenarios could range from "gradual adoption with government support" to "rapid transition due to technological breakthroughs."'),
+        'Step 4: Define what milestones or signals could indicate whether the trend is progressing slowly or quickly, and adjust your strategies accordingly.'
     )
   ),
   null,
