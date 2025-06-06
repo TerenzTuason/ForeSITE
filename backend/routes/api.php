@@ -14,7 +14,6 @@ use App\Http\Controllers\Api\CertificateController;
 use App\Http\Controllers\Api\EnrollmentController;
 use App\Http\Controllers\Api\LessonScreenController;
 use App\Http\Controllers\Api\LessonScreenProgressController;
-use App\Http\Controllers\ChatController;
 use App\Http\Controllers\Api\ModuleAssessmentController;
 use App\Http\Controllers\Api\ModuleAssessmentProgressController;
 use App\Http\Controllers\Api\ScoreController;
@@ -139,13 +138,6 @@ Route::prefix('v1')->group(function () {
     Route::get('module-assessments/{assessment}/progress', [ModuleAssessmentProgressController::class, 'getByAssessment']);
     Route::get('module-progress/{moduleProgress}/assessment-progress', [ModuleAssessmentProgressController::class, 'getByModuleProgress']);
     
-    // Chat functionality
-    Route::get('chat/room/learning-style/{styleId}', [ChatController::class, 'getChatRoomByLearningStyle']);
-    Route::get('chat/room/user/{userId}', [ChatController::class, 'getUserChatRoom']);
-    Route::get('chat/messages/{roomId}', [ChatController::class, 'getChatMessages']);
-    Route::post('chat/messages', [ChatController::class, 'sendMessage']);
-    Route::get('chat/users/learning-style/{styleId}', [ChatController::class, 'getUsersWithSameLearningStyle']);
-
     // Scores routes
     Route::prefix('scores')->group(function () {
         Route::get('/', [ScoreController::class, 'index']);

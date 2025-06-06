@@ -1335,7 +1335,6 @@ INSERT INTO roles (role_name, description) VALUES
 -- Insert admin user (password should be properly hashed in production)
 INSERT INTO users (role_id, email, password, first_name, last_name) VALUES
 (3, 'admin@foresite.com', '$2y$10$nHipa0I9/v/SEy4HrI6mxOnBJ.a4kXnhgxyMC.2WaJnELzpikNiUi', 'System', 'Administrator');
-
 -- Chat functionality tables
 -- Chat rooms table for learning style specific chat rooms
 CREATE TABLE chat_rooms (
