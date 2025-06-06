@@ -173,64 +173,178 @@
         border-radius: var(--border-radius);
         overflow: hidden;
         box-shadow: var(--card-shadow);
+        max-width: 1200px;
+        margin: 0 auto;
       }
 
       .content-header {
-        padding: 1.5rem;
+        padding: 2rem;
         border-bottom: 1px solid #eee;
+        background: linear-gradient(135deg, var(--maroon) 0%, #600000 100%);
+        color: white;
       }
 
       .content-title {
-        font-size: 1.5rem;
-        color: var(--dark-gray);
+        font-size: 2rem;
         margin: 0;
+        color: white;
+        font-weight: 600;
+        letter-spacing: 0.5px;
       }
 
       .content-body {
-        padding: 2rem;
+        padding: 2.5rem;
         min-height: 400px;
+        line-height: 1.8;
+      }
+
+      .lesson-content {
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      .lesson-content p {
+        font-size: 1.1rem;
+        color: #2c3e50;
+        margin-bottom: 1.5rem;
+        line-height: 1.8;
+      }
+
+      .lesson-content ul {
+        background: #f8f9fa;
+        padding: 1.5rem 2rem 1.5rem 3.5rem;
+        border-radius: 8px;
+        margin: 1.5rem 0;
+      }
+
+      .lesson-content li {
+        margin-bottom: 1rem;
+        color: #2c3e50;
+        position: relative;
+      }
+
+      .lesson-content li::before {
+        content: "•";
+        color: var(--maroon);
+        font-weight: bold;
+        position: absolute;
+        left: -1.2rem;
+      }
+
+      .video-container {
+        background: #000;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        margin: 2rem auto;
+        max-width: 900px;
+      }
+
+      .video-content {
+        background: #000;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        margin: 2rem auto;
+        max-width: 900px;
+      }
+
+      .image-content {
+        text-align: center;
+        margin: 2rem auto;
+        max-width: 900px;
+      }
+
+      .image-content img {
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        max-width: 100%;
+        height: auto;
+      }
+
+      .alert {
+        border: none;
+        border-radius: 8px;
+        padding: 1.25rem;
+        margin: 1.5rem auto;
+        max-width: 900px;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .alert i {
+        font-size: 1.25rem;
+      }
+
+      .alert-info {
+        background: rgba(var(--maroon), 0.1);
+        color: var(--maroon);
+      }
+
+      .video-progress-indicator {
+        text-align: center;
+        margin: 1rem auto;
+        max-width: 900px;
+        font-size: 0.95rem;
       }
 
       .content-footer {
-        padding: 1.5rem;
+        padding: 1.5rem 2.5rem;
         border-top: 1px solid #eee;
         display: flex;
         justify-content: space-between;
         align-items: center;
+        background: #f8f9fa;
       }
 
       .nav-button {
-        padding: 0.5rem 1rem;
+        padding: 0.75rem 1.5rem;
         border: none;
         border-radius: var(--border-radius);
         cursor: pointer;
         display: flex;
         align-items: center;
-        gap: 0.5rem;
-        transition: all 0.2s;
+        gap: 0.75rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
       }
 
       .btn-back {
-        background-color: #f8f9fa;
-        color: var(--dark-gray);
+        background-color: #e9ecef;
+        color: #495057;
       }
 
-      .btn-back:hover {
-        background-color: #e9ecef;
+      .btn-back:hover:not(:disabled) {
+        background-color: #dee2e6;
+        transform: translateX(-2px);
       }
 
       .btn-continue {
-        background-color: var(--maroon);
+        background: linear-gradient(135deg, var(--maroon) 0%, #600000 100%);
         color: white;
       }
 
-      .btn-continue:hover {
-        background-color: #600000;
+      .btn-continue:hover:not(:disabled) {
+        transform: translateX(2px);
+        box-shadow: 0 4px 12px rgba(128, 0, 0, 0.2);
       }
 
-      .btn-continue[disabled] {
-        opacity: 0.65;
+      .nav-button:disabled {
+        opacity: 0.6;
         cursor: not-allowed;
+        transform: none !important;
+      }
+
+      .lead {
+        font-size: 1.25rem;
+        color: #6c757d;
+        margin-bottom: 2rem;
+        line-height: 1.8;
+        font-weight: 300;
+        max-width: 900px;
+        margin-left: auto;
+        margin-right: auto;
       }
 
       .progress-indicator {

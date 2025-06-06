@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\LessonScreenProgress;
+use App\Models\ModuleAssessmentProgress;
 
 class ModuleProgress extends Model
 {
@@ -78,10 +80,18 @@ class ModuleProgress extends Model
     }
 
     /**
-     * Get the module contents for the module progress.
+     * Get the lesson screen progress for the module progress.
      */
-    public function moduleContents(): HasMany
+    public function lessonScreenProgress(): HasMany
     {
-        return $this->hasMany(ModuleContent::class, 'module_progress_id', 'progress_id');
+        return $this->hasMany(LessonScreenProgress::class, 'module_progress_id', 'progress_id');
+    }
+
+    /**
+     * Get the module assessment progress for the module progress.
+     */
+    public function moduleAssessmentProgress(): HasMany
+    {
+        return $this->hasMany(ModuleAssessmentProgress::class, 'module_progress_id', 'progress_id');
     }
 }

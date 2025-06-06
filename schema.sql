@@ -884,8 +884,8 @@ CREATE TABLE module_progress (
     completed_at TIMESTAMP NULL,
     time_spent_minutes INT DEFAULT 0,
     score INT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(user_id),
-    FOREIGN KEY (course_id) REFERENCES courses(course_id)
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE
 );
 
 -- Module content table (for each module)
@@ -896,7 +896,7 @@ CREATE TABLE lesson_screen_progress (
     course_module_number INT NOT NULL,
     status ENUM('not_started', 'in_progress', 'completed') DEFAULT 'not_started',
     progress_percentage INT DEFAULT 0,
-    FOREIGN KEY (module_progress_id) REFERENCES module_progress(progress_id)
+    FOREIGN KEY (module_progress_id) REFERENCES module_progress(progress_id) ON DELETE CASCADE
 );
 
 CREATE TABLE module_assessment (
