@@ -12,6 +12,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- CryptoJS for Cloudinary signature -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <style>
         :root {
             --maroon: #800000;
@@ -208,6 +210,7 @@
         .chat-input form {
             display: flex;
             gap: 1rem;
+            align-items: center; /* Align items vertically */
         }
 
         .chat-input .form-control {
@@ -220,6 +223,21 @@
         .chat-input .form-control:focus {
             border-color: var(--maroon);
             box-shadow: 0 0 0 0.2rem rgba(128, 0, 0, 0.1);
+        }
+
+        #attach-file-btn {
+            border-radius: 50px;
+            padding: 0.75rem;
+            line-height: 1;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            color: var(--dark-gray);
+            transition: all 0.3s ease;
+        }
+
+        #attach-file-btn:hover {
+            background-color: #e2e6ea;
+            border-color: #dae0e5;
         }
 
         .btn-send {
@@ -403,6 +421,10 @@
                 font-size: 0.9rem;
             }
             
+            #attach-file-btn {
+                padding: 0.5rem;
+            }
+
             .btn-send i {
                 font-size: 0.8rem;
             }
@@ -442,6 +464,33 @@
                 padding: 0.5rem;
             }
         }
+
+        .file-download-link {
+            display: inline-block;
+            padding: 0.5rem 0.75rem;
+            background-color: #f0f0f0;
+            border-radius: var(--border-radius);
+            color: var(--maroon);
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+            border: 1px solid #ddd;
+        }
+        .file-download-link:hover {
+            background-color: #e0e0e0;
+            color: #600000;
+        }
+        .file-download-link i {
+            margin-right: 0.5rem;
+        }
+        .message.received .file-download-link {
+            background-color: #e9ecef;
+            color: #333;
+            border: 1px solid #ced4da;
+        }
+        .message.received .file-download-link:hover {
+            background-color: #dce1e5;
+            color: #000;
+        }
     </style>
 </head>
 <body>
@@ -467,7 +516,11 @@
 
             <div class="chat-input">
                 <form id="message-form">
-                    <input type="text" class="form-control" placeholder="Type your message..." id="message-input">
+                    <input type="file" id="file-input" style="display: none;">
+                    <button type="button" id="attach-file-btn" class="btn btn-light me-2">
+                        <i class="fas fa-paperclip"></i>
+                    </button>
+                    <input type="text" class="form-control" placeholder="Type your message or attach a .docx file..." id="message-input">
                     <button type="submit" class="btn btn-send">
                         Send <i class="fas fa-paper-plane"></i>
                     </button>
@@ -482,6 +535,14 @@
         // Global variables
         let currentRoomId = null;
         let currentLearningStyleId = null;
+        
+        // Cloudinary configuration - WARNING: Exposing API Secret on client-side is a security risk!
+        const CLOUDINARY_CONFIG = {
+            cloudName: 'dwn5t3o4j',
+            apiKey: '214461813776441',
+            apiSecret: '-3Lake60UIDCJSt7eugmk_-CRIM' // VERY BAD PRACTICE TO HAVE THIS IN CLIENT-SIDE CODE
+            // uploadPreset: 'ml_default' // Not used for signed uploads in this new approach
+        };
         
         // Load navbar
         $(document).ready(function() {
@@ -500,6 +561,9 @@
             
             // Setup message form submission
             setupMessageForm();
+
+            // Setup file input listener
+            setupFileInput();
         });
 
         function initializeChat() {
@@ -750,6 +814,28 @@
                 });
         }
 
+        // Helper function to parse message content, handling potential double stringification
+        function getParsedMessageContent(messageString) {
+            try {
+                let content = JSON.parse(messageString);
+                // If the first parse results in a string, it might be double-stringified JSON
+                if (typeof content === 'string') {
+                    try {
+                        content = JSON.parse(content);
+                    } catch (eInner) {
+                        // If inner parse fails, it implies the outer string was not double-encoded JSON.
+                        // 'content' is already the string from the first parse.
+                        console.warn("Attempted second parse on a string that wasn't valid JSON after first parse. Content:", content, "Error:", eInner);
+                    }
+                }
+                return content; // Could be an object or a string (if original was e.g. "'a string in quotes'")
+            } catch (eOuter) {
+                // If the initial parse fails, it's likely plain text or genuinely malformed.
+                // console.log("Initial parse failed, returning original string:", messageString, "Error:", eOuter);
+                return messageString; // Return original string
+            }
+        }
+
         function loadChatMessages(roomId) {
             // Fetch messages for this chat room from the API
             fetch(`http://127.0.0.1:8000/api/v1/chat/messages/${roomId}`)
@@ -773,13 +859,31 @@
                             const messageDate = new Date(msg.created_at);
                             const formattedTime = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                             
+                            let messageContentHtml;
+                            const contentObjectOrString = getParsedMessageContent(msg.message);
+
+                            if (typeof contentObjectOrString === 'object' && contentObjectOrString.type === 'file' && contentObjectOrString.url && contentObjectOrString.name) {
+                                // It's a file message object
+                                messageContentHtml = `
+                                    <a href="${contentObjectOrString.url}" target="_blank" rel="noopener noreferrer" class="file-download-link">
+                                        <i class="fas ${contentObjectOrString.file_type === 'pdf' ? 'fa-file-pdf' : 'fa-file-word'}"></i>
+                                        ${contentObjectOrString.name}
+                                        <small>(${(contentObjectOrString.size / 1024).toFixed(1)} KB)</small>
+                                        <i class="fas fa-download ms-2"></i>
+                                    </a>
+                                `;
+                            } else {
+                                // Not a file object, or parsing failed and returned original string
+                                messageContentHtml = msg.message; // Display original message string
+                            }
+
                             messageElement.innerHTML = `
                                 <div class="message-header">
                                     ${isSentByCurrentUser ? '' : `<strong>${msg.user.first_name} ${msg.user.last_name}</strong>`}
                                     <span class="message-time">${formattedTime}</span>
                                 </div>
                                 <div class="message-content">
-                                    ${msg.message}
+                                    ${messageContentHtml}
                                 </div>
                             `;
                             messagesContainer.appendChild(messageElement);
@@ -858,110 +962,143 @@
                     sendMessageToApi(userData, currentRoomId, message);
                 }
             });
+        }
+        
+        // Moved sendMessageToApi to be globally accessible in the script
+        function sendMessageToApi(userData, roomId, message) {
+            // This function handles the actual API call to send the message
+            // Add a loading indicator or disable the send button
+            const sendButton = document.querySelector('.btn-send');
+            sendButton.disabled = true;
+            sendButton.innerHTML = 'Sending... <i class="fas fa-spinner fa-spin"></i>';
             
-            function sendMessageToApi(userData, roomId, message) {
-                // This function handles the actual API call to send the message
-                // Add a loading indicator or disable the send button
-                const sendButton = document.querySelector('.btn-send');
-                sendButton.disabled = true;
-                sendButton.innerHTML = 'Sending... <i class="fas fa-spinner fa-spin"></i>';
-                
-                // Add message to UI immediately (optimistic UI update)
-                const messagesContainer = document.querySelector('.chat-messages');
-                const tempMessageElement = document.createElement('div');
-                tempMessageElement.className = 'message sent';
-                tempMessageElement.style.opacity = '0.7'; // Indicate it's pending
-                
-                const formattedTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                
-                tempMessageElement.innerHTML = `
-                    <div class="message-header">
-                        <span class="message-time">${formattedTime}</span>
-                    </div>
-                    <div class="message-content">
-                        ${message}
-                    </div>
+            // Add message to UI immediately (optimistic UI update)
+            const messagesContainer = document.querySelector('.chat-messages');
+            const tempMessageElement = document.createElement('div');
+            tempMessageElement.className = 'message sent';
+            tempMessageElement.style.opacity = '0.7'; // Indicate it's pending
+            
+            const formattedTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            let tempMessageContentHtml;
+            const contentObjectOrString = getParsedMessageContent(message);
+
+            if (typeof contentObjectOrString === 'object' && contentObjectOrString.type === 'file' && contentObjectOrString.url && contentObjectOrString.name) {
+                tempMessageContentHtml = `
+                    <a href="${contentObjectOrString.url}" target="_blank" rel="noopener noreferrer" class="file-download-link">
+                        <i class="fas ${contentObjectOrString.file_type === 'pdf' ? 'fa-file-pdf' : 'fa-file-word'}"></i>
+                        ${contentObjectOrString.name}
+                        <small>(${(contentObjectOrString.size / 1024).toFixed(1)} KB)</small>
+                        <i class="fas fa-download ms-2"></i>
+                    </a>
                 `;
-                messagesContainer.appendChild(tempMessageElement);
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                
-                // Clear input if it exists
-                const inputElement = document.getElementById('message-input');
-                if (inputElement) {
-                    inputElement.value = '';
-                }
-                
-                console.log('Sending message to API:', {
+            } else {
+                tempMessageContentHtml = message; // A stringified JSON that isn't our file type
+            }
+
+            tempMessageElement.innerHTML = `
+                <div class="message-header">
+                    <span class="message-time">${formattedTime}</span>
+                </div>
+                <div class="message-content">
+                    ${tempMessageContentHtml}
+                </div>
+            `;
+            messagesContainer.appendChild(tempMessageElement);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            // Clear input if it exists
+            const inputElement = document.getElementById('message-input');
+            if (inputElement) {
+                inputElement.value = '';
+            }
+            
+            console.log('Sending message to API:', {
+                room_id: roomId,
+                user_id: userData.user_id,
+                message: message
+            });
+            
+            // Send message to API
+            fetch('http://127.0.0.1:8000/api/v1/chat/messages', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
                     room_id: roomId,
                     user_id: userData.user_id,
                     message: message
-                });
+                })
+            })
+            .then(response => {
+                // Check if response is ok before parsing JSON
+                if (!response.ok) {
+                    console.error('Server error:', response.status, response.statusText);
+                    return response.text().then(text => {
+                        throw new Error(`Server error: ${response.status} ${response.statusText}\nResponse: ${text}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Message sent successfully:', data);
                 
-                // Send message to API
-                fetch('http://127.0.0.1:8000/api/v1/chat/messages', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        room_id: roomId,
-                        user_id: userData.user_id,
-                        message: message
-                    })
-                })
-                .then(response => {
-                    // Check if response is ok before parsing JSON
-                    if (!response.ok) {
-                        console.error('Server error:', response.status, response.statusText);
-                        return response.text().then(text => {
-                            throw new Error(`Server error: ${response.status} ${response.statusText}\nResponse: ${text}`);
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Message sent successfully:', data);
-                    
-                    // Remove temporary message
-                    messagesContainer.removeChild(tempMessageElement);
-                    
-                    // Add confirmed message
-                    const confirmedMessageElement = document.createElement('div');
-                    confirmedMessageElement.className = 'message sent';
-                    
-                    // Format timestamp
-                    const messageDate = new Date(data.data.created_at);
-                    const confirmedTime = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    
-                    confirmedMessageElement.innerHTML = `
-                        <div class="message-header">
-                            <span class="message-time">${confirmedTime}</span>
-                        </div>
-                        <div class="message-content">
-                            ${data.data.message}
-                        </div>
+                // Remove temporary message
+                messagesContainer.removeChild(tempMessageElement);
+                
+                // Add confirmed message
+                const confirmedMessageElement = document.createElement('div');
+                confirmedMessageElement.className = 'message sent';
+                
+                // Format timestamp
+                const messageDate = new Date(data.data.created_at);
+                const confirmedTime = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
+                let confirmedMessageContentHtml;
+                const confirmedContentObjectOrString = getParsedMessageContent(data.data.message);
+
+                if (typeof confirmedContentObjectOrString === 'object' && confirmedContentObjectOrString.type === 'file' && confirmedContentObjectOrString.url && confirmedContentObjectOrString.name) {
+                     confirmedMessageContentHtml = `
+                        <a href="${confirmedContentObjectOrString.url}" target="_blank" rel="noopener noreferrer" class="file-download-link">
+                            <i class="fas ${confirmedContentObjectOrString.file_type === 'pdf' ? 'fa-file-pdf' : 'fa-file-word'}"></i>
+                            ${confirmedContentObjectOrString.name}
+                            <small>(${(confirmedContentObjectOrString.size / 1024).toFixed(1)} KB)</small>
+                            <i class="fas fa-download ms-2"></i>
+                        </a>
                     `;
-                    messagesContainer.appendChild(confirmedMessageElement);
-                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                })
-                .catch(error => {
-                    console.error('Error sending message:', error);
-                    
-                    // Change temporary message to indicate error
-                    tempMessageElement.style.opacity = '1';
-                    tempMessageElement.querySelector('.message-content').innerHTML += `
-                        <div class="text-danger mt-1" style="font-size: 0.8rem;">
-                            <i class="fas fa-exclamation-triangle"></i> Error sending message
-                        </div>
-                    `;
-                })
-                .finally(() => {
-                    // Re-enable send button
-                    sendButton.disabled = false;
-                    sendButton.innerHTML = 'Send <i class="fas fa-paper-plane"></i>';
-                });
-            }
+                } else {
+                    confirmedMessageContentHtml = data.data.message; // Display original message string
+                }
+
+                confirmedMessageElement.innerHTML = `
+                    <div class="message-header">
+                        <span class="message-time">${confirmedTime}</span>
+                    </div>
+                    <div class="message-content">
+                        ${confirmedMessageContentHtml}
+                    </div>
+                `;
+                messagesContainer.appendChild(confirmedMessageElement);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            })
+            .catch(error => {
+                console.error('Error sending message:', error);
+                
+                // Change temporary message to indicate error
+                tempMessageElement.style.opacity = '1';
+                tempMessageElement.querySelector('.message-content').innerHTML += `
+                    <div class="text-danger mt-1" style="font-size: 0.8rem;">
+                        <i class="fas fa-exclamation-triangle"></i> Error sending message
+                    </div>
+                `;
+            })
+            .finally(() => {
+                // Re-enable send button
+                sendButton.disabled = false;
+                sendButton.innerHTML = 'Send <i class="fas fa-paper-plane"></i>';
+            });
         }
         
         // Set up polling for new messages and users list every 5 seconds
@@ -983,7 +1120,159 @@
         $(document).ready(function() {
             setupPolling();
         });
-    
+
+        function setupFileInput() {
+            const attachButton = document.getElementById('attach-file-btn');
+            const fileInput = document.getElementById('file-input');
+
+            if (attachButton) {
+                attachButton.addEventListener('click', () => {
+                    fileInput.click(); // Trigger hidden file input
+                });
+            }
+
+            if (fileInput) {
+                fileInput.addEventListener('change', (event) => {
+                    const file = event.target.files[0];
+                    if (file) {
+                        // Validate file type
+                        const allowedTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+                        const maxSize = 10 * 1024 * 1024; // 10MB
+
+                        if (!allowedTypes.includes(file.type)) {
+                            alert('Invalid file type. Please upload PDF or DOCX files only.');
+                            fileInput.value = ''; // Reset file input
+                            return;
+                        }
+
+                        if (file.size > maxSize) {
+                            alert('File is too large. Maximum size is 10MB.');
+                            fileInput.value = ''; // Reset file input
+                            return;
+                        }
+                        
+                        uploadFileToCloudinary(file);
+                        fileInput.value = ''; // Reset file input after selection for re-upload
+                    }
+                });
+            }
+        }
+
+        function uploadFileToCloudinary(file) {
+            // WARNING: This function now uses signed uploads with API Secret on the client-side.
+            // This is a significant security risk for public applications.
+
+            const timestamp = Math.round((new Date).getTime()/1000);
+            const uploadFolder = 'chat_files'; // Specific folder for chat files
+            const accessMode = 'public';
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('folder', uploadFolder);
+            formData.append('timestamp', timestamp);
+            formData.append('access_mode', accessMode);
+            
+            // Generate signature
+            // Note: Parameters in signature string must be alphabetically sorted by parameter name
+            const signatureStr = `access_mode=${accessMode}&folder=${uploadFolder}&timestamp=${timestamp}${CLOUDINARY_CONFIG.apiSecret}`;
+            const signature = CryptoJS.SHA1(signatureStr).toString();
+            
+            formData.append('signature', signature);
+            formData.append('api_key', CLOUDINARY_CONFIG.apiKey);
+            // formData.append('upload_preset', CLOUDINARY_CONFIG.uploadPreset); // Not used for signed uploads
+
+            const messagesContainer = document.querySelector('.chat-messages');
+            const tempFileMessageElement = document.createElement('div');
+            tempFileMessageElement.className = 'message sent pending-upload';
+            tempFileMessageElement.style.opacity = '0.7';
+            const formattedTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            tempFileMessageElement.innerHTML = `
+                <div class="message-header">
+                    <span class="message-time">${formattedTime}</span>
+                </div>
+                <div class="message-content">
+                    <i class="fas fa-spinner fa-spin"></i> Uploading ${file.name}...
+                </div>
+            `;
+            messagesContainer.appendChild(tempFileMessageElement);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // Using /auto/upload endpoint for signed uploads, similar to courses.html
+            fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/auto/upload`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    // Try to parse error from Cloudinary if response is not OK
+                    return response.json().then(errorData => {
+                        console.error('Cloudinary error response:', errorData);
+                        throw new Error(errorData.error?.message || `Upload failed with status: ${response.status}`);
+                    }).catch(parseError => {
+                        // If parsing errorData fails, throw a generic error
+                        console.error('Could not parse Cloudinary error response:', parseError);
+                        throw new Error(`Upload failed with status: ${response.status} and response was not valid JSON.`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (tempFileMessageElement.parentNode === messagesContainer) {
+                    messagesContainer.removeChild(tempFileMessageElement);
+                }
+
+                if (data.secure_url) {
+                    console.log('File uploaded to Cloudinary (signed):', data);
+                    const userData = JSON.parse(sessionStorage.getItem('user'));
+                    
+                    const fileMessagePayload = {
+                        type: 'file',
+                        name: data.original_filename || file.name,
+                        url: data.secure_url,
+                        file_type: data.format || file.type.split('/')[1],
+                        size: data.bytes 
+                    };
+
+                    sendMessageToApi(userData, currentRoomId, JSON.stringify(fileMessagePayload));
+                } else {
+                    // This else block might not be reached if errors are caught by !response.ok check
+                    console.error('Cloudinary signed upload error (no secure_url):', data);
+                    alert('File upload failed. Please try again. (Reason: No secure URL returned)');
+                    const errorElement = document.createElement('div');
+                    errorElement.className = 'message sent';
+                    errorElement.innerHTML = `
+                        <div class="message-header">
+                            <span class="message-time">${formattedTime}</span>
+                        </div>
+                        <div class="message-content" style="color: red;">
+                           Failed to upload ${file.name}.
+                        </div>
+                    `;
+                    messagesContainer.appendChild(errorElement);
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }
+            })
+            .catch(error => {
+                if (tempFileMessageElement.parentNode === messagesContainer) {
+                    messagesContainer.removeChild(tempFileMessageElement);
+                }
+                console.error('Error uploading file (signed):', error);
+                alert(`Error uploading file: ${error.message}`);
+                const errorElement = document.createElement('div');
+                errorElement.className = 'message sent';
+                errorElement.innerHTML = `
+                    <div class="message-header">
+                        <span class="message-time">${formattedTime}</span>
+                    </div>
+                    <div class="message-content" style="color: red;">
+                       Error uploading ${file.name}.
+                    </div>
+                `;
+                messagesContainer.appendChild(errorElement);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            });
+        }
     </script>
 </body>
 </html>

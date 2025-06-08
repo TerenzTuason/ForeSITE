@@ -379,6 +379,14 @@
                     <p class="text-muted">Select a student to view their module progress</p>
                 </div>
             </div>
+
+            <!-- Assessment Progress -->
+            <h2 class="section-title">Assessment Progress</h2>
+            <div id="assessment-progress-container">
+                <div class="text-center p-5">
+                    <p class="text-muted">Select a student to view their assessment progress</p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -576,14 +584,16 @@
                                         `No department • ${studentEmail}`;
                                 });
                                 
-                            // Fetch user's module progress
+                            // Fetch user's module progress and assessment progress
                             fetchModuleProgress(userId);
+                            fetchAssessmentProgress(userId);
                         }
                     })
                     .catch(error => {
                         console.error(`Error fetching details for user ${userId}:`, error);
                         document.getElementById('studentName').textContent = 'Error loading student';
                         document.getElementById('studentDepartment').textContent = 'Please try again';
+                        resetModuleUI();
                     });
             }
             
@@ -768,28 +778,6 @@
                         `Score: ${module.score}%` : 
                         `Progress: ${progressPercentage}%`;
                     
-                    // Static feedback examples based on module status
-                    let feedbackHtml = '';
-                    if (module.status === 'completed') {
-                        feedbackHtml = `
-                            <div class="feedback-display">
-                                <h6>Faculty Feedback</h6>
-                                <div class="feedback-text">
-                                    <p class="mb-0">Excellent work on understanding the module concepts. Your discussion posts showed great insight into the methodologies.</p>
-                                </div>
-                            </div>
-                        `;
-                    } else if (module.status === 'in_progress') {
-                        feedbackHtml = `
-                            <div class="feedback-display">
-                                <h6>Faculty Feedback</h6>
-                                <div class="feedback-text">
-                                    <p class="no-feedback">No feedback provided yet.</p>
-                                </div>
-                            </div>
-                        `;
-                    }
-                    
                     // Set module card HTML
                     moduleCard.innerHTML = `
                         <div class="d-flex justify-content-between align-items-center">
@@ -800,7 +788,6 @@
                             <div class="progress-bar" style="width: ${progressPercentage}%"></div>
                         </div>
                         <p class="mb-0 mt-2">${scoreText}</p>
-                        ${feedbackHtml}
                     `;
                     
                     // Add to container
@@ -835,11 +822,136 @@
                         No module data available for this student.
                     </div>
                 `;
+
+                // Clear assessment progress
+                const assessmentContainer = document.getElementById('assessment-progress-container');
+                assessmentContainer.innerHTML = `
+                    <div class="alert alert-warning">
+                        No assessment data available for this student.
+                    </div>
+                `;
             }
             
-            // Function to display module data (mock data for now)
-            function displayModuleData() {
-                // This function is no longer used as we're fetching real data
+            // Function to fetch assessment progress for a student
+            function fetchAssessmentProgress(userId) {
+                fetch(`${apiBaseUrl}/users/${userId}/assessment-progress`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(progressData => {
+                        if (progressData && progressData.data) {
+                            displayAssessmentProgress(progressData.data);
+                        } else {
+                            const container = document.getElementById('assessment-progress-container');
+                            container.innerHTML = '<div class="alert alert-warning">No assessment data available.</div>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error(`Error fetching assessment progress for user ${userId}:`, error);
+                        const container = document.getElementById('assessment-progress-container');
+                        container.innerHTML = '<div class="alert alert-danger">Error loading assessment progress.</div>';
+                    });
+            }
+
+            // Function to display assessment progress cards
+            function displayAssessmentProgress(assessmentProgressData) {
+                const container = document.getElementById('assessment-progress-container');
+                container.innerHTML = ''; // Clear loading/old content
+
+                if (assessmentProgressData.length === 0) {
+                    const noAssessmentsMessage = document.createElement('div');
+                    noAssessmentsMessage.className = 'alert alert-info';
+                    noAssessmentsMessage.textContent = 'No assessment submissions found for this student.';
+                    container.appendChild(noAssessmentsMessage);
+                    return;
+                }
+
+                assessmentProgressData.forEach(item => {
+                    const assessmentCard = document.createElement('div');
+                    assessmentCard.className = 'module-card';
+
+                    let statusBadge = '';
+                    if (item.status === 'completed') {
+                        statusBadge = '<span class="badge bg-success">Completed</span>';
+                    } else if (item.status === 'in_progress' || item.status === 'submitted') {
+                        statusBadge = '<span class="badge bg-warning text-dark">In Progress</span>';
+                    } else {
+                        statusBadge = '<span class="badge bg-secondary">Not Started</span>';
+                    }
+
+                    const assessmentTitle = item.assessment ? item.assessment.assessment_title : 'Untitled Assessment';
+                    const fileUrlLink = item.file_url ? 
+                        `<p class="mb-2 mt-2">Submission: <a href="${item.file_url}" target="_blank" rel="noopener noreferrer">View Submission</a></p>` : 
+                        '<p class="mb-2 mt-2 text-muted">No submission file.</p>';
+
+                    const feedbackContainer = document.createElement('div');
+                    feedbackContainer.className = 'feedback-container';
+                    feedbackContainer.innerHTML = `
+                        <div class="text-center p-2">
+                            <div class="spinner-border spinner-border-sm text-maroon" role="status"></div>
+                            <span class="ms-2">Loading feedback...</span>
+                        </div>
+                    `;
+
+                    assessmentCard.innerHTML = `
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5>${assessmentTitle}</h5>
+                            ${statusBadge}
+                        </div>
+                        ${fileUrlLink}
+                    `;
+                    assessmentCard.appendChild(feedbackContainer);
+                    container.appendChild(assessmentCard);
+
+                    loadAndDisplayFeedback(item.assessment_progress_id, feedbackContainer);
+                });
+            }
+
+            // Function to load and display feedback for an assessment
+            function loadAndDisplayFeedback(progressId, container) {
+                const scorePromise = fetch(`${apiBaseUrl}/scores/assessment-progress/${progressId}`).then(res => res.json().catch(() => ({ data: null })));
+                const feedbackPromise = fetch(`${apiBaseUrl}/feedback/assessment-progress/${progressId}`).then(res => res.json().catch(() => ({ data: null })));
+
+                Promise.all([scorePromise, feedbackPromise])
+                    .then(([scoreResponse, feedbackResponse]) => {
+                        const scoreData = (scoreResponse && scoreResponse.data && scoreResponse.data.length > 0) ? scoreResponse.data[0] : null;
+                        const feedbackData = (feedbackResponse && feedbackResponse.data && feedbackResponse.data.length > 0) ? feedbackResponse.data[0] : null;
+
+                        if (scoreData && feedbackData) {
+                            container.innerHTML = `
+                                <div class="feedback-display">
+                                    <h6>Faculty Feedback</h6>
+                                    <div class="feedback-text">
+                                        <p class="mb-1"><strong>Score:</strong> ${scoreData.score}/5</p>
+                                        <p class="mb-0"><strong>Feedback:</strong> ${feedbackData.feedback}</p>
+                                    </div>
+                                </div>
+                            `;
+                        } else {
+                            container.innerHTML = `
+                                <div class="feedback-display">
+                                    <h6>Faculty Feedback</h6>
+                                    <div class="feedback-text">
+                                        <p class="no-feedback">No feedback provided yet.</p>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    })
+                    .catch(error => {
+                        console.error(`Error loading feedback for assessment progress ${progressId}:`, error);
+                        container.innerHTML = `
+                            <div class="feedback-display">
+                                <h6>Faculty Feedback</h6>
+                                <div class="feedback-text">
+                                    <p class="no-feedback">Error loading feedback.</p>
+                                </div>
+                            </div>
+                        `;
+                    });
             }
         });
     </script>

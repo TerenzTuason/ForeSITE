@@ -134,12 +134,12 @@
         <div class="row">
             <div class="col-12">
                 <div class="profile-container position-relative">
-                    <!-- Edit Profile Button at top right
+                    <!-- Edit Profile Button at top right -->
                     <div class="position-absolute top-0 end-0 mt-4 me-4">
                         <button class="edit-btn" id="edit-profile-btn">
                             <i class="fas fa-edit me-2"></i>Edit Profile
                         </button>
-                    </div> -->
+                    </div>
                     <div class="profile-header">
                         <div class="profile-avatar">
                             <i class="fas fa-user"></i>
@@ -217,6 +217,9 @@
                 }, 100);
             });
             
+            // Load learning styles for the modal
+            loadLearningStyles();
+            loadCourses();
             // Load user data
             loadUserProfile();
             
@@ -243,6 +246,130 @@
         // Global variables
         let currentUser = null;
         let userPassword = '';
+        let currentAssessmentResult = null;
+        let allLearningStyles = [];
+        let allCourses = [];
+        
+        async function deleteAllStudentProgress(userId) {
+            try {
+                // Deletion order is important due to foreign key constraints.
+                // 1. Scores & Feedback -> Module Assessment Progress
+                // 2. Module Assessment Progress -> Module Progress
+                // 3. Lesson Screen Progress -> Module Progress (CASCADE)
+                // 4. Enrollments are independent of module progress records.
+                // Correct order:
+                // - Delete Scores & Feedback
+                // - Delete Module Assessment Progress
+                // - Delete Enrollments
+                // - Delete Module Progress (cascades to Lesson Screen Progress)
+                
+                // --- Start Deletion ---
+
+                // 1. Delete Module Assessment Progress and its dependencies (Scores, Feedback)
+                const assessmentProgressResponse = await fetch(`http://127.0.0.1:8000/api/v1/users/${userId}/assessment-progress`);
+                if (!assessmentProgressResponse.ok) {
+                    if (assessmentProgressResponse.status !== 404) {
+                        throw new Error('Failed to fetch assessment progress for deletion.');
+                    }
+                } else {
+                    const assessmentProgressData = await assessmentProgressResponse.json();
+                    const assessmentProgresses = assessmentProgressData.data;
+
+                    if (assessmentProgresses && assessmentProgresses.length > 0) {
+                        // 1a. Delete scores and feedback.
+                        await Promise.all(assessmentProgresses.map(async (progress) => {
+                            const progressId = progress.assessment_progress_id;
+                            // Delete scores
+                            const scoresResponse = await fetch(`http://127.0.0.1:8000/api/v1/scores/assessment-progress/${progressId}`);
+                            if (scoresResponse.ok) {
+                                const scoresData = await scoresResponse.json();
+                                if (scoresData.data && scoresData.data.length > 0) {
+                                    await Promise.all(scoresData.data.map(score => 
+                                        fetch(`http://127.0.0.1:8000/api/v1/scores/${score.score_id}`, { method: 'DELETE' })
+                                    ));
+                                }
+                            }
+                            // Delete feedback
+                            const feedbackResponse = await fetch(`http://127.0.0.1:8000/api/v1/feedback/assessment-progress/${progressId}`);
+                            if (feedbackResponse.ok) {
+                                const feedbackData = await feedbackResponse.json();
+                                if (feedbackData.data && feedbackData.data.length > 0) {
+                                    await Promise.all(feedbackData.data.map(fb => 
+                                        fetch(`http://127.0.0.1:8000/api/v1/feedback/${fb.feedback_id}`, { method: 'DELETE' })
+                                    ));
+                                }
+                            }
+                        }));
+
+                        // 1b. Now, delete the module assessment progress records.
+                        await Promise.all(assessmentProgresses.map(progress =>
+                            fetch(`http://127.0.0.1:8000/api/v1/module-assessment-progress/${progress.assessment_progress_id}`, { method: 'DELETE' })
+                        ));
+                    }
+                }
+
+                // 2. Delete all enrollments for the user.
+                const enrollmentsResponse = await fetch(`http://127.0.0.1:8000/api/v1/users/${userId}/enrollments`);
+                if(!enrollmentsResponse.ok) {
+                    if (enrollmentsResponse.status !== 404) {
+                        throw new Error('Failed to fetch enrollments for deletion.');
+                    }
+                } else {
+                    const enrollmentsData = await enrollmentsResponse.json();
+                    const enrollments = enrollmentsData.data;
+                    if (enrollments && enrollments.length > 0) {
+                        await Promise.all(enrollments.map(enrollment =>
+                            fetch(`http://127.0.0.1:8000/api/v1/courses/${enrollment.course_id}/enrollments/${enrollment.enrollment_id}`, { method: 'DELETE' })
+                        ));
+                    }
+                }
+
+                // 3. Delete module progress (which cascades to lesson_screen_progress).
+                const moduleProgressResponse = await fetch(`http://127.0.0.1:8000/api/v1/users/${userId}/module-progress`);
+                if (!moduleProgressResponse.ok) {
+                    if (moduleProgressResponse.status !== 404) {
+                        throw new Error('Failed to fetch module progress for deletion.');
+                    }
+                } else {
+                    const moduleProgressData = await moduleProgressResponse.json();
+                    const moduleProgresses = moduleProgressData.data;
+                    if (moduleProgresses && moduleProgresses.length > 0) {
+                        await Promise.all(moduleProgresses.map(progress =>
+                            fetch(`http://127.0.0.1:8000/api/v1/module-progress/${progress.progress_id}`, { method: 'DELETE' })
+                        ));
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Error deleting student progress:', error);
+                throw new Error('Failed to clear previous progress data. Please try again.');
+            }
+        }
+        
+        // Fetch available learning styles
+        async function loadLearningStyles() {
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/api/v1/learning-styles`);
+                if (!response.ok) throw new Error('Failed to fetch learning styles');
+                const learningStylesData = await response.json();
+                allLearningStyles = learningStylesData.data;
+                console.log('Loaded learning styles:', allLearningStyles);
+            } catch (error) {
+                console.error('Error loading learning styles:', error);
+            }
+        }
+        
+        // Fetch available courses
+        async function loadCourses() {
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/api/v1/courses`);
+                if (!response.ok) throw new Error('Failed to fetch courses');
+                const coursesData = await response.json();
+                allCourses = coursesData.data;
+            } catch (error) {
+                console.error('Error loading courses:', error);
+            }
+        }
         
         // Fetch user profile data
         async function loadUserProfile() {
@@ -274,9 +401,12 @@
                 const userProfileData = userData.data;
                 
                 // If we have assessment results with learning style info, add it to the user profile data
-                if (assessmentData.data && assessmentData.data.length > 0 && assessmentData.data[0].result) {
-                    userProfileData.learningStyleFromAssessment = assessmentData.data[0].result.learning_style;
-                    userProfileData.departmentFromAssessment = assessmentData.data[0].department;
+                if (assessmentData.data && assessmentData.data.length > 0) {
+                    currentAssessmentResult = assessmentData.data[0]; // Store the first result
+                    if (assessmentData.data[0].result) {
+                        userProfileData.learningStyleFromAssessment = assessmentData.data[0].result.learning_style;
+                        userProfileData.departmentFromAssessment = assessmentData.data[0].department;
+                    }
                 }
                 
                 // Update UI with combined data
@@ -395,6 +525,29 @@
             document.getElementById('modal-last-name').value = document.getElementById('last-name').value;
             document.getElementById('modal-password').value = '';
             
+            // Populate learning style dropdown
+            const learningStyleSelect = document.getElementById('modal-learning-style');
+            learningStyleSelect.innerHTML = ''; // Clear existing options
+
+            if (allLearningStyles && allLearningStyles.length > 0) {
+                allLearningStyles.forEach(style => {
+                    const option = document.createElement('option');
+                    option.value = style.style_name;
+                    option.textContent = style.style_name.charAt(0).toUpperCase() + style.style_name.slice(1);
+                    learningStyleSelect.appendChild(option);
+                });
+            } else {
+                const option = document.createElement('option');
+                option.textContent = 'No learning styles available';
+                option.disabled = true;
+                learningStyleSelect.appendChild(option);
+            }
+            
+            // Set current learning style
+            if (currentAssessmentResult && currentAssessmentResult.result && currentAssessmentResult.result.learning_style) {
+                learningStyleSelect.value = currentAssessmentResult.result.learning_style;
+            }
+
             // Show modal
             const editProfileModal = new bootstrap.Modal(document.getElementById('edit-profile-modal'));
             editProfileModal.show();
@@ -407,6 +560,7 @@
                 const firstName = document.getElementById('modal-first-name').value;
                 const lastName = document.getElementById('modal-last-name').value;
                 const password = document.getElementById('modal-password').value;
+                const newLearningStyle = document.getElementById('modal-learning-style').value;
                 
                 // Validation
                 if (!firstName || !lastName) {
@@ -419,30 +573,74 @@
                     return;
                 }
                 
-                // Prepare update data
-                const updateData = {
+                // Show loading spinner
+                Swal.fire({
+                    title: 'Updating Profile...',
+                    text: 'Please wait while we update your information.',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+                
+                // Prepare update data for user and assessment
+                const promises = [];
+
+                // 1. User profile update
+                const userUpdateData = {
                     first_name: firstName,
                     last_name: lastName
                 };
-                
-                // Add password to update data if provided
                 if (password.trim() !== '') {
-                    updateData.password = password;
+                    userUpdateData.password = password;
                 }
                 
-                // Update user data
-                const response = await fetch(`http://127.0.0.1:8000/api/v1/users/${userId}`, {
+                promises.push(fetch(`http://127.0.0.1:8000/api/v1/users/${userId}`, {
                     method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(updateData)
-                });
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userUpdateData)
+                }));
+
+
+                // 2. Assessment result (learning style) update
+                if (currentAssessmentResult && newLearningStyle && newLearningStyle !== currentAssessmentResult.result.learning_style) {
+                    // If learning style changes, delete all previous progress
+                    await deleteAllStudentProgress(userId);
+
+                    const resultId = currentAssessmentResult.result_id;
+                    
+                    const assessmentUpdateData = JSON.parse(JSON.stringify(currentAssessmentResult));
+                    assessmentUpdateData.result.learning_style = newLearningStyle;
+                    
+                    // Find new course_id based on the new learning style
+                    const newLearningStyleObject = allLearningStyles.find(style => style.style_name === newLearningStyle);
+                    if (newLearningStyleObject) {
+                        const newStyleId = newLearningStyleObject.style_id;
+                        const newCourse = allCourses.find(course => course.learning_style_id === newStyleId);
+                        if (newCourse) {
+                            assessmentUpdateData.course_id = newCourse.course_id;
+                        } else {
+                            console.warn(`No course found for learning style: ${newLearningStyle}`);
+                        }
+                    }
+
+                    delete assessmentUpdateData.course; // This is a nested object from GET, not a column in the table
+
+                    promises.push(fetch(`http://127.0.0.1:8000/api/v1/assessment-results/${resultId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(assessmentUpdateData)
+                    }));
+                }
                 
-                if (!response.ok) throw new Error('Failed to update profile');
-                
-                // Department is no longer edited in the profile modal
-                // It is displayed from assessment results in the header
+                const responses = await Promise.all(promises);
+
+                for(const response of responses) {
+                    if (!response.ok) {
+                         const errorData = await response.json().catch(() => ({ message: 'Failed to update profile' }));
+                         throw new Error(errorData.message || 'Failed to update profile');
+                    }
+                }
                 
                 // Hide modal
                 const editProfileModal = bootstrap.Modal.getInstance(document.getElementById('edit-profile-modal'));
@@ -463,7 +661,7 @@
                 console.error('Error saving profile:', error);
                 Swal.fire({
                     title: 'Error',
-                    text: 'Failed to update profile. Please try again later.',
+                    text: error.message,
                     icon: 'error',
                     confirmButtonColor: '#800000'
                 });
@@ -522,6 +720,12 @@
                             <small class="text-muted">Leave blank if you don't want to change your password</small>
                         </div>
                         
+                        <!-- Learning Style -->
+                        <div class="mb-3">
+                            <label for="modal-learning-style" class="form-label">Learning Style</label>
+                            <select class="form-select" id="modal-learning-style"></select>
+                            <small class="text-muted">Override your detected learning style.</small>
+                        </div>
 
                     </form>
                 </div>

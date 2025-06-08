@@ -139,7 +139,7 @@ class ModuleProgressController extends Controller
      */
     public function show(string $id): JsonResponse
     {
-        $moduleProgress = ModuleProgress::with(['user', 'course', 'moduleContents'])->find($id);
+        $moduleProgress = ModuleProgress::with(['user', 'course', 'lessonScreenProgress'])->find($id);
         
         if (!$moduleProgress) {
             return response()->json(['error' => 'Module progress not found'], Response::HTTP_NOT_FOUND);
@@ -204,21 +204,41 @@ class ModuleProgressController extends Controller
      */
     public function destroy(string $id): JsonResponse
     {
-        $moduleProgress = ModuleProgress::find($id);
+        $moduleProgress = ModuleProgress::with([
+            'lessonScreenProgress', 
+            'moduleAssessmentProgress'
+        ])->find($id);
         
         if (!$moduleProgress) {
             return response()->json(['error' => 'Module progress not found'], Response::HTTP_NOT_FOUND);
         }
         
-        // Check if module progress has related module contents before deleting
-        if ($moduleProgress->moduleContents()->count() > 0) {
-            return response()->json([
-                'error' => 'Cannot delete module progress with existing module contents'
-            ], Response::HTTP_BAD_REQUEST);
-        }
+        DB::beginTransaction();
         
-        $moduleProgress->delete();
-        return response()->json(null, Response::HTTP_NO_CONTENT);
+        try {
+            // Manually delete related module assessment progress records
+            $moduleProgress->moduleAssessmentProgress()->delete();
+
+            // Manually delete related lesson screen progress records
+            $moduleProgress->lessonScreenProgress()->delete();
+            
+            // Now, delete the module progress record
+            $moduleProgress->delete();
+            
+            DB::commit();
+            
+            return response()->json(null, Response::HTTP_NO_CONTENT);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            // Optional: Log the exception for debugging
+            // Log::error('Failed to delete module progress: ' . $e->getMessage());
+            
+            return response()->json([
+                'error' => 'Failed to delete module progress and its related records.',
+                'details' => $e->getMessage() // Be cautious about exposing detailed errors in production
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
     
     /**

@@ -370,6 +370,66 @@ The API provides CRUD (Create, Read, Update, Delete) operations for the main ent
 }
 ```
 
+### 19. Groups (`groups` table)
+- **GET /api/v1/groups**: List all groups. Can be filtered by `course_id`.
+- **GET /api/v1/groups/{id}**: Get a specific group.
+- **POST /api/v1/groups**: Create a new group.
+- **PUT /api/v1/groups/{id}**: Update a group.
+- **DELETE /api/v1/groups/{id}**: Delete a group.
+- **GET /api/v1/groups/{id}/members**: Get all members of a group.
+
+### Group API Examples
+
+### Get All Groups for a Course
+```json
+// GET /api/v1/groups?course_id=1
+{
+  "data": [
+    {
+      "group_id": 1,
+      "course_id": 1,
+      "group_name": "Group A",
+      "course": { ... },
+      "group_members": [ ... ]
+    }
+  ]
+}
+```
+
+### Create a Group
+```json
+// POST /api/v1/groups
+{
+  "course_id": 1,
+  "group_name": "Group C"
+}
+```
+
+### 20. Group Members (`group_members` table)
+- **POST /api/v1/group-members**: Add a user to a group.
+- **DELETE /api/v1/group-members/{id}**: Remove a user from a group by membership ID.
+- **POST /api/v1/group-members/remove**: Remove a user from a group by `group_id` and `user_id`.
+
+### Group Members API Examples
+
+### Add a User to a Group
+```json
+// POST /api/v1/group-members
+{
+  "group_id": 1,
+  "user_id": 2
+}
+```
+
+### Remove a User from a Group (by user and group ID)
+```json
+// POST /api/v1/group-members/remove
+{
+  "group_id": 1,
+  "user_id": 2
+}
+```
+
 ## Testing with Postman or APIdog
 
 1. Import the following cURL commands into your API client to test the API:
