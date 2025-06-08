@@ -1365,3 +1365,20 @@ INSERT INTO chat_rooms (learning_style_id, room_name) VALUES
 (2, 'Reflector Learning Chat'),
 (3, 'Theorist Learning Chat'),
 (4, 'Pragmatist Learning Chat');
+
+-- Table for groups of students in a course
+CREATE TABLE `groups` (
+  group_id int PRIMARY KEY AUTO_INCREMENT,
+  course_id int NOT NULL,
+  group_name varchar(100) NOT NULL,
+  FOREIGN KEY (course_id) REFERENCES courses(course_id)
+);
+
+-- Table to associate users with groups
+CREATE TABLE group_members (
+  group_member_id int PRIMARY KEY AUTO_INCREMENT,
+  group_id int NOT NULL,
+  user_id int NOT NULL,
+  FOREIGN KEY (group_id) REFERENCES `groups`(group_id),
+  FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
