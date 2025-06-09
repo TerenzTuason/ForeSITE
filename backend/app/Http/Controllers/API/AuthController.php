@@ -132,4 +132,47 @@ class AuthController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    /**
+     * Reset user password
+     */
+    public function resetPassword(Request $request): JsonResponse
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'email' => 'required|email|exists:users,email',
+                'password' => 'required|min:8',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['error' => $validator->errors()], Response::HTTP_BAD_REQUEST);
+            }
+
+            $user = User::where('email', $request->email)->first();
+
+            if (!$user) {
+                return response()->json([
+                    'error' => 'User not found'
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+            $user->password = Hash::make($request->password);
+            $user->save();
+
+            return response()->json([
+                'data' => [
+                    'message' => 'Password reset successful'
+                ]
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            Log::error('Error during password reset: ' . $e->getMessage(), [
+                'exception' => $e,
+                'request_data' => $request->except(['password'])
+            ]);
+
+            return response()->json([
+                'error' => 'Password reset failed: ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 } 

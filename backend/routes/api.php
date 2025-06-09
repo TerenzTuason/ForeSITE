@@ -68,6 +68,7 @@ Route::prefix('v1')->group(function () {
     // Authentication Routes
     Route::post('auth/register', [AuthController::class, 'register']);
     Route::post('auth/login', [AuthController::class, 'login']);
+    Route::post('auth/reset-password', [AuthController::class, 'resetPassword']);
     
     // Roles
     Route::apiResource('roles', RoleController::class);
