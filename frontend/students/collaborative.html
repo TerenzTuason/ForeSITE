@@ -500,8 +500,8 @@
     <div class="container-fluid main-content">
         <div class="chat-container">
             <div class="chat-header">
-                <h2>Theorist Learning Style Chat</h2>
-                <p>Connect and discuss with other theorist learners</p>
+                <h2 id="chat-title">Group Chat</h2>
+                <p id="chat-description">Discuss with your group members.</p>
             </div>
 
             <div class="online-users">
@@ -533,21 +533,19 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Global variables
-        let currentRoomId = null;
-        let currentLearningStyleId = null;
+        let currentGroupId = null;
+        let currentUserId = null;
         
-        // Cloudinary configuration - WARNING: Exposing API Secret on client-side is a security risk!
+        // Cloudinary configuration
         const CLOUDINARY_CONFIG = {
             cloudName: 'dwn5t3o4j',
             apiKey: '214461813776441',
-            apiSecret: '-3Lake60UIDCJSt7eugmk_-CRIM' // VERY BAD PRACTICE TO HAVE THIS IN CLIENT-SIDE CODE
-            // uploadPreset: 'ml_default' // Not used for signed uploads in this new approach
+            apiSecret: '-3Lake60UIDCJSt7eugmk_-CRIM' // IMPORTANT: This is a security risk in production
         };
         
         // Load navbar
         $(document).ready(function() {
             $("#navbar-placeholder").load("../components/navbar.html", function() {
-                // After loading navbar, set active link
                 const navLinks = document.querySelectorAll('.nav-link');
                 navLinks.forEach(link => {
                     if (link.getAttribute('href') === 'collaborative.html') {
@@ -556,470 +554,171 @@
                 });
             });
 
-            // Initialize chat
             initializeChat();
-            
-            // Setup message form submission
             setupMessageForm();
-
-            // Setup file input listener
             setupFileInput();
+            setupPolling();
         });
 
         function initializeChat() {
-            // Get user data from session storage
             const userData = JSON.parse(sessionStorage.getItem('user'));
             if (!userData) {
                 window.location.href = '../login.html';
                 return;
             }
+            currentUserId = userData.user_id;
 
-            // Fetch user's learning style from assessment results
-            fetch(`http://127.0.0.1:8000/api/v1/users/${userData.user_id}/assessment-results`)
+            // First, get assessment results to determine the course ID.
+            fetch(`http://127.0.0.1:8000/api/v1/users/${currentUserId}/assessment-results`)
                 .then(response => response.json())
-                .then(data => {
-                    console.log('Assessment results:', data);
-                    if (data.data && data.data.length > 0) {
-                        // Get the result data which contains learning style information
-                        const resultData = data.data[0].result;
-                        console.log('Result data:', resultData);
-                        
-                        // Extract learning style name
-                        const learningStyle = resultData.learning_style;
-                        
-                        // Get learning style ID - handle different possible formats
-                        if (resultData.learning_style_id) {
-                            // If learning_style_id exists directly
-                            currentLearningStyleId = resultData.learning_style_id;
-                        } else if (learningStyle) {
-                            // Map learning style name to ID if needed
-                            // This mapping should match your database
-                            const styleMapping = {
-                                'activist': 1,
-                                'reflector': 2,
-                                'theorist': 3,
-                                'pragmatist': 4
-                            };
-                            
-                            const styleLower = learningStyle.toLowerCase();
-                            currentLearningStyleId = styleMapping[styleLower];
-                            
-                            if (!currentLearningStyleId) {
-                                console.error('Could not map learning style to ID:', learningStyle);
-                                // Default to ID 4 (pragmatist) as a fallback based on the chat header
-                                currentLearningStyleId = 4;
-                            }
-                        } else {
-                            // Fallback to ID 4 (pragmatist) as a last resort
-                            currentLearningStyleId = 4;
-                            console.warn('No learning style found, defaulting to pragmatist (ID: 4)');
-                        }
-                        
-                        console.log(`Using learning style: ${learningStyle} (ID: ${currentLearningStyleId})`);
-                        
-                        // Display learning style in all uppercase
-                        const styleUpperCase = learningStyle ? learningStyle.toUpperCase() : 'PRAGMATIST';
-                        document.querySelector('.chat-header h2').textContent = `${styleUpperCase} Learning Style Chat`;
-                        document.querySelector('.chat-header p').textContent = `Connect and discuss with other ${styleUpperCase} learners`;
-                        
-                        // Get or create chat room for this learning style
-                        getChatRoom(currentLearningStyleId);
+                .then(assessmentData => {
+                    if (assessmentData.data && assessmentData.data.length > 0) {
+                        const courseId = assessmentData.data[0].course_id;
+                        // Now, find or create the group for this user and course
+                        fetch(`http://127.0.0.1:8000/api/v1/chat/courses/${courseId}/users/${currentUserId}/group`)
+                            .then(response => response.json())
+                            .then(chatInfo => {
+                                if (chatInfo.data && chatInfo.data.group) {
+                                    const { group, messages } = chatInfo.data;
+                                    currentGroupId = group.group_id;
+                                    
+                                    updateChatHeader(group);
+                                    updateUsersList(group.group_members);
+                                    displayMessages(messages);
+                                } else {
+                                    console.error('Failed to get group info:', chatInfo);
+                                    alert('Could not join or create a chat group.');
+                                }
+                            });
                     } else {
-                        console.error('No assessment results found');
-                        // Default to pragmatist as fallback
-                        currentLearningStyleId = 4; // Pragmatist
-                        getChatRoom(currentLearningStyleId);
+                        // Handle case where user has no assessment results, so no course context.
+                        $('.chat-messages').html('<div class="message received"><div class="message-content">You must be enrolled in a course and have an assessment result to join a group chat.</div></div>');
+                        $('#message-form').hide();
                     }
                 })
                 .catch(error => {
-                    console.error('Error fetching learning style:', error);
-                    // Default to pragmatist as fallback in case of error
-                    currentLearningStyleId = 4; // Pragmatist
-                    getChatRoom(currentLearningStyleId);
-                });
-        }
-
-        function getChatRoom(learningStyleId) {
-            console.log(`Getting chat room for learning style ID: ${learningStyleId}`);
-            // Get or create a chat room for this learning style
-            fetch(`http://127.0.0.1:8000/api/v1/chat/room/learning-style/${learningStyleId}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.data) {
-                        const chatRoom = data.data;
-                        // Store room ID in global variable
-                        currentRoomId = chatRoom.room_id;
-                        console.log(`Chat room set to ID: ${currentRoomId}`);
-                        
-                        // Load users with the same learning style
-                        loadLearningStyleUsers(learningStyleId);
-                        
-                        // Load real messages from the database
-                        loadChatMessages(currentRoomId);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error getting chat room:', error);
-                    alert('Error connecting to the chat service. Please try again later.');
+                    console.error('Error fetching assessment results:', error);
+                    alert('Could not determine your course to join a chat.');
                 });
         }
         
-        function loadLearningStyleUsers(learningStyleId) {
-            // Get user data from session storage
-            const userData = JSON.parse(sessionStorage.getItem('user'));
-            const currentUserId = userData.user_id;
-            
-            // Fetch users with the same learning style using the new API endpoint
-            fetch(`http://127.0.0.1:8000/api/v1/chat/users/learning-style/${learningStyleId}`)
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Users with same learning style:', data);
-                    
-                    // Get the users container
-                    const onlineUsersSection = document.querySelector('.online-users');
-                    const usersList = document.querySelector('.online-users-list');
-                    usersList.innerHTML = ''; // Clear existing list
-                    
-                    // Move the online users section above the chat messages
-                    const chatContainer = document.querySelector('.chat-container');
-                    const messagesContainer = document.querySelector('.chat-messages');
-                    chatContainer.insertBefore(onlineUsersSection, messagesContainer);
-                    
-                    // First add the current user to the list
-                    const currentUserElement = document.createElement('div');
-                    currentUserElement.className = 'user-item current-user';
-                    currentUserElement.innerHTML = `
-                        <div class="circle-indicator"></div>
-                        <span>You (${userData.first_name} ${userData.last_name})</span>
-                    `;
-                    usersList.appendChild(currentUserElement);
-                    
-                    // Also fetch users from chat messages to catch anyone who has messaged in this room
-                    if (currentRoomId) {
-                        fetch(`http://127.0.0.1:8000/api/v1/chat/messages/${currentRoomId}`)
-                            .then(response => response.json())
-                            .then(messageData => {
-                                console.log('Messages data for user extraction:', messageData);
-                                
-                                // Create a set to store unique user IDs we've displayed
-                                const displayedUserIds = new Set([currentUserId]);
-                                
-                                // First process users from the learning style API
-                                if (data.data && data.data.length > 0) {
-                                    // Display other users from learning style API
-                                    data.data.forEach(user => {
-                                        // Skip current user as we've already added them
-                                        if (user.user_id === currentUserId) {
-                                            return;
-                                        }
-                                        
-                                        // Add this user to our displayed set
-                                        displayedUserIds.add(user.user_id);
-                                        
-                                        // Create and add user element
-                                        const userElement = document.createElement('div');
-                                        userElement.className = 'user-item current-user';
-                                        userElement.innerHTML = `
-                                            <div class="circle-indicator"></div>
-                                            <span>${user.first_name} ${user.last_name}</span>
-                                        `;
-                                        usersList.appendChild(userElement);
-                                    });
-                                }
-                                
-                                // Then add any users from chat messages who aren't already displayed
-                                if (messageData.data && messageData.data.length > 0) {
-                                    // Create a map to store user info by ID
-                                    const messageUsers = new Map();
-                                    
-                                    // Extract unique users from messages
-                                    messageData.data.forEach(msg => {
-                                        if (msg.user && msg.user.user_id && !displayedUserIds.has(msg.user.user_id)) {
-                                            messageUsers.set(msg.user.user_id, msg.user);
-                                        }
-                                    });
-                                    
-                                    // Add these users to the list
-                                    messageUsers.forEach(user => {
-                                        displayedUserIds.add(user.user_id);
-                                        
-                                        const userElement = document.createElement('div');
-                                        userElement.className = 'user-item current-user';
-                                        userElement.innerHTML = `
-                                            <div class="circle-indicator"></div>
-                                            <span>${user.first_name} ${user.last_name}</span>
-                                        `;
-                                        usersList.appendChild(userElement);
-                                    });
-                                }
-                                
-                                // If no other users found besides the current user
-                                if (displayedUserIds.size === 1) {
-                                    const emptyMessage = document.createElement('div');
-                                    emptyMessage.className = 'no-users-message';
-                                    emptyMessage.textContent = 'No other users with the same learning style found.';
-                                    usersList.appendChild(emptyMessage);
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error fetching messages for user extraction:', error);
-                            });
-                    } else {
-                        // If no room ID, just show users from learning style API
-                        if (data.data && data.data.length > 0) {
-                            // Keep track of whether we found other users
-                            let otherUsersFound = false;
-                            
-                            // Display other users
-                            data.data.forEach(user => {
-                                // Skip current user as we've already added them
-                                if (user.user_id === currentUserId) {
-                                    return;
-                                }
-                                
-                                // We found at least one other user
-                                otherUsersFound = true;
-                                
-                                // Create and add user element
-                                const userElement = document.createElement('div');
-                                userElement.className = 'user-item current-user';
-                                userElement.innerHTML = `
-                                    <div class="circle-indicator"></div>
-                                    <span>${user.first_name} ${user.last_name}</span>
-                                `;
-                                usersList.appendChild(userElement);
-                            });
-                            
-                            // If no other users found (only current user)
-                            if (!otherUsersFound) {
-                                const emptyMessage = document.createElement('div');
-                                emptyMessage.className = 'no-users-message';
-                                emptyMessage.textContent = 'No other users with the same learning style found.';
-                                usersList.appendChild(emptyMessage);
-                            }
-                        } else {
-                            // No users found with this learning style besides the current user
-                            const emptyMessage = document.createElement('div');
-                            emptyMessage.className = 'no-users-message';
-                            emptyMessage.textContent = 'No other users with the same learning style found.';
-                            usersList.appendChild(emptyMessage);
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching users:', error);
-                    // Show error message
-                    const usersList = document.querySelector('.online-users-list');
-                    usersList.innerHTML = '<div class="text-danger">Error loading users. Please refresh the page.</div>';
-                });
+        function updateChatHeader(group) {
+            $('#chat-title').text(group.group_name);
+            $('#chat-description').text(`A collaborative space for your group in course: ${group.course.name}`);
         }
 
-        // Helper function to parse message content, handling potential double stringification
-        function getParsedMessageContent(messageString) {
-            try {
-                let content = JSON.parse(messageString);
-                // If the first parse results in a string, it might be double-stringified JSON
-                if (typeof content === 'string') {
-                    try {
-                        content = JSON.parse(content);
-                    } catch (eInner) {
-                        // If inner parse fails, it implies the outer string was not double-encoded JSON.
-                        // 'content' is already the string from the first parse.
-                        console.warn("Attempted second parse on a string that wasn't valid JSON after first parse. Content:", content, "Error:", eInner);
-                    }
-                }
-                return content; // Could be an object or a string (if original was e.g. "'a string in quotes'")
-            } catch (eOuter) {
-                // If the initial parse fails, it's likely plain text or genuinely malformed.
-                // console.log("Initial parse failed, returning original string:", messageString, "Error:", eOuter);
-                return messageString; // Return original string
+        function updateUsersList(members) {
+            const usersList = $('.online-users-list');
+            usersList.html(''); // Clear list
+
+            if (members && members.length > 0) {
+                members.forEach(member => {
+                    const user = member.user;
+                    const isCurrentUser = user.user_id === currentUserId;
+                    const userElement = `
+                        <div class="user-item ${isCurrentUser ? 'current-user' : ''}">
+                            <div class="circle-indicator"></div>
+                            <span>${user.first_name} ${user.last_name} ${isCurrentUser ? '(You)' : ''}</span>
+                        </div>
+                    `;
+                    usersList.append(userElement);
+                });
+            } else {
+                usersList.append('<div class="no-users-message">No members in this group yet.</div>');
             }
         }
+        
+        function displayMessages(messages) {
+            const messagesContainer = $('.chat-messages');
+            messagesContainer.html(''); // Clear messages
 
-        function loadChatMessages(roomId) {
-            // Fetch messages for this chat room from the API
-            fetch(`http://127.0.0.1:8000/api/v1/chat/messages/${roomId}`)
+            if (messages && messages.length > 0) {
+                messages.forEach(msg => {
+                    appendMessage(msg);
+                });
+            } else {
+                // Show a welcome message if no messages yet
+                const welcomeMessage = `
+                    <div class="message received">
+                        <div class="message-header">
+                            <strong>ForeSITE System</strong>
+                            <span class="message-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                        </div>
+                        <div class="message-content">
+                            Welcome to your group chat! Start the conversation.
+                        </div>
+                    </div>`;
+                messagesContainer.append(welcomeMessage);
+            }
+            messagesContainer.scrollTop(messagesContainer.prop("scrollHeight"));
+        }
+
+        function appendMessage(msg) {
+            const messagesContainer = $('.chat-messages');
+            const isSentByCurrentUser = msg.user_id === currentUserId;
+            const messageDate = new Date(msg.created_at);
+            const formattedTime = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            let messageContentHtml;
+            try {
+                const contentObject = JSON.parse(msg.message);
+                if (contentObject.type === 'file' && contentObject.url && contentObject.name) {
+                    messageContentHtml = `
+                        <a href="${contentObject.url}" target="_blank" rel="noopener noreferrer" class="file-download-link">
+                            <i class="fas ${contentObject.file_type === 'pdf' ? 'fa-file-pdf' : 'fa-file-word'}"></i>
+                            ${contentObject.name}
+                            <small>(${(contentObject.size / 1024).toFixed(1)} KB)</small>
+                            <i class="fas fa-download ms-2"></i>
+                        </a>`;
+                } else {
+                    messageContentHtml = msg.message; // It's a JSON string but not our file format
+                }
+            } catch (e) {
+                messageContentHtml = msg.message; // It's a plain text message
+            }
+
+            const messageElement = `
+                <div class="message ${isSentByCurrentUser ? 'sent' : 'received'}">
+                    <div class="message-header">
+                        ${isSentByCurrentUser ? '' : `<strong>${msg.user.first_name} ${msg.user.last_name}</strong>`}
+                        <span class="message-time">${formattedTime}</span>
+                    </div>
+                    <div class="message-content">
+                        ${messageContentHtml}
+                    </div>
+                </div>`;
+            messagesContainer.append(messageElement);
+        }
+
+        function loadLatestMessages() {
+            if (!currentGroupId) return;
+            fetch(`http://127.0.0.1:8000/api/v1/chat/groups/${currentGroupId}/messages`)
                 .then(response => response.json())
                 .then(data => {
-                    const messagesContainer = document.querySelector('.chat-messages');
-                    messagesContainer.innerHTML = ''; // Clear existing messages
-                    
-                    // Get current user ID
-                    const userData = JSON.parse(sessionStorage.getItem('user'));
-                    const currentUserId = userData.user_id;
-                    
-                    if (data.data && data.data.length > 0) {
-                        // Display real messages from the database
-                        data.data.forEach(msg => {
-                            const isSentByCurrentUser = msg.user_id === currentUserId;
-                            const messageElement = document.createElement('div');
-                            messageElement.className = `message ${isSentByCurrentUser ? 'sent' : 'received'}`;
-                            
-                            // Format timestamp
-                            const messageDate = new Date(msg.created_at);
-                            const formattedTime = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                            
-                            let messageContentHtml;
-                            const contentObjectOrString = getParsedMessageContent(msg.message);
-
-                            if (typeof contentObjectOrString === 'object' && contentObjectOrString.type === 'file' && contentObjectOrString.url && contentObjectOrString.name) {
-                                // It's a file message object
-                                messageContentHtml = `
-                                    <a href="${contentObjectOrString.url}" target="_blank" rel="noopener noreferrer" class="file-download-link">
-                                        <i class="fas ${contentObjectOrString.file_type === 'pdf' ? 'fa-file-pdf' : 'fa-file-word'}"></i>
-                                        ${contentObjectOrString.name}
-                                        <small>(${(contentObjectOrString.size / 1024).toFixed(1)} KB)</small>
-                                        <i class="fas fa-download ms-2"></i>
-                                    </a>
-                                `;
-                            } else {
-                                // Not a file object, or parsing failed and returned original string
-                                messageContentHtml = msg.message; // Display original message string
-                            }
-
-                            messageElement.innerHTML = `
-                                <div class="message-header">
-                                    ${isSentByCurrentUser ? '' : `<strong>${msg.user.first_name} ${msg.user.last_name}</strong>`}
-                                    <span class="message-time">${formattedTime}</span>
-                                </div>
-                                <div class="message-content">
-                                    ${messageContentHtml}
-                                </div>
-                            `;
-                            messagesContainer.appendChild(messageElement);
-                        });
-                    } else {
-                        // If no messages, show default welcome message
-                        const learningStyle = document.querySelector('.chat-header h2').textContent.split(' ')[0];
-                        
-                        // Create a welcome message based on learning style
-                        let welcomeMessage = "Welcome to the learning style chat! Start a conversation with others who share your learning style.";
-                        
-                        const messageElement = document.createElement('div');
-                        messageElement.className = 'message received';
-                        messageElement.innerHTML = `
-                            <div class="message-header">
-                                <strong>ForeSITE System</strong>
-                                <span class="message-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                            </div>
-                            <div class="message-content">
-                                ${welcomeMessage}
-                            </div>
-                        `;
-                        messagesContainer.appendChild(messageElement);
+                    if(data.data) {
+                        displayMessages(data.data);
                     }
-                    
-                    // Scroll to bottom
-                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
                 })
-                .catch(error => console.error('Error fetching chat messages:', error));
+                .catch(error => console.error('Error fetching latest messages:', error));
         }
 
         function setupMessageForm() {
-            // Handle new message submission
-            document.getElementById('message-form').addEventListener('submit', function(e) {
+            $('#message-form').on('submit', function(e) {
                 e.preventDefault();
-                const input = document.getElementById('message-input');
-                const message = input.value.trim();
-                    
-                if (message) {
-                    // Get user data and use global chat room ID
-                    const userData = JSON.parse(sessionStorage.getItem('user'));
-                    
-                    if (!currentRoomId) {
-                        console.warn('No chat room ID found, attempting to retrieve it');
-                        
-                        if (currentLearningStyleId) {
-                            console.log(`Using learning style ID ${currentLearningStyleId} to determine chat room`);
-                            // Retrieve or create the chat room first
-                            fetch(`http://127.0.0.1:8000/api/v1/chat/room/learning-style/${currentLearningStyleId}`)
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (data.data && data.data.room_id) {
-                                        console.log('Retrieved chat room:', data.data);
-                                        currentRoomId = data.data.room_id;
-                                        // Now that we have the room ID, proceed with sending the message
-                                        sendMessageToApi(userData, currentRoomId, message);
-                                    } else {
-                                        console.error('Failed to get chat room for style ID:', currentLearningStyleId);
-                                        alert('Unable to send message: Could not determine chat room. Please refresh the page and try again.');
-                                    }
-                                })
-                                .catch(error => {
-                                    console.error('Error getting chat room:', error);
-                                    alert('Error connecting to chat service. Please try again later.');
-                                });
-                            return; // Exit early as we're handling the send in the callback
-                        } else {
-                            console.error('No learning style ID available');
-                            alert('Unable to determine your learning style. Please refresh the page and try again.');
-                            return;
-                        }
-                    }
-                    
-                    // If we have a room ID, proceed with sending
-                    console.log(`Sending message to room ID: ${currentRoomId}`);
-                    sendMessageToApi(userData, currentRoomId, message);
+                const input = $('#message-input');
+                const message = input.val().trim();
+                
+                if (message && currentGroupId) {
+                    sendMessageToApi(currentUserId, currentGroupId, message);
+                    input.val('');
                 }
             });
         }
         
-        // Moved sendMessageToApi to be globally accessible in the script
-        function sendMessageToApi(userData, roomId, message) {
-            // This function handles the actual API call to send the message
-            // Add a loading indicator or disable the send button
-            const sendButton = document.querySelector('.btn-send');
-            sendButton.disabled = true;
-            sendButton.innerHTML = 'Sending... <i class="fas fa-spinner fa-spin"></i>';
-            
-            // Add message to UI immediately (optimistic UI update)
-            const messagesContainer = document.querySelector('.chat-messages');
-            const tempMessageElement = document.createElement('div');
-            tempMessageElement.className = 'message sent';
-            tempMessageElement.style.opacity = '0.7'; // Indicate it's pending
-            
-            const formattedTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            
-            let tempMessageContentHtml;
-            const contentObjectOrString = getParsedMessageContent(message);
+        function sendMessageToApi(userId, groupId, message) {
+            const sendButton = $('.btn-send');
+            sendButton.prop('disabled', true).html('Sending... <i class="fas fa-spinner fa-spin"></i>');
 
-            if (typeof contentObjectOrString === 'object' && contentObjectOrString.type === 'file' && contentObjectOrString.url && contentObjectOrString.name) {
-                tempMessageContentHtml = `
-                    <a href="${contentObjectOrString.url}" target="_blank" rel="noopener noreferrer" class="file-download-link">
-                        <i class="fas ${contentObjectOrString.file_type === 'pdf' ? 'fa-file-pdf' : 'fa-file-word'}"></i>
-                        ${contentObjectOrString.name}
-                        <small>(${(contentObjectOrString.size / 1024).toFixed(1)} KB)</small>
-                        <i class="fas fa-download ms-2"></i>
-                    </a>
-                `;
-            } else {
-                tempMessageContentHtml = message; // A stringified JSON that isn't our file type
-            }
-
-            tempMessageElement.innerHTML = `
-                <div class="message-header">
-                    <span class="message-time">${formattedTime}</span>
-                </div>
-                <div class="message-content">
-                    ${tempMessageContentHtml}
-                </div>
-            `;
-            messagesContainer.appendChild(tempMessageElement);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            
-            // Clear input if it exists
-            const inputElement = document.getElementById('message-input');
-            if (inputElement) {
-                inputElement.value = '';
-            }
-            
-            console.log('Sending message to API:', {
-                room_id: roomId,
-                user_id: userData.user_id,
-                message: message
-            });
-            
-            // Send message to API
             fetch('http://127.0.0.1:8000/api/v1/chat/messages', {
                 method: 'POST',
                 headers: {
@@ -1027,205 +726,103 @@
                     'Accept': 'application/json'
                 },
                 body: JSON.stringify({
-                    room_id: roomId,
-                    user_id: userData.user_id,
+                    group_id: groupId,
+                    user_id: userId,
                     message: message
                 })
             })
-            .then(response => {
-                // Check if response is ok before parsing JSON
-                if (!response.ok) {
-                    console.error('Server error:', response.status, response.statusText);
-                    return response.text().then(text => {
-                        throw new Error(`Server error: ${response.status} ${response.statusText}\nResponse: ${text}`);
-                    });
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
-                console.log('Message sent successfully:', data);
-                
-                // Remove temporary message
-                messagesContainer.removeChild(tempMessageElement);
-                
-                // Add confirmed message
-                const confirmedMessageElement = document.createElement('div');
-                confirmedMessageElement.className = 'message sent';
-                
-                // Format timestamp
-                const messageDate = new Date(data.data.created_at);
-                const confirmedTime = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                
-                let confirmedMessageContentHtml;
-                const confirmedContentObjectOrString = getParsedMessageContent(data.data.message);
-
-                if (typeof confirmedContentObjectOrString === 'object' && confirmedContentObjectOrString.type === 'file' && confirmedContentObjectOrString.url && confirmedContentObjectOrString.name) {
-                     confirmedMessageContentHtml = `
-                        <a href="${confirmedContentObjectOrString.url}" target="_blank" rel="noopener noreferrer" class="file-download-link">
-                            <i class="fas ${confirmedContentObjectOrString.file_type === 'pdf' ? 'fa-file-pdf' : 'fa-file-word'}"></i>
-                            ${confirmedContentObjectOrString.name}
-                            <small>(${(confirmedContentObjectOrString.size / 1024).toFixed(1)} KB)</small>
-                            <i class="fas fa-download ms-2"></i>
-                        </a>
-                    `;
+                if (data.data) {
+                    appendMessage(data.data);
+                    const messagesContainer = $('.chat-messages');
+                    messagesContainer.scrollTop(messagesContainer.prop("scrollHeight"));
                 } else {
-                    confirmedMessageContentHtml = data.data.message; // Display original message string
+                    console.error('Error sending message:', data.error);
+                    alert('Failed to send message.');
                 }
-
-                confirmedMessageElement.innerHTML = `
-                    <div class="message-header">
-                        <span class="message-time">${confirmedTime}</span>
-                    </div>
-                    <div class="message-content">
-                        ${confirmedMessageContentHtml}
-                    </div>
-                `;
-                messagesContainer.appendChild(confirmedMessageElement);
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
             })
             .catch(error => {
                 console.error('Error sending message:', error);
-                
-                // Change temporary message to indicate error
-                tempMessageElement.style.opacity = '1';
-                tempMessageElement.querySelector('.message-content').innerHTML += `
-                    <div class="text-danger mt-1" style="font-size: 0.8rem;">
-                        <i class="fas fa-exclamation-triangle"></i> Error sending message
-                    </div>
-                `;
+                alert('An error occurred while sending your message.');
             })
             .finally(() => {
-                // Re-enable send button
-                sendButton.disabled = false;
-                sendButton.innerHTML = 'Send <i class="fas fa-paper-plane"></i>';
+                sendButton.prop('disabled', false).html('Send <i class="fas fa-paper-plane"></i>');
             });
         }
         
-        // Set up polling for new messages and users list every 5 seconds
         function setupPolling() {
             setInterval(function() {
-                if (currentRoomId) {
-                    // Refresh chat messages
-                    loadChatMessages(currentRoomId);
-                    
-                    // Also refresh the users list to show new participants
-                    if (currentLearningStyleId) {
-                        loadLearningStyleUsers(currentLearningStyleId);
-                    }
+                if (currentGroupId) {
+                    loadLatestMessages();
+                    // Optionally refresh group members too if they can change
+                    // fetch(`http://127.0.0.1:8000/api/v1/chat/groups/${currentGroupId}/members`).then...
                 }
             }, 5000);
         }
-        
-        // Initialize after DOM is ready
-        $(document).ready(function() {
-            setupPolling();
-        });
 
         function setupFileInput() {
-            const attachButton = document.getElementById('attach-file-btn');
-            const fileInput = document.getElementById('file-input');
+            $('#attach-file-btn').on('click', () => {
+                $('#file-input').click();
+            });
 
-            if (attachButton) {
-                attachButton.addEventListener('click', () => {
-                    fileInput.click(); // Trigger hidden file input
-                });
-            }
+            $('#file-input').on('change', function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const allowedTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+                    const maxSize = 10 * 1024 * 1024; // 10MB
 
-            if (fileInput) {
-                fileInput.addEventListener('change', (event) => {
-                    const file = event.target.files[0];
-                    if (file) {
-                        // Validate file type
-                        const allowedTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-                        const maxSize = 10 * 1024 * 1024; // 10MB
-
-                        if (!allowedTypes.includes(file.type)) {
-                            alert('Invalid file type. Please upload PDF or DOCX files only.');
-                            fileInput.value = ''; // Reset file input
-                            return;
-                        }
-
-                        if (file.size > maxSize) {
-                            alert('File is too large. Maximum size is 10MB.');
-                            fileInput.value = ''; // Reset file input
-                            return;
-                        }
-                        
-                        uploadFileToCloudinary(file);
-                        fileInput.value = ''; // Reset file input after selection for re-upload
+                    if (!allowedTypes.includes(file.type)) {
+                        alert('Invalid file type. Please upload PDF or DOCX files only.');
+                        this.value = '';
+                        return;
                     }
-                });
-            }
+                    if (file.size > maxSize) {
+                        alert('File is too large. Maximum size is 10MB.');
+                        this.value = '';
+                        return;
+                    }
+                    
+                    uploadFileToCloudinary(file);
+                    this.value = '';
+                }
+            });
         }
 
         function uploadFileToCloudinary(file) {
-            // WARNING: This function now uses signed uploads with API Secret on the client-side.
-            // This is a significant security risk for public applications.
-
             const timestamp = Math.round((new Date).getTime()/1000);
-            const uploadFolder = 'chat_files'; // Specific folder for chat files
-            const accessMode = 'public';
-
+            const uploadFolder = 'chat_files';
             const formData = new FormData();
             formData.append('file', file);
             formData.append('folder', uploadFolder);
             formData.append('timestamp', timestamp);
-            formData.append('access_mode', accessMode);
             
-            // Generate signature
-            // Note: Parameters in signature string must be alphabetically sorted by parameter name
-            const signatureStr = `access_mode=${accessMode}&folder=${uploadFolder}&timestamp=${timestamp}${CLOUDINARY_CONFIG.apiSecret}`;
+            const signatureStr = `folder=${uploadFolder}&timestamp=${timestamp}${CLOUDINARY_CONFIG.apiSecret}`;
             const signature = CryptoJS.SHA1(signatureStr).toString();
             
             formData.append('signature', signature);
             formData.append('api_key', CLOUDINARY_CONFIG.apiKey);
-            // formData.append('upload_preset', CLOUDINARY_CONFIG.uploadPreset); // Not used for signed uploads
+            
+            // Temporary UI update
+            const messagesContainer = $('.chat-messages');
+            const tempFileMessageId = `temp_${Date.now()}`;
+            const tempFileMessageElement = `
+                <div id="${tempFileMessageId}" class="message sent" style="opacity: 0.7;">
+                    <div class="message-content">
+                        <i class="fas fa-spinner fa-spin"></i> Uploading ${file.name}...
+                    </div>
+                </div>`;
+            messagesContainer.append(tempFileMessageElement);
+            messagesContainer.scrollTop(messagesContainer.prop("scrollHeight"));
 
-            const messagesContainer = document.querySelector('.chat-messages');
-            const tempFileMessageElement = document.createElement('div');
-            tempFileMessageElement.className = 'message sent pending-upload';
-            tempFileMessageElement.style.opacity = '0.7';
-            const formattedTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-            tempFileMessageElement.innerHTML = `
-                <div class="message-header">
-                    <span class="message-time">${formattedTime}</span>
-                </div>
-                <div class="message-content">
-                    <i class="fas fa-spinner fa-spin"></i> Uploading ${file.name}...
-                </div>
-            `;
-            messagesContainer.appendChild(tempFileMessageElement);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-
-            // Using /auto/upload endpoint for signed uploads, similar to courses.html
             fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/auto/upload`, {
                 method: 'POST',
                 body: formData
             })
-            .then(response => {
-                if (!response.ok) {
-                    // Try to parse error from Cloudinary if response is not OK
-                    return response.json().then(errorData => {
-                        console.error('Cloudinary error response:', errorData);
-                        throw new Error(errorData.error?.message || `Upload failed with status: ${response.status}`);
-                    }).catch(parseError => {
-                        // If parsing errorData fails, throw a generic error
-                        console.error('Could not parse Cloudinary error response:', parseError);
-                        throw new Error(`Upload failed with status: ${response.status} and response was not valid JSON.`);
-                    });
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
-                if (tempFileMessageElement.parentNode === messagesContainer) {
-                    messagesContainer.removeChild(tempFileMessageElement);
-                }
-
+                $(`#${tempFileMessageId}`).remove();
                 if (data.secure_url) {
-                    console.log('File uploaded to Cloudinary (signed):', data);
-                    const userData = JSON.parse(sessionStorage.getItem('user'));
-                    
                     const fileMessagePayload = {
                         type: 'file',
                         name: data.original_filename || file.name,
@@ -1233,44 +830,16 @@
                         file_type: data.format || file.type.split('/')[1],
                         size: data.bytes 
                     };
-
-                    sendMessageToApi(userData, currentRoomId, JSON.stringify(fileMessagePayload));
+                    sendMessageToApi(currentUserId, currentGroupId, JSON.stringify(fileMessagePayload));
                 } else {
-                    // This else block might not be reached if errors are caught by !response.ok check
-                    console.error('Cloudinary signed upload error (no secure_url):', data);
-                    alert('File upload failed. Please try again. (Reason: No secure URL returned)');
-                    const errorElement = document.createElement('div');
-                    errorElement.className = 'message sent';
-                    errorElement.innerHTML = `
-                        <div class="message-header">
-                            <span class="message-time">${formattedTime}</span>
-                        </div>
-                        <div class="message-content" style="color: red;">
-                           Failed to upload ${file.name}.
-                        </div>
-                    `;
-                    messagesContainer.appendChild(errorElement);
-                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    console.error('Cloudinary upload error:', data);
+                    alert('File upload failed.');
                 }
             })
             .catch(error => {
-                if (tempFileMessageElement.parentNode === messagesContainer) {
-                    messagesContainer.removeChild(tempFileMessageElement);
-                }
-                console.error('Error uploading file (signed):', error);
-                alert(`Error uploading file: ${error.message}`);
-                const errorElement = document.createElement('div');
-                errorElement.className = 'message sent';
-                errorElement.innerHTML = `
-                    <div class="message-header">
-                        <span class="message-time">${formattedTime}</span>
-                    </div>
-                    <div class="message-content" style="color: red;">
-                       Error uploading ${file.name}.
-                    </div>
-                `;
-                messagesContainer.appendChild(errorElement);
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                $(`#${tempFileMessageId}`).remove();
+                console.error('Error uploading file:', error);
+                alert('Error uploading file.');
             });
         }
     </script>

@@ -314,7 +314,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
             "Environmental"
         ],
         "Look beyond current events—important drivers often emerge outside the usual policy space.",
-        "Tip: It’s better to collect too many drivers than miss a critical one.",
+        "Tip: It's better to collect too many drivers than miss a critical one.",
         "Driver identification is the foundation of most futures work."
     ]',
     null,
@@ -329,7 +329,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
         "Weak signals are early hints of significant future changes.",
         "They are often unclear, rare, or not well understood yet.",
         "Horizon Scanning helps identify these subtle trends.",
-        "Even if there’s no solid data, trust your intuition — a weak signal might grow into a major shift.",
+        "Even if there's no solid data, trust your intuition — a weak signal might grow into a major shift.",
         "Example: An unusual news article today could indicate a big future trend tomorrow."
     ]',
     null,
@@ -516,7 +516,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
             "The first ripple is the direct impact.",
             "Then, those ripples create new, smaller ripples, which are the indirect impacts (or \'second and third-order effects\')."
         ],
-        "This tool helps us see how one initial change “seed of change” can set off a chain reaction of consequences, both good and bad, that keep going and going."
+        "This tool helps us see how one initial change "seed of change" can set off a chain reaction of consequences, both good and bad, that keep going and going."
   ]',
   'https://res.cloudinary.com/dwn5t3o4j/image/upload/v1748186078/2.3_Implications_Analysis_Considerations_fzxlyt.png',
   '18 minutes'
@@ -1336,42 +1336,16 @@ INSERT INTO roles (role_name, description) VALUES
 INSERT INTO users (role_id, email, password, first_name, last_name) VALUES
 (3, 'admin@foresite.com', '$2y$10$nHipa0I9/v/SEy4HrI6mxOnBJ.a4kXnhgxyMC.2WaJnELzpikNiUi', 'System', 'Administrator');
 
--- Chat functionality tables
--- Chat rooms table for learning style specific chat rooms
-CREATE TABLE chat_rooms (
-    room_id INT PRIMARY KEY AUTO_INCREMENT,
-    learning_style_id INT NOT NULL,
-    room_name VARCHAR(100) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (learning_style_id) REFERENCES learning_styles(style_id)
-);
-
--- Chat messages table for storing chat messages
-CREATE TABLE chat_messages (
-    message_id INT PRIMARY KEY AUTO_INCREMENT,
-    room_id INT NOT NULL,
-    user_id INT NOT NULL,
-    message TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (room_id) REFERENCES chat_rooms(room_id),
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
-);
-
--- Initialize default chat rooms for each learning style
-INSERT INTO chat_rooms (learning_style_id, room_name) VALUES
-(1, 'Activist Learning Chat'),
-(2, 'Reflector Learning Chat'),
-(3, 'Theorist Learning Chat'),
-(4, 'Pragmatist Learning Chat');
-
 -- Table for groups of students in a course
 CREATE TABLE `groups` (
   group_id int PRIMARY KEY AUTO_INCREMENT,
   course_id int NOT NULL,
   group_name varchar(100) NOT NULL,
-  FOREIGN KEY (course_id) REFERENCES courses(course_id)
+  learning_style_id INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (course_id) REFERENCES courses(course_id),
+  FOREIGN KEY (learning_style_id) REFERENCES learning_styles(style_id)
 );
 
 -- Table to associate users with groups
@@ -1379,6 +1353,19 @@ CREATE TABLE group_members (
   group_member_id int PRIMARY KEY AUTO_INCREMENT,
   group_id int NOT NULL,
   user_id int NOT NULL,
-  FOREIGN KEY (group_id) REFERENCES `groups`(group_id),
-  FOREIGN KEY (user_id) REFERENCES users(user_id)
+  FOREIGN KEY (group_id) REFERENCES `groups`(group_id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+  UNIQUE KEY unique_user_group (user_id, group_id)
+);
+
+-- Chat messages table for storing chat messages
+CREATE TABLE chat_messages (
+    message_id INT PRIMARY KEY AUTO_INCREMENT,
+    group_id INT NOT NULL,
+    user_id INT NOT NULL,
+    message TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (group_id) REFERENCES `groups`(group_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );

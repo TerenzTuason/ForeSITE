@@ -37,7 +37,7 @@ class Group extends Model
      *
      * @var bool
      */
-    public $timestamps = false;
+    public $timestamps = true;
 
     /**
      * Get the course that the group belongs to.
@@ -53,5 +53,13 @@ class Group extends Model
     public function groupMembers(): HasMany
     {
         return $this->hasMany(GroupMember::class, 'group_id', 'group_id');
+    }
+
+    /**
+     * Get the messages for the group.
+     */
+    public function chatMessages(): HasMany
+    {
+        return $this->hasMany(ChatMessage::class, 'group_id', 'group_id');
     }
 } 

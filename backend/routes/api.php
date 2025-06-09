@@ -142,11 +142,13 @@ Route::prefix('v1')->group(function () {
     Route::get('module-progress/{moduleProgress}/assessment-progress', [ModuleAssessmentProgressController::class, 'getByModuleProgress']);
     
     // Chat functionality
-    Route::get('chat/room/learning-style/{styleId}', [ChatController::class, 'getChatRoomByLearningStyle']);
-    Route::get('chat/room/user/{userId}', [ChatController::class, 'getUserChatRoom']);
-    Route::get('chat/messages/{roomId}', [ChatController::class, 'getChatMessages']);
-    Route::post('chat/messages', [ChatController::class, 'sendMessage']);
-    Route::get('chat/users/learning-style/{styleId}', [ChatController::class, 'getUsersWithSameLearningStyle']);
+    Route::prefix('chat')->group(function () {
+        Route::get('courses/{course}/users/{user}/group', [ChatController::class, 'findOrCreateGroupForUser']);
+        Route::get('groups/{group}', [ChatController::class, 'getGroupChatInfo']);
+        Route::get('groups/{group}/messages', [ChatController::class, 'getChatMessages']);
+        Route::get('groups/{group}/members', [ChatController::class, 'getGroupMembers']);
+        Route::post('messages', [ChatController::class, 'sendMessage']);
+    });
 
     // Groups
     Route::apiResource('groups', GroupController::class);

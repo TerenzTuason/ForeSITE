@@ -14,7 +14,7 @@ class ChatMessage extends Model
     protected $primaryKey = 'message_id';
     
     protected $fillable = [
-        'room_id',
+        'group_id',
         'user_id',
         'message'
     ];
@@ -28,10 +28,10 @@ class ChatMessage extends Model
     }
 
     /**
-     * Get the chat room for this message
+     * Get the group for this message
      */
-    public function chatRoom(): BelongsTo
+    public function group(): BelongsTo
     {
-        return $this->belongsTo(ChatRoom::class, 'room_id', 'room_id');
+        return $this->belongsTo(Group::class, 'group_id', 'group_id');
     }
 }

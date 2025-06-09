@@ -14,6 +14,7 @@ use App\Models\AssessmentAttempt;
 use App\Models\Certificate;
 use App\Models\Feedback;
 use App\Models\AssessmentResult;
+use App\Models\GroupMember;
 
 class UserController extends Controller
 {
@@ -226,8 +227,10 @@ class UserController extends Controller
             return response()->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
         }
         
-        $feedback = Feedback::with(['module', 'faculty'])
-            ->where('student_id', $id)
+        $feedback = Feedback::with(['assessmentProgress.moduleAssessment', 'faculty'])
+            ->whereHas('assessmentProgress', function ($query) use ($id) {
+                $query->where('user_id', $id);
+            })
             ->get();
         
         return response()->json(['data' => $feedback], Response::HTTP_OK);
@@ -244,7 +247,7 @@ class UserController extends Controller
             return response()->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
         }
         
-        $feedback = Feedback::with(['module', 'student'])
+        $feedback = Feedback::with(['assessmentProgress.moduleAssessment', 'assessmentProgress.user'])
             ->where('faculty_id', $id)
             ->get();
         
@@ -274,5 +277,25 @@ class UserController extends Controller
         }
         
         return response()->json(['data' => $assessmentResults], Response::HTTP_OK);
+    }
+
+    /**
+     * Get the group for a specific user.
+     */
+    public function getGroup(string $id): JsonResponse
+    {
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        $groupMember = GroupMember::with('group.course')->where('user_id', $id)->first();
+
+        if (!$groupMember) {
+            return response()->json(['error' => 'User is not in any group'], Response::HTTP_NOT_FOUND);
+        }
+
+        return response()->json(['data' => $groupMember->group]);
     }
 }
