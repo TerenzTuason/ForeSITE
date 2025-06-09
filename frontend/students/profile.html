@@ -250,6 +250,85 @@
         let allLearningStyles = [];
         let allCourses = [];
         
+        async function reassignUserGroup(userId, oldCourseId, newCourseId, newLearningStyle) {
+            if (!oldCourseId || !newCourseId) {
+                console.warn("Cannot reassign group without old and new course IDs.");
+                return;
+            }
+
+            try {
+                // 1. Find and remove user from their current group in the old course
+                const oldGroupsResponse = await fetch(`http://127.0.0.1:8000/api/v1/groups?course_id=${oldCourseId}`);
+                if (oldGroupsResponse.ok) {
+                    const oldGroupsData = await oldGroupsResponse.json();
+                    const oldGroups = oldGroupsData.data || [];
+                    
+                    for (const group of oldGroups) {
+                        const member = group.group_members.find(m => m.user_id === userId);
+                        if (member) {
+                            // User found in a group, remove them
+                            await fetch(`http://127.0.0.1:8000/api/v1/group-members/remove`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    group_id: group.group_id,
+                                    user_id: userId
+                                })
+                            });
+                            console.log(`User ${userId} removed from group ${group.group_id}`);
+                            break; // Assume user is in only one group per course
+                        }
+                    }
+                }
+
+                // 2. Assign user to a new group in the new course
+                const assignResponse = await fetch(`http://127.0.0.1:8000/api/v1/groups?course_id=${newCourseId}`);
+                const assignData = await assignResponse.json();
+                const groups = assignData.data || [];
+
+                const targetGroup = groups.find(group => group.group_members && group.group_members.length < 5);
+
+                if (targetGroup) {
+                    // Add to existing group
+                    await fetch(`http://127.0.0.1:8000/api/v1/group-members`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ group_id: targetGroup.group_id, user_id: userId })
+                    });
+                    console.log(`User ${userId} added to existing group ${targetGroup.group_id}`);
+                } else {
+                    // Create a new group
+                    const newGroupNumber = groups.length + 1;
+                    const newGroupName = `${newLearningStyle.charAt(0).toUpperCase() + newLearningStyle.slice(1)} Group ${newGroupNumber}`;
+                    
+                    const createGroupResponse = await fetch(`http://127.0.0.1:8000/api/v1/groups`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ course_id: newCourseId, group_name: newGroupName })
+                    });
+
+                    if (createGroupResponse.ok) {
+                        const newGroupData = await createGroupResponse.json();
+                        const newGroupId = newGroupData.data.group_id;
+                        
+                        // Add user to the newly created group
+                        await fetch(`http://127.0.0.1:8000/api/v1/group-members`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ group_id: newGroupId, user_id: userId })
+                        });
+                        console.log(`User ${userId} added to new group ${newGroupId}`);
+                    } else {
+                        throw new Error('Failed to create a new group.');
+                    }
+                }
+            } catch (error) {
+                console.error('Error reassigning user group:', error);
+                // We can choose to throw the error to be caught by the calling function
+                throw new Error('Failed to reassign user to a new group.');
+            }
+        }
+        
         async function deleteAllStudentProgress(userId) {
             try {
                 // Deletion order is important due to foreign key constraints.
@@ -604,24 +683,37 @@
 
                 // 2. Assessment result (learning style) update
                 if (currentAssessmentResult && newLearningStyle && newLearningStyle !== currentAssessmentResult.result.learning_style) {
-                    // If learning style changes, delete all previous progress
-                    await deleteAllStudentProgress(userId);
-
+                    const oldCourseId = currentAssessmentResult.course_id;
                     const resultId = currentAssessmentResult.result_id;
-                    
-                    const assessmentUpdateData = JSON.parse(JSON.stringify(currentAssessmentResult));
-                    assessmentUpdateData.result.learning_style = newLearningStyle;
                     
                     // Find new course_id based on the new learning style
                     const newLearningStyleObject = allLearningStyles.find(style => style.style_name === newLearningStyle);
+                    let newCourseId = null;
+
                     if (newLearningStyleObject) {
                         const newStyleId = newLearningStyleObject.style_id;
                         const newCourse = allCourses.find(course => course.learning_style_id === newStyleId);
                         if (newCourse) {
-                            assessmentUpdateData.course_id = newCourse.course_id;
+                           newCourseId = newCourse.course_id;
                         } else {
                             console.warn(`No course found for learning style: ${newLearningStyle}`);
                         }
+                    }
+
+                    // Reassign user to a new group before deleting progress
+                    if (oldCourseId && newCourseId) {
+                        await reassignUserGroup(userId, oldCourseId, newCourseId, newLearningStyle);
+                    }
+
+                    // If learning style changes, delete all previous progress
+                    await deleteAllStudentProgress(userId);
+
+                    
+                    const assessmentUpdateData = JSON.parse(JSON.stringify(currentAssessmentResult));
+                    assessmentUpdateData.result.learning_style = newLearningStyle;
+                    
+                    if (newCourseId) {
+                        assessmentUpdateData.course_id = newCourseId;
                     }
 
                     delete assessmentUpdateData.course; // This is a nested object from GET, not a column in the table
