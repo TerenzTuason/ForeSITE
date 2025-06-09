@@ -404,9 +404,10 @@
 
             // API base URL
             const apiBaseUrl = 'http://127.0.0.1:8000/api/v1';
+            const facultyId = userData.user_id;
             
-            // Fetch students
-            fetchStudents();
+            // Fetch assigned learners
+            fetchAssignedLearners(facultyId);
             
             // Search functionality
             document.getElementById('searchInput').addEventListener('input', function(e) {
@@ -452,32 +453,45 @@
                 }
             });
             
-            // Function to fetch students
-            function fetchStudents() {
-                fetch(`${apiBaseUrl}/users`)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
+            // Function to fetch assigned learners for the faculty
+            async function fetchAssignedLearners(facultyId) {
+                const learnersListContainer = document.getElementById('learnersList');
+                try {
+                    const groupsResponse = await fetch(`${apiBaseUrl}/groups`);
+                    if (!groupsResponse.ok) {
+                        throw new Error('Failed to fetch groups.');
+                    }
+                    const groupsData = await groupsResponse.json();
+                    const allGroups = groupsData.data || [];
+
+                    const assignedStudents = new Map();
+
+                    allGroups.forEach(group => {
+                        if (group.assigned_faculty && Array.isArray(group.assigned_faculty)) {
+                            const isFacultyAssigned = group.assigned_faculty.some(faculty => faculty.user_id === facultyId);
+                            if (isFacultyAssigned) {
+                                if (group.group_members && Array.isArray(group.group_members)) {
+                                    group.group_members.forEach(member => {
+                                        if (member.user && !assignedStudents.has(member.user.user_id)) {
+                                            assignedStudents.set(member.user.user_id, member.user);
+                                        }
+                                    });
+                                }
+                            }
                         }
-                        return response.json();
-                    })
-                    .then(data => {
-                        // Filter users with student role
-                        const students = data.data.filter(user => 
-                            user.role && user.role.role_name === 'student'
-                        );
-                        
-                        // Update the learners list
-                        displayStudents(students);
-                    })
-                    .catch(error => {
-                        console.error('Error fetching students:', error);
-                        document.getElementById('learnersList').innerHTML = `
-                            <div class="alert alert-danger">
-                                Error loading students. Please try again later.
-                            </div>
-                        `;
                     });
+
+                    const students = Array.from(assignedStudents.values());
+                    displayStudents(students);
+
+                } catch (error) {
+                    console.error('Error fetching assigned learners:', error);
+                    learnersListContainer.innerHTML = `
+                        <div class="alert alert-danger">
+                            Error loading your assigned learners. Please try again later.
+                        </div>
+                    `;
+                }
             }
             
             // Function to display students in the sidebar
@@ -486,10 +500,18 @@
                 
                 if (students.length === 0) {
                     learnersListContainer.innerHTML = `
-                        <div class="alert alert-info">
-                            No students found.
+                        <div class="alert alert-info text-center p-4">
+                            <i class="fas fa-info-circle fa-2x mb-3"></i>
+                            <h5 class="fw-bold">No Assigned Learners</h5>
+                            <p class="mb-0">You are not currently assigned to any learner groups. <br>Please contact an administrator to be assigned.</p>
                         </div>
                     `;
+                     // Clear the main content area if no students are assigned
+                    document.getElementById('studentName').textContent = 'No Learners Assigned';
+                    document.getElementById('studentDepartment').textContent = 'Please contact an admin to be assigned to a group.';
+                    document.getElementById('module-progress-container').innerHTML = '';
+                    document.getElementById('assessment-progress-container').innerHTML = '';
+                    updateModuleStats([]); // Reset stats to 0
                     return;
                 }
                 
