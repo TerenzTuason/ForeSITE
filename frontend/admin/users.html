@@ -631,6 +631,11 @@
             const searchInput = document.getElementById('searchInput');
             const roleFilter = document.getElementById('roleFilter');
             
+            // Modal instances
+            const addUserModal = new bootstrap.Modal(document.getElementById('addUserModal'));
+            const assignGroupModal = new bootstrap.Modal(document.getElementById('assignGroupModal'));
+            const deleteUserModal = new bootstrap.Modal(document.getElementById('deleteUserModal'));
+            
             // API base URL
             const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
                 ? `http://${window.location.hostname}:8000/api/v1` 
@@ -1105,12 +1110,10 @@
                 document.getElementById('deleteUserId').value = userId;
                 document.getElementById('deleteUserName').textContent = userName || 'this user';
                 
-                const deleteModal = new bootstrap.Modal(document.getElementById('deleteUserModal'));
-                deleteModal.show();
+                deleteUserModal.show();
             };
             
             window.openAssignGroupModal = function(userId, userName) {
-                const modal = new bootstrap.Modal(document.getElementById('assignGroupModal'));
                 const user = allUsers.find(u => u.id === userId);
                 const isStudent = user && (user.role || '').toLowerCase() === 'student';
 
@@ -1162,7 +1165,7 @@
                     });
                 }
 
-                modal.show();
+                assignGroupModal.show();
             };
             
             // Handle Assign Group submission
@@ -1235,8 +1238,7 @@
                 } finally {
                     saveBtn.innerHTML = originalText;
                     saveBtn.disabled = false;
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('assignGroupModal'));
-                    modal.hide();
+                    assignGroupModal.hide();
                     await fetchUsers(); // This re-fetches all data and re-renders
                 }
             });
@@ -1317,8 +1319,7 @@
                         console.log('User created successfully:', data);
                         
                         // Close modal
-                        const modal = bootstrap.Modal.getInstance(document.getElementById('addUserModal'));
-                        modal.hide();
+                        addUserModal.hide();
                         
                         // Clear form
                         form.reset();
@@ -1384,8 +1385,7 @@
                     }
                     
                     // Close modal
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('deleteUserModal'));
-                    modal.hide();
+                    deleteUserModal.hide();
                     
                     // Show success message
                     const alertDiv = document.createElement('div');
