@@ -182,6 +182,9 @@
         border-bottom: 1px solid #eee;
         background: linear-gradient(135deg, var(--maroon) 0%, #600000 100%);
         color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
       }
 
       .content-title {
@@ -655,6 +658,7 @@
         <div class="content-container">
           <div class="content-header">
             <h2 class="content-title"></h2>
+            <span class="content-duration" style="font-size: 1rem; font-weight: 400;"></span>
           </div>
           <div class="content-body">
             <!-- Content will be loaded dynamically -->
@@ -1655,6 +1659,15 @@
               lessonScreen.screen_title ||
                 `Screen ${lessonScreen.screen_number}`
             );
+          }
+
+          // Update duration in the header
+          const durationSpan = $(".content-header .content-duration");
+          if (lessonScreen.screen_duration) {
+            durationSpan.text(`${lessonScreen.screen_duration} min`);
+            durationSpan.show();
+          } else {
+            durationSpan.hide();
           }
 
           // Create content HTML
