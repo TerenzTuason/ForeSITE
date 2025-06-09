@@ -23,7 +23,13 @@ class ChatController extends Controller
     public function findOrCreateGroupForUser(Request $request, $courseId, $userId)
     {
         try {
-            $user = User::findOrFail($userId);
+            $user = User::with('role')->findOrFail($userId);
+            
+            // Ensure the user is a student
+            if ($user->role->role_name !== 'student') {
+                return response()->json(['error' => 'Only students can be assigned to groups.'], 403);
+            }
+
             $course = Course::findOrFail($courseId);
 
             // Check if the user is already in a group for this course

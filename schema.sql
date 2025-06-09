@@ -314,7 +314,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
             "Environmental"
         ],
         "Look beyond current events—important drivers often emerge outside the usual policy space.",
-        "Tip: It's better to collect too many drivers than miss a critical one.",
+        "Tip: It’s better to collect too many drivers than miss a critical one.",
         "Driver identification is the foundation of most futures work."
     ]',
     null,
@@ -329,7 +329,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
         "Weak signals are early hints of significant future changes.",
         "They are often unclear, rare, or not well understood yet.",
         "Horizon Scanning helps identify these subtle trends.",
-        "Even if there's no solid data, trust your intuition — a weak signal might grow into a major shift.",
+        "Even if there’s no solid data, trust your intuition — a weak signal might grow into a major shift.",
         "Example: An unusual news article today could indicate a big future trend tomorrow."
     ]',
     null,
@@ -516,7 +516,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
             "The first ripple is the direct impact.",
             "Then, those ripples create new, smaller ripples, which are the indirect impacts (or \'second and third-order effects\')."
         ],
-        "This tool helps us see how one initial change "seed of change" can set off a chain reaction of consequences, both good and bad, that keep going and going."
+        "This tool helps us see how one initial change “seed of change” can set off a chain reaction of consequences, both good and bad, that keep going and going."
   ]',
   'https://res.cloudinary.com/dwn5t3o4j/image/upload/v1748186078/2.3_Implications_Analysis_Considerations_fzxlyt.png',
   '18 minutes'
@@ -1336,7 +1336,7 @@ INSERT INTO roles (role_name, description) VALUES
 INSERT INTO users (role_id, email, password, first_name, last_name) VALUES
 (3, 'admin@foresite.com', '$2y$10$nHipa0I9/v/SEy4HrI6mxOnBJ.a4kXnhgxyMC.2WaJnELzpikNiUi', 'System', 'Administrator');
 
--- Table for groups of students in a course
+-- Table for groups of students in a course (students only)
 CREATE TABLE `groups` (
   group_id int PRIMARY KEY AUTO_INCREMENT,
   course_id int NOT NULL,
@@ -1348,7 +1348,7 @@ CREATE TABLE `groups` (
   FOREIGN KEY (learning_style_id) REFERENCES learning_styles(style_id)
 );
 
--- Table to associate users with groups
+-- Table to associate users (students) with groups
 CREATE TABLE group_members (
   group_member_id int PRIMARY KEY AUTO_INCREMENT,
   group_id int NOT NULL,
@@ -1356,6 +1356,15 @@ CREATE TABLE group_members (
   FOREIGN KEY (group_id) REFERENCES `groups`(group_id) ON DELETE CASCADE,
   FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
   UNIQUE KEY unique_user_group (user_id, group_id)
+);
+
+-- Table to assign a faculty member to a group for supervision/grading
+CREATE TABLE faculty_assigned_groups (
+    faculty_id INT NOT NULL,
+    group_id INT NOT NULL,
+    PRIMARY KEY (faculty_id, group_id),
+    FOREIGN KEY (faculty_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (group_id) REFERENCES `groups`(group_id) ON DELETE CASCADE
 );
 
 -- Chat messages table for storing chat messages

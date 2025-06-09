@@ -18,7 +18,7 @@ class GroupController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $groups = Group::with('course', 'groupMembers.user');
+        $groups = Group::with('course', 'groupMembers.user', 'assignedFaculty');
 
         if ($request->has('course_id')) {
             $groups->where('course_id', $request->course_id);
@@ -50,7 +50,7 @@ class GroupController extends Controller
      */
     public function show(string $id): JsonResponse
     {
-        $group = Group::with('course', 'groupMembers.user')->find($id);
+        $group = Group::with('course', 'groupMembers.user', 'assignedFaculty')->find($id);
         
         if (!$group) {
             return response()->json(['error' => 'Group not found'], Response::HTTP_NOT_FOUND);

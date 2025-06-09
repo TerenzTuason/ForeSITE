@@ -500,6 +500,7 @@
                                 <th>Email</th>
                                 <th>Role</th>
                                 <th>Learning Style</th>
+                                <th class="text-center">Group</th>
                                 <th class="text-center">Action</th>
                             </tr>
                         </thead>
@@ -565,6 +566,36 @@
         </div>
     </div>
 
+    <!-- Assign Group Modal -->
+    <div class="modal fade" id="assignGroupModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Assign Groups for <span id="assignGroupUserName" class="fw-bold"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="assignGroupForm">
+                        <input type="hidden" id="assignGroupUserId">
+                        <p>Select the groups for this student:</p>
+                        <div id="group-checkboxes-container">
+                            <!-- Checkboxes will be dynamically inserted here -->
+                            <div class="text-center p-3">
+                                <div class="spinner-border spinner-border-sm" role="status">
+                                    <span class="visually-hidden">Loading groups...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="saveGroupAssignmentBtn">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Delete Confirmation Modal -->
     <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -610,34 +641,34 @@
             let itemsPerPage = 10;
             let filteredUsers = [];
             let allUsers = [];
+            let allGroups = [];
+            let userGroupMap = {};
             
             // Fetch users from API
             async function fetchUsers() {
                 try {
-                    const response = await fetch(`${API_BASE_URL}/users/`);
-                    if (!response.ok) {
-                        throw new Error(`Failed to fetch users: ${response.status} ${response.statusText}`);
+                    // Fetch users and groups in parallel
+                    const [usersResponse] = await Promise.all([
+                        fetch(`${API_BASE_URL}/users/`),
+                    ]);
+
+                    if (!usersResponse.ok) {
+                        throw new Error(`Failed to fetch users: ${usersResponse.status} ${usersResponse.statusText}`);
                     }
-                    const responseData = await response.json();
+                    const usersData = await usersResponse.json();
                     
-                    // Handle different API response structures
+                    // Handle different API response structures for users
                     let usersArray;
-                    
-                    if (Array.isArray(responseData)) {
-                        // If the API returns an array directly
-                        usersArray = responseData;
-                    } else if (responseData.data && Array.isArray(responseData.data)) {
-                        // If the API returns {data: [...]}
-                        usersArray = responseData.data;
-                    } else if (responseData.users && Array.isArray(responseData.users)) {
-                        // If the API returns {users: [...]}
-                        usersArray = responseData.users;
-                    } else if (responseData.results && Array.isArray(responseData.results)) {
-                        // If the API returns {results: [...]}
-                        usersArray = responseData.results;
+                    if (Array.isArray(usersData)) {
+                        usersArray = usersData;
+                    } else if (usersData.data && Array.isArray(usersData.data)) {
+                        usersArray = usersData.data;
+                    } else if (usersData.users && Array.isArray(usersData.users)) {
+                        usersArray = usersData.users;
+                    } else if (usersData.results && Array.isArray(usersData.results)) {
+                        usersArray = usersData.results;
                     } else {
-                        // If we can't determine the structure
-                        console.error('Unknown API response structure:', responseData);
+                        console.error('Unknown API response structure for users:', usersData);
                         throw new Error('Invalid API response format: Could not find user data');
                     }
                     
@@ -645,30 +676,18 @@
                     
                     // Transform each user object to match our expected format
                     allUsers = usersArray.map(user => {
-                        // Determine the name based on available fields
                         let userName = 'Unknown User';
-                        if (user.name) {
-                            userName = user.name;
-                        } else if (user.first_name || user.last_name) {
-                            userName = `${user.first_name || ''} ${user.last_name || ''}`.trim();
-                        } else if (user.username) {
-                            userName = user.username;
-                        }
+                        if (user.name) userName = user.name;
+                        else if (user.first_name || user.last_name) userName = `${user.first_name || ''} ${user.last_name || ''}`.trim();
+                        else if (user.username) userName = user.username;
                         
-                        // Determine user ID
                         const userId = user.id || user.user_id || user._id || null;
                         
-                        // Determine role
                         let userRole = '';
-                        if (typeof user.role === 'string') {
-                            userRole = user.role;
-                        } else if (user.role && user.role.role_name) {
-                            userRole = user.role.role_name;
-                        } else if (user.role && user.role.name) {
-                            userRole = user.role.name;
-                        } else if (user.role_name) {
-                            userRole = user.role_name;
-                        }
+                        if (typeof user.role === 'string') userRole = user.role;
+                        else if (user.role && user.role.role_name) userRole = user.role.role_name;
+                        else if (user.role && user.role.name) userRole = user.role.name;
+                        else if (user.role_name) userRole = user.role_name;
                         
                         return {
                             id: userId,
@@ -683,24 +702,16 @@
                         };
                     });
                     
+                    await fetchGroups();
+
                     filteredUsers = [...allUsers];
                     
-                    // Apply initial filtering
+                    // Hide spinner and show content
+                    loadingSpinner.classList.add('d-none');
                     applyFilters();
                     
-                    // Hide spinner
-                    loadingSpinner.classList.add('d-none');
-                    
-                    // Show either empty state or user list
-                    if (filteredUsers.length === 0) {
-                        emptyState.classList.remove('d-none');
-                    } else {
-                        userList.classList.remove('d-none');
-                        renderUsers();
-                        setupPagination();
-                    }
                 } catch (error) {
-                    console.error('Error fetching users:', error);
+                    console.error('Error fetching data:', error);
                     loadingSpinner.classList.add('d-none');
                     
                     let errorMessage = error.message;
@@ -731,6 +742,54 @@
                             </button>
                         </div>
                     `;
+                }
+            }
+
+            async function fetchGroups() {
+                try {
+                    const groupsResponse = await fetch(`${API_BASE_URL}/groups`);
+                    if (!groupsResponse.ok) return;
+
+                    const groupsData = await groupsResponse.json();
+                    let groupsArray = [];
+
+                    if (Array.isArray(groupsData)) groupsArray = groupsData;
+                    else if (groupsData.data && Array.isArray(groupsData.data)) groupsArray = groupsData.data;
+                    else if (groupsData.groups && Array.isArray(groupsData.groups)) groupsArray = groupsData.groups;
+
+                    allGroups = groupsArray;
+                    userGroupMap = {};
+
+                    allGroups.forEach(group => {
+                        // For students
+                        if (group.group_members && Array.isArray(group.group_members)) {
+                            group.group_members.forEach(member => {
+                                const userId = member.user_id || member.id;
+                                if (userId) {
+                                    if (!userGroupMap[userId]) userGroupMap[userId] = [];
+                                    userGroupMap[userId].push({
+                                        group_id: group.group_id,
+                                        group_name: group.group_name
+                                    });
+                                }
+                            });
+                        }
+                        // For faculty
+                        if (group.assigned_faculty && Array.isArray(group.assigned_faculty)) {
+                            group.assigned_faculty.forEach(faculty => {
+                                const userId = faculty.user_id || faculty.id;
+                                if (userId) {
+                                    if (!userGroupMap[userId]) userGroupMap[userId] = [];
+                                    userGroupMap[userId].push({
+                                        group_id: group.group_id,
+                                        group_name: group.group_name
+                                    });
+                                }
+                            });
+                        }
+                    });
+                } catch (e) {
+                    console.error('Failed to fetch and process groups', e);
                 }
             }
             
@@ -773,6 +832,7 @@
                     
                     // Create table row
                     const row = document.createElement('tr');
+                    row.className = 'align-middle';
                     
                     // Name column with avatar
                     const nameCell = document.createElement('td');
@@ -800,80 +860,115 @@
                         <span class="visually-hidden">Loading...</span>
                     </div>`;
                     
+                    // Group column
+                    const groupCell = document.createElement('td');
+                    groupCell.className = 'text-center';
+
+                    if (isStudent) {
+                        groupCell.innerHTML = `<div class="spinner-border spinner-border-sm text-secondary" role="status"><span class="visually-hidden">Loading...</span></div>`;
+                    } else { // For Faculty
+                        const userGroups = userGroupMap[user.id];
+                        if (userGroups && userGroups.length > 0) {
+                            groupCell.textContent = userGroups.map(g => g.group_name).join(', ');
+                        } else {
+                            groupCell.innerHTML = `<span class="text-muted">Not assigned</span>`;
+                        }
+                    }
+                    
                     // Action column
                     const actionCell = document.createElement('td');
                     actionCell.className = 'text-center';
-                    actionCell.innerHTML = `
-                        <button class="btn btn-delete" onclick="deleteUser(${user.id || 0}, '${safeUserName.replace(/'/g, "\\'")}')">
+                    
+                    let actionButtons = `
+                        <button class="btn btn-delete" onclick="deleteUser(${user.id || 0}, '${safeUserName.replace(/'/g, "\\'")}')" title="Delete User">
                             <i class="fas fa-trash fa-sm"></i>
                         </button>
                     `;
+
+                    if (isFaculty) {
+                        actionButtons += `
+                            <button class="btn btn-edit" onclick="openAssignGroupModal(${user.id || 0}, '${safeUserName.replace(/'/g, "\\'")}')" title="Assign Group">
+                                <i class="fas fa-users"></i>
+                            </button>
+                        `;
+                    }
+                    actionCell.innerHTML = `<div class="d-flex justify-content-center gap-2">${actionButtons}</div>`;
                     
                     // Append cells to row
                     row.appendChild(nameCell);
                     row.appendChild(emailCell);
                     row.appendChild(roleCell);
                     row.appendChild(learningStyleCell);
+                    row.appendChild(groupCell);
                     row.appendChild(actionCell);
                     
                     // Append row to table
                     tableBody.appendChild(row);
                     
                     // Fetch learning style for this user
-                    fetchLearningStyle(user.id, learningStyleCell, user.role);
+                    fetchLearningStyle(user.id, learningStyleCell, user.role, groupCell);
                 });
             }
             
             // Function to fetch learning style for a user
-            async function fetchLearningStyle(userId, cell, userRole) {
+            async function fetchLearningStyle(userId, cell, userRole, groupCell) {
                 if (!userId) {
                     cell.innerHTML = `<span class="text-muted">Not available</span>`;
+                    if (userRole.toLowerCase() === 'student') {
+                        groupCell.innerHTML = `<span class="text-muted">Not assigned</span>`;
+                    }
                     return;
                 }
                 
-                // For faculty, immediately show "Not applicable" without API call
-                if (userRole && userRole.toLowerCase() === 'faculty') {
+                const isStudent = userRole && userRole.toLowerCase() === 'student';
+
+                if (!isStudent) {
                     cell.innerHTML = `<span class="text-muted">Not applicable</span>`;
-                    return;
+                    return; // Group cell for faculty is handled in renderUsers
                 }
                 
                 try {
                     const response = await fetch(`${API_BASE_URL}/users/${userId}/assessment-results`);
                     
-                    if (!response.ok) {
-                        cell.innerHTML = `<span class="text-muted">Not assessed</span>`;
-                        return;
-                    }
-                    
-                    const data = await response.json();
-                    
                     let learningStyle = 'Not assessed';
                     let styleClass = '';
                     
-                    // Try to find the learning style in the response
-                    if (data && data.data && data.data.length > 0) {
-                        // Find the first assessment result with a learning style
-                        const resultWithStyle = data.data.find(result => 
-                            result.result && result.result.learning_style
-                        );
-                        
-                        if (resultWithStyle && resultWithStyle.result) {
-                            learningStyle = resultWithStyle.result.learning_style;
-                            // Set the appropriate CSS class based on the learning style
-                            styleClass = learningStyle.toLowerCase();
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data && data.data && data.data.length > 0) {
+                            const resultWithStyle = data.data.find(result => result.result && result.result.learning_style);
+                            if (resultWithStyle && resultWithStyle.result) {
+                                learningStyle = resultWithStyle.result.learning_style;
+                                styleClass = learningStyle.toLowerCase();
+                            }
                         }
                     }
-                    
-                    // Update the cell with the learning style
+
+                    // Update the style cell
                     if (styleClass) {
                         cell.innerHTML = `<span class="badge badge-learning-style ${styleClass}">${learningStyle}</span>`;
                     } else {
                         cell.innerHTML = `<span class="text-muted">${learningStyle}</span>`;
                     }
                     
+                    // Update the group cell for students
+                    const userGroups = userGroupMap[userId];
+                    if (userGroups && userGroups.length > 0) {
+                        const groupName = userGroups.map(g => g.group_name).join(', ');
+                        if (learningStyle !== 'Not assessed' && learningStyle) {
+                            const learningStyleInitial = learningStyle.charAt(0).toUpperCase();
+                            groupCell.textContent = `${learningStyleInitial} - ${groupName}`;
+                        } else {
+                            groupCell.textContent = groupName;
+                        }
+                    } else {
+                        groupCell.innerHTML = `<span class="text-muted">Not assigned</span>`;
+                    }
+                    
                 } catch (error) {
                     console.error('Error fetching learning style:', error);
                     cell.innerHTML = `<span class="text-danger">Error</span>`;
+                    groupCell.innerHTML = `<span class="text-danger">Error</span>`;
                 }
             }
             
@@ -1014,8 +1109,137 @@
                 deleteModal.show();
             };
             
-            // Initialize user list
-            fetchUsers();
+            window.openAssignGroupModal = function(userId, userName) {
+                const modal = new bootstrap.Modal(document.getElementById('assignGroupModal'));
+                const user = allUsers.find(u => u.id === userId);
+                const isStudent = user && (user.role || '').toLowerCase() === 'student';
+
+                document.getElementById('assignGroupUserName').textContent = userName;
+                document.getElementById('assignGroupUserId').value = userId;
+
+                const modalTitle = document.querySelector('#assignGroupModal .modal-title');
+                const modalBodyText = document.querySelector('#assignGroupModal .modal-body p');
+
+                if (isStudent) {
+                    modalTitle.innerHTML = `Assign Group for <span class="fw-bold">${userName}</span>`;
+                    modalBodyText.textContent = 'Select the group for this student:';
+                } else {
+                    modalTitle.innerHTML = `Assign Groups for Faculty <span class="fw-bold">${userName}</span>`;
+                    modalBodyText.textContent = 'Select the group(s) this faculty will manage:';
+                }
+
+                const container = document.getElementById('group-checkboxes-container');
+                container.innerHTML = ''; // Clear previous content
+
+                if (allGroups.length === 0) {
+                    container.innerHTML = '<p class="text-muted">No groups have been created yet.</p>';
+                } else {
+                    const userGroupIds = userGroupMap[userId] ? userGroupMap[userId].map(g => g.group_id) : [];
+                    
+                    allGroups.forEach(group => {
+                        const isChecked = userGroupIds.includes(group.group_id);
+                        const div = document.createElement('div');
+                        div.className = 'form-check';
+
+                        const input = document.createElement('input');
+                        input.className = 'form-check-input';
+                        input.type = isStudent ? 'radio' : 'checkbox';
+                        input.name = isStudent ? 'studentGroup' : `facultyGroup-${group.group_id}`;
+                        input.value = group.group_id;
+                        input.id = `group-check-${group.group_id}`;
+                        if (isChecked) {
+                            input.checked = true;
+                        }
+
+                        const label = document.createElement('label');
+                        label.className = 'form-check-label';
+                        label.htmlFor = `group-check-${group.group_id}`;
+                        label.textContent = escapeHtml(group.group_name);
+                        
+                        div.appendChild(input);
+                        div.appendChild(label);
+                        container.appendChild(div);
+                    });
+                }
+
+                modal.show();
+            };
+            
+            // Handle Assign Group submission
+            document.getElementById('saveGroupAssignmentBtn').addEventListener('click', async function() {
+                const userId = document.getElementById('assignGroupUserId').value;
+                const user = allUsers.find(u => u.id === parseInt(userId));
+                const isStudent = user && (user.role || '').toLowerCase() === 'student';
+
+                let selectedGroupIds = [];
+                if (isStudent) {
+                    const selectedRadio = document.querySelector('#group-checkboxes-container input[type="radio"]:checked');
+                    if (selectedRadio) {
+                        selectedGroupIds.push(parseInt(selectedRadio.value));
+                    }
+                } else {
+                    selectedGroupIds = Array.from(document.querySelectorAll('#group-checkboxes-container input[type="checkbox"]:checked')).map(cb => parseInt(cb.value));
+                }
+                
+                const currentGroupIds = userGroupMap[userId] ? userGroupMap[userId].map(g => g.group_id) : [];
+
+                const groupsToAdd = selectedGroupIds.filter(id => !currentGroupIds.includes(id));
+                const groupsToRemove = currentGroupIds.filter(id => !selectedGroupIds.includes(id));
+
+                const saveBtn = this;
+                const originalText = saveBtn.innerHTML;
+                saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...';
+                saveBtn.disabled = true;
+
+                try {
+                    let promises = [];
+                    if (isStudent) {
+                        const addPromises = groupsToAdd.map(groupId => {
+                            return fetch(`${API_BASE_URL}/group-members`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ user_id: parseInt(userId), group_id: groupId })
+                            });
+                        });
+                        const removePromises = groupsToRemove.map(groupId => {
+                            return fetch(`${API_BASE_URL}/group-members/remove`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ user_id: parseInt(userId), group_id: groupId })
+                            });
+                        });
+                        promises = [...addPromises, ...removePromises];
+                    } else { // Faculty logic
+                        const addPromises = groupsToAdd.map(groupId => {
+                            return fetch(`${API_BASE_URL}/faculty/assign-group`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ faculty_id: parseInt(userId), group_id: groupId })
+                            });
+                        });
+                        const removePromises = groupsToRemove.map(groupId => {
+                            return fetch(`${API_BASE_URL}/faculty/unassign-group`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ faculty_id: parseInt(userId), group_id: groupId })
+                            });
+                        });
+                        promises = [...addPromises, ...removePromises];
+                    }
+
+                    await Promise.all(promises);
+
+                } catch (error) {
+                    console.error('Error assigning groups:', error);
+                    alert('Failed to update group assignments.');
+                } finally {
+                    saveBtn.innerHTML = originalText;
+                    saveBtn.disabled = false;
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('assignGroupModal'));
+                    modal.hide();
+                    await fetchUsers(); // This re-fetches all data and re-renders
+                }
+            });
             
             // Update the Add User Form Submission
             document.getElementById('saveUserBtn').addEventListener('click', async function() {
@@ -1194,6 +1418,9 @@
                 e.preventDefault();
                 window.location.href = 'login.html';
             });
+            
+            // Initialize user list
+            fetchUsers();
         });
     </script>
 </body>

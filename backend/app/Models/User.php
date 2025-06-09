@@ -92,6 +92,14 @@ class User extends Authenticatable
     }
 
     /**
+     * The groups that the faculty is assigned to.
+     */
+    public function assignedGroups(): BelongsToMany
+    {
+        return $this->belongsToMany(Group::class, 'faculty_assigned_groups', 'faculty_id', 'group_id');
+    }
+
+    /**
      * Indicates if the model should be timestamped.
      *
      * @var bool

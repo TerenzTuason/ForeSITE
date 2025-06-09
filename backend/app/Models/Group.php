@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Group extends Model
 {
@@ -53,6 +54,22 @@ class Group extends Model
     public function groupMembers(): HasMany
     {
         return $this->hasMany(GroupMember::class, 'group_id', 'group_id');
+    }
+
+    /**
+     * Get the student members of the group.
+     */
+    public function members(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'group_members', 'group_id', 'user_id');
+    }
+
+    /**
+     * Get the faculty assigned to the group.
+     */
+    public function assignedFaculty(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'faculty_assigned_groups', 'group_id', 'faculty_id');
     }
 
     /**

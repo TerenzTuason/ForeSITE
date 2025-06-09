@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\ModuleAssessmentProgressController;
 use App\Http\Controllers\Api\ScoreController;
 use App\Http\Controllers\Api\GroupController;
 use App\Http\Controllers\Api\GroupMemberController;
+use App\Http\Controllers\FacultyController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -149,6 +150,10 @@ Route::prefix('v1')->group(function () {
         Route::get('groups/{group}/members', [ChatController::class, 'getGroupMembers']);
         Route::post('messages', [ChatController::class, 'sendMessage']);
     });
+
+    // Faculty
+    Route::post('faculty/assign-group', [FacultyController::class, 'assignGroup']);
+    Route::post('faculty/unassign-group', [FacultyController::class, 'unassignGroup']);
 
     // Groups
     Route::apiResource('groups', GroupController::class);
