@@ -1333,41 +1333,63 @@
             console.log(`Checking co-learner progress for user ${currentUserId}, course ${courseId}, module ${moduleNumber}`);
 
             try {
-                // Step 1: Fetch all module progress data.
+                // Step 1: Find the current user's group for the course
+                const groupsRes = await fetch(`http://127.0.0.1:8000/api/v1/groups?course_id=${courseId}`);
+                if (!groupsRes.ok) throw new Error('Failed to fetch groups for the course.');
+                const groupsPayload = await groupsRes.json();
+                const allGroups = groupsPayload.data;
+
+                const currentUserGroup = allGroups.find(g =>
+                    g.group_members && g.group_members.some(m => {
+                        const memberUserId = m.user ? m.user.user_id : m.user_id;
+                        return memberUserId == currentUserId;
+                    })
+                );
+
+                if (!currentUserGroup) {
+                    console.log("User is not in any group for this course. Skipping co-learner check.");
+                    return { allowed: true };
+                }
+                
+                const groupMemberIds = currentUserGroup.group_members.map(m => m.user ? m.user.user_id : m.user_id);
+
+                // Step 2: Fetch all module progress data.
                 const allProgressRes = await fetch('http://127.0.0.1:8000/api/v1/module-progress');
                 if (!allProgressRes.ok) throw new Error('Failed to fetch module progress data.');
                 const allProgressPayload = await allProgressRes.json();
                 const allProgress = allProgressPayload.data;
 
-                // Step 2: Filter for progress in the same course and module.
-                const relevantProgress = allProgress.filter(p =>
-                    p.course_id === courseId &&
-                    p.module_number === moduleNumber
-                );
+                // Step 3: Check progress for each co-learner in the group.
+                const coLearnerIds = groupMemberIds.filter(id => id != currentUserId);
 
-                const coLearnersProgress = relevantProgress.filter(p => p.user_id !== currentUserId);
-
-                if (coLearnersProgress.length === 0) {
-                    console.log("No other learners found in this course module.");
+                if (coLearnerIds.length === 0) {
+                    console.log("No other co-learners found in this group.");
                     return { allowed: true };
                 }
 
-                // Step 3: Fetch user data to get names for the log/alert.
+                // Create a map of progress records for this module for efficient lookup.
+                const progressMap = new Map(allProgress
+                    .filter(p => p.course_id === courseId && p.module_number === moduleNumber)
+                    .map(p => [p.user_id, p])
+                );
+                
+                // Step 4: Fetch user data to get names for the log/alert.
                 const allUsersRes = await fetch(`http://127.0.0.1:8000/api/v1/users`);
                 if (!allUsersRes.ok) throw new Error('Failed to fetch user data for names.');
                 const allUsersPayload = await allUsersRes.json();
                 const userMap = new Map(allUsersPayload.data.map(u => [u.user_id, `${u.first_name} ${u.last_name}`]));
                 
-                // Step 4: Check progress for each co-learner.
+                // Step 5: Check progress for each co-learner in the group.
                 const waitingFor = [];
                 const coLearnerProgressDetails = [];
 
-                for (const progress of coLearnersProgress) {
-                    const userName = userMap.get(progress.user_id) || `User ${progress.user_id}`;
-                    const userProgress = progress.progress_percentage || 0;
+                for (const coLearnerId of coLearnerIds) {
+                    const progressRecord = progressMap.get(coLearnerId);
+                    const userProgress = progressRecord ? (progressRecord.progress_percentage || 0) : 0;
+                    const userName = userMap.get(coLearnerId) || `User ${coLearnerId}`;
 
                     coLearnerProgressDetails.push({
-                        'Co-Learner': `${userName} (ID: ${progress.user_id})`,
+                        'Co-Learner': `${userName} (ID: ${coLearnerId})`,
                         'Module Progress (%)': userProgress,
                         'Sufficient Progress (>=80%)': userProgress >= 80 ? 'Yes' : 'No'
                     });
@@ -1378,7 +1400,7 @@
                 }
 
                 // Log the progress table
-                console.log("--- Co-Learner Module Progress Check ---");
+                console.log(`--- Co-Learner Module Progress Check (Group: ${currentUserGroup.group_name}) ---`);
                 console.table(coLearnerProgressDetails);
                 console.log("----------------------------------------");
 
@@ -1386,7 +1408,7 @@
                     return { allowed: false, waitingFor: waitingFor };
                 }
 
-                console.log("All co-learners have sufficient progress.");
+                console.log("All co-learners in the group have sufficient progress.");
                 return { allowed: true };
 
             } catch (error) {
