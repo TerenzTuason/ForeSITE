@@ -18,8 +18,6 @@ use App\Http\Controllers\ChatController;
 use App\Http\Controllers\Api\ModuleAssessmentController;
 use App\Http\Controllers\Api\ModuleAssessmentProgressController;
 use App\Http\Controllers\Api\ScoreController;
-use App\Http\Controllers\Api\GroupController;
-use App\Http\Controllers\Api\GroupMemberController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -147,15 +145,6 @@ Route::prefix('v1')->group(function () {
     Route::get('chat/messages/{roomId}', [ChatController::class, 'getChatMessages']);
     Route::post('chat/messages', [ChatController::class, 'sendMessage']);
     Route::get('chat/users/learning-style/{styleId}', [ChatController::class, 'getUsersWithSameLearningStyle']);
-
-    // Groups
-    Route::apiResource('groups', GroupController::class);
-    Route::get('groups/{group}/members', [GroupController::class, 'getGroupMembers']);
-
-    // Group Members
-    Route::post('group-members', [GroupMemberController::class, 'store']);
-    Route::delete('group-members/{group_member}', [GroupMemberController::class, 'destroy']);
-    Route::post('group-members/remove', [GroupMemberController::class, 'removeMember']);
 
     // Scores routes
     Route::prefix('scores')->group(function () {

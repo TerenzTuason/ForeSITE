@@ -688,6 +688,8 @@
                   return;
                 }
 
+                console.log("All questions answered. Starting submission process...");
+
                 // Send answers to prediction API
                 fetch("http://127.0.0.1:5000/predict", {
                   method: "POST",
@@ -696,12 +698,20 @@
                   },
                   body: JSON.stringify({ answers: savedAnswers }),
                 })
-                  .then((response) => response.json())
+                  .then((response) => {
+                    console.log("Prediction API response received:", response);
+                    if (!response.ok) {
+                      throw new Error(`Prediction API failed with status: ${response.status}`);
+                    }
+                    return response.json();
+                  })
                   .then((data) => {
+                    console.log("Prediction successful. Learning style:", data.learning_style);
                     // Fetch courses and find matching learning style
                     fetch("http://127.0.0.1:8000/api/v1/courses")
                       .then((response) => response.json())
                       .then((coursesData) => {
+                        console.log("Courses fetched successfully.");
                         // Find the course matching the predicted learning style
                         const matchingCourse = coursesData.data.find(
                           (course) =>
@@ -736,40 +746,50 @@
                               result: data,
                             }),
                           })
-                          .then((response) => {
-                            // Log the request payload
-                            console.log('Request payload:', {
-                              first_name: firstName,
-                              last_name: lastName,
-                              department: department,
-                              user_id: userData.user_id,
-                              course_id: matchingCourse.course_id,
-                              answers: {
-                                answers: savedAnswers,
-                              },
-                              result: data,
-                            });
+                          .then(response => response.json())
+                          .then(assessmentResult => {
+                              if (!assessmentResult.data || !assessmentResult.data.result_id) {
+                                  throw new Error('Failed to get assessment result ID from response.');
+                              }
+                              
+                              console.log('Assessment result stored successfully:', assessmentResult);
 
-                            if (!response.ok) {
-                              return response.json().then((err) => {
-                                // Log the error details
-                                console.error('Server validation errors:', err);
-                                throw new Error(
-                                  err.error
-                                    ? JSON.stringify(err.error)
-                                    : "Failed to store assessment results"
-                                );
+                              // Now, create the student profile
+                              const profilePayload = {
+                                  user_id: userData.user_id,
+                                  dominant_learning_style_id: matchingCourse.learning_style_id,
+                                  course_id: matchingCourse.course_id, // Pass course_id for group assignment
+                              };
+
+                              return fetch("http://127.0.0.1:8000/api/v1/student-profiles", {
+                                  method: "POST",
+                                  headers: {
+                                      "Content-Type": "application/json",
+                                      "Accept": "application/json",
+                                  },
+                                  body: JSON.stringify(profilePayload),
                               });
-                                                         }
-                             // Store the learning style in session storage to be used on the dashboard
-                             sessionStorage.setItem('learning_style', data.learning_style.toLowerCase());
-                             // Redirect to dashboard
-                             window.location.href = "dashboard.html";
+                          })
+                          .then(profileResponse => {
+                            if (!profileResponse.ok) {
+                              return profileResponse.json().then(err => {
+                                console.error('Error creating student profile:', err);
+                                throw new Error(err.error ? JSON.stringify(err.error) : 'Failed to create student profile.');
+                              });
+                            }
+                            return profileResponse.json();
+                          })
+                          .then(profileResult => {
+                              console.log('Student profile created successfully:', profileResult);
+                              // Store the learning style in session storage to be used on the dashboard
+                              sessionStorage.setItem('learning_style', data.learning_style.toLowerCase());
+                              // Redirect to dashboard
+                              window.location.href = "dashboard.html";
                            })
                            .catch((error) => {
-                            console.error('Error storing assessment results:', error);
+                            console.error('Error during submission process:', error);
                             alert(
-                              "An error occurred while storing your assessment results. Please try again."
+                              "An error occurred while processing your results. Please check the console for details and try again."
                             );
                           });
                         } else {

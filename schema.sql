@@ -58,6 +58,7 @@ CREATE TABLE student_profiles (
     profile_id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL UNIQUE,
     dominant_learning_style_id INT,
+    group_id INT NULL,
     profile_created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     last_updated TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id),
