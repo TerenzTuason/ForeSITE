@@ -733,9 +733,25 @@
                         }
                     })
                     .catch(error => {
-                        console.error(`Error fetching module progress for user ${userId}:`, error);
                         const container = document.getElementById('module-progress-container');
-                        container.innerHTML = '<div class="alert alert-danger">Error loading module progress.</div>';
+                        if (error.message === 'No enrollments found for user') {
+                            console.log(`User ${userId} not enrolled in any course yet.`);
+                            updateModuleStats([]); // Reset stats to 0
+
+                            container.innerHTML = ''; // Clear previous content
+                            const moduleTitle = document.createElement('h2');
+                            moduleTitle.className = 'section-title';
+                            moduleTitle.textContent = 'Module Progress';
+                            container.appendChild(moduleTitle);
+
+                            const noEnrollmentMessage = document.createElement('div');
+                            noEnrollmentMessage.className = 'alert alert-info';
+                            noEnrollmentMessage.textContent = 'Student not yet enrolled.';
+                            container.appendChild(noEnrollmentMessage);
+                        } else {
+                            console.error(`Error fetching module progress for user ${userId}:`, error);
+                            container.innerHTML = '<div class="alert alert-danger">Error loading module progress.</div>';
+                        }
                     });
             }
             
