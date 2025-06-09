@@ -761,10 +761,8 @@
                                 );
                               });
                                                          }
-                             // Store the learning style in session storage to be used on the dashboard
-                             sessionStorage.setItem('learning_style', data.learning_style.toLowerCase());
-                             // Redirect to dashboard
-                             window.location.href = "dashboard.html";
+                              // After successful assessment, assign to a group
+                              assignUserToGroup(userData.user_id, matchingCourse.course_id, data.learning_style);
                            })
                            .catch((error) => {
                             console.error('Error storing assessment results:', error);
@@ -817,7 +815,71 @@
           });
         }
 
-        // We're removing this function as it will now be on the dashboard page
+        function assignUserToGroup(userId, courseId, learningStyle) {
+          const redirect = () => {
+            sessionStorage.setItem('learning_style', learningStyle.toLowerCase());
+            window.location.href = "dashboard.html";
+          };
+
+          fetch(`http://127.0.0.1:8000/api/v1/groups?course_id=${courseId}`)
+            .then(response => response.json())
+            .then(groupsData => {
+              const groups = groupsData.data || [];
+              
+              const targetGroup = groups.find(group => group.group_members && group.group_members.length < 5);
+
+              if (targetGroup) {
+                addUserToGroup(userId, targetGroup.group_id, redirect);
+              } else {
+                const newGroupNumber = groups.length + 1;
+                const newGroupName = `${learningStyle} Group ${newGroupNumber}`;
+                createGroupAndAddUser(userId, courseId, newGroupName, redirect);
+              }
+            })
+            .catch(error => {
+              console.error("Error fetching groups:", error);
+              alert("An error occurred during group assignment. Please contact support.");
+              redirect(); // Redirect even if group assignment fails
+            });
+        }
+
+        function createGroupAndAddUser(userId, courseId, groupName, callback) {
+          fetch("http://127.0.0.1:8000/api/v1/groups", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Accept: "application/json" },
+            body: JSON.stringify({ course_id: courseId, group_name: groupName }),
+          })
+          .then(response => response.json())
+          .then(newGroupData => {
+            if (newGroupData.error) throw new Error(JSON.stringify(newGroupData.error));
+            const newGroupId = newGroupData.data.group_id;
+            addUserToGroup(userId, newGroupId, callback);
+          })
+          .catch(error => {
+            console.error('Error creating group:', error);
+            alert('Failed to create a new group. Please contact support.');
+            callback();
+          });
+        }
+
+        function addUserToGroup(userId, groupId, callback) {
+          fetch("http://127.0.0.1:8000/api/v1/group-members", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Accept: "application/json" },
+            body: JSON.stringify({ user_id: userId, group_id: groupId }),
+          })
+          .then(response => response.json())
+          .then(membershipData => {
+            if (membershipData.error) throw new Error(JSON.stringify(membershipData.error));
+            console.log(`User ${userId} added to group ${groupId}`);
+            callback();
+          })
+          .catch(error => {
+            console.error('Error adding user to group:', error);
+            alert('Failed to add you to a group. Please contact support.');
+            callback();
+          });
+        }
       });
     </script>
   </body>
