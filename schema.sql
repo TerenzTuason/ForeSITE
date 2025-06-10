@@ -1416,8 +1416,8 @@ CREATE TABLE `groups` (
   learning_style_id INT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE,
-  FOREIGN KEY (learning_style_id) REFERENCES learning_styles(style_id) ON DELETE CASCADE
+  FOREIGN KEY (course_id) REFERENCES courses(course_id),
+  FOREIGN KEY (learning_style_id) REFERENCES learning_styles(style_id)
 );
 
 -- Table to associate users with groups
@@ -1428,6 +1428,15 @@ CREATE TABLE group_members (
   FOREIGN KEY (group_id) REFERENCES `groups`(group_id) ON DELETE CASCADE,
   FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
   UNIQUE KEY unique_user_group (user_id, group_id)
+);
+
+-- Table to assign a faculty member to a group for supervision/gradingAdd commentMore actions
+CREATE TABLE faculty_assigned_groups (
+    faculty_id INT NOT NULL,
+    group_id INT NOT NULL,
+    PRIMARY KEY (faculty_id, group_id),
+    FOREIGN KEY (faculty_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (group_id) REFERENCES `groups`(group_id) ON DELETE CASCADE
 );
 
 -- Chat messages table for storing chat messages
