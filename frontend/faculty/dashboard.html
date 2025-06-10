@@ -405,7 +405,9 @@
             fetchModuleProgressStats();
 
             // Fetch notifications
-            fetchNotifications(userData.user_id);
+            if (userData && userData.user_id) {
+                fetchNotifications(userData.user_id);
+            }
             
             // Function to fetch students
             function fetchStudents() {
@@ -558,7 +560,7 @@
                     });
             }
 
-            // Function to fetch notifications
+            // Function to fetch and display notifications
             function fetchNotifications(userId) {
                 const notificationList = document.getElementById('notificationList');
                 notificationList.innerHTML = '<div class="notification-item empty"><p>Loading notifications...</p></div>';
@@ -582,15 +584,24 @@
                                 const isReadClass = notification.is_read ? 'read' : 'unread';
                                 const iconClass = notification.is_read ? 'fa-check-circle' : 'fa-edit';
 
-                                // Very basic keyword detection for styling
-                                let actionButton = '<a href="learners.html" class="btn btn-sm">View</a>';
-                                if (notification.message.toLowerCase().includes('scoring')) {
-                                    actionButton = '<a href="#" class="btn btn-sm">Score Now</a>';
-                                }
-
                                 // Date formatting
                                 const notificationDate = new Date(notification.created_at);
                                 const timeAgo = getTimeAgo(notificationDate);
+
+                                // Logic to create the correct link
+                                let actionButton = '';
+                                const message = notification.message;
+                                const studentMatch = message.match(/Student (.*?) has submitted/);
+                                const assessmentMatch = message.match(/assessment '(.*?)'/);
+
+                                if (studentMatch && studentMatch[1] && assessmentMatch && assessmentMatch[1]) {
+                                    const studentName = studentMatch[1];
+                                    const assessmentTitle = assessmentMatch[1];
+                                    actionButton = `<a href="learners.html?student_name=${encodeURIComponent(studentName)}&assessment_title=${encodeURIComponent(assessmentTitle)}" class="btn btn-sm">View Submission</a>`;
+                                } else {
+                                    // Fallback for other notifications
+                                    actionButton = `<a href="learners.html" class="btn btn-sm">View Learners</a>`;
+                                }
 
                                 item.innerHTML = `
                                     <div class="notification-icon">

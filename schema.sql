@@ -353,7 +353,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
   'Identifying Weak Signals',
   null,
   null,
-  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1749389236/1.4_Identifying_Weak_Signals_lo6qbb.mp4',
+  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1749564558/1.4_Identifying_Weak_Signals_imaqwk.mp4',
   '3 minutes 5 seconds'
 );
 
@@ -377,7 +377,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
   'Linking Futures Thinking to the Policy Cycle',
   null,
   null,
-  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1749389050/1.5_Linking_Futures_Thinking_to_the_Policy_Cycle_pqfozn.mp4',
+  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1749566067/1.5_Linking_Futures_Thinking_to_the_Policy_Cycle_1_vokxbt.mp4',
   '1 minute 54 seconds'
 );
 
@@ -1454,9 +1454,11 @@ CREATE TABLE chat_messages (
 CREATE TABLE notifications (
   notification_id INT PRIMARY KEY AUTO_INCREMENT,
   user_id INT NOT NULL,
+  sender_id INT NULL,
   message TEXT NOT NULL,
   is_read BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+  FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+  FOREIGN KEY (sender_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
