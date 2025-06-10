@@ -17,6 +17,7 @@ class Notification extends Model
         'sender_id',
         'message',
         'is_read',
+        'url',
     ];
 
     protected $casts = [

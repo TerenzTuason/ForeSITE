@@ -90,7 +90,7 @@ class ModuleAssessmentProgressController extends Controller
                 }
 
                 if ($faculties->isNotEmpty()) {
-                    $message = "Student {$studentName} has submitted the assessment '{$assessmentTitle}'.";
+                    $message = "{$studentName} has submitted the assessment '{$assessmentTitle}'.";
                     foreach ($faculties as $faculty) {
                         Notification::create([
                             'user_id' => $faculty->user_id,
