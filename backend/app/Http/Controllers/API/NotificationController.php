@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Notification;
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -15,9 +16,13 @@ class NotificationController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index(Request $request, User $user)
+    public function index(Request $request)
     {
-        $notifications = Notification::where('user_id', $user->user_id)->orderBy('created_at', 'desc')->get();
+        $user = Auth::user();
+        $notifications = Notification::where('user_id', $user->user_id)
+            ->with(['user', 'role', 'faculty'])
+            ->orderBy('created_at', 'desc')->get();
+            
         return response()->json(['data' => $notifications]);
     }
 
@@ -32,9 +37,12 @@ class NotificationController extends Controller
         $request->validate([
             'user_id' => 'required|exists:users,user_id',
             'message' => 'required|string',
+            'role_id' => 'required|exists:roles,role_id',
+            'faculty_id' => 'nullable|exists:users,user_id',
         ]);
 
         $notification = Notification::create($request->all());
+        $notification->load(['user', 'role', 'faculty']);
 
         return response()->json(['data' => $notification], 201);
     }
@@ -47,6 +55,7 @@ class NotificationController extends Controller
      */
     public function show(Notification $notification)
     {
+        $notification->load(['user', 'role', 'faculty']);
         return response()->json(['data' => $notification]);
     }
 
@@ -64,6 +73,7 @@ class NotificationController extends Controller
         ]);
 
         $notification->update($request->all());
+        $notification->load(['user', 'role', 'faculty']);
 
         return response()->json(['data' => $notification]);
     }
@@ -107,5 +117,42 @@ class NotificationController extends Controller
         $count = Notification::where('user_id', $user->user_id)->where('is_read', false)->count();
 
         return response()->json(['data' => ['count' => $count]]);
+    }
+
+    /**
+     * Get notifications for a specific faculty member.
+     *
+     * @param  \App\Models\User  $faculty
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getNotificationsByFaculty(User $faculty)
+    {
+        // Ensure the user is a faculty member
+        if ($faculty->role->role_name !== 'faculty') {
+            return response()->json(['message' => 'User is not a faculty member.'], 403);
+        }
+
+        $notifications = Notification::where('faculty_id', $faculty->user_id)
+            ->with(['user', 'role', 'faculty'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json(['data' => $notifications]);
+    }
+
+     /**
+     * Get notifications for a specific role.
+     *
+     * @param  \App\Models\Role  $role
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getNotificationsByRole(Role $role)
+    {
+        $notifications = Notification::where('role_id', $role->role_id)
+            ->with(['user', 'role', 'faculty'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json(['data' => $notifications]);
     }
 } 

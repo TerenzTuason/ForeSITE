@@ -16,6 +16,8 @@ class Notification extends Model
         'user_id',
         'message',
         'is_read',
+        'role_id',
+        'faculty_id',
     ];
 
     protected $casts = [
@@ -25,5 +27,15 @@ class Notification extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class, 'role_id');
+    }
+
+    public function faculty()
+    {
+        return $this->belongsTo(User::class, 'faculty_id');
     }
 } 
