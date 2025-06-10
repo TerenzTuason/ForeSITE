@@ -8,6 +8,10 @@ CORS(app)
 # Initialize the classifier
 classifier = LearningStyleClassifier()
 
+@app.route('/')
+def index():
+    return jsonify({'message': 'Welcome to the Learning Style Prediction API'})
+
 @app.route('/predict', methods=['POST'])
 def predict_learning_style():
     try:

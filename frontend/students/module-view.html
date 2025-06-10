@@ -1475,6 +1475,19 @@
 
           moduleProgressData.forEach((module) => {
             const isLocked = isModuleLocked(module.module_number);
+            let durationText = "";
+            if (module.module_title === "Foundations of Futures Thinking") {
+              durationText = "2 hours 40minutes";
+            } else if (
+              module.module_title === "Mapping Change and Building Insight"
+            ) {
+              durationText = "3 hours 30 minutes";
+            } else if (module.module_title === "Creating Strategic Pathways") {
+              durationText = "3 hours 30minutes";
+            }
+            const durationHtml = durationText
+              ? `<small class="d-block fw-normal" style="margin-top: 4px;">${durationText}</small>`
+              : "";
             // Create module item with collapsible indicator
             const moduleItem = $(`
                         <li class="module-item" id="module-${
@@ -1490,13 +1503,16 @@
                                 : ""
                             }">
                                 <i class="fas ${
-                                  isLocked 
-                                    ? "fa-lock" 
+                                  isLocked
+                                    ? "fa-lock"
                                     : module.status === "completed"
                                     ? "fa-check-circle"
                                     : "fa-book"
                                 }"></i>
-                                <span>${module.module_title}</span>
+                                <div class="flex-grow-1">
+                                  <span>${module.module_title}</span>
+                                  ${durationHtml}
+                                </div>
                                 <i class="fas fa-chevron-down ms-auto"></i>
                                 ${
                                   module.status === "completed"
@@ -2110,12 +2126,31 @@
               // If screen is completed, disable continue button
               btnContinue.prop("disabled", true);
             } else {
-              // For videos, the button is enabled when the video is complete
-              // For non-video content, enable the button immediately
+              // For videos with tracking, disable the continue button until the video is finished.
+              // For other content, the button is enabled.
+              const lessonScreen = allLessonScreens.find(
+                (screen) => screen.screen_number === currentId
+              );
+
+              let isTrackableVideo = false;
               if (
-                !currentId.includes("video") ||
-                currentItem.is(":first-child")
+                lessonScreen &&
+                lessonScreen.screen_url &&
+                lessonScreen.screen_url.includes("cloudinary")
               ) {
+                const isVideoByUrl =
+                  lessonScreen.screen_url.match(/\.(mp4|webm|mov)$/i);
+                const isVideoByScreenNumber =
+                  lessonScreen.screen_number &&
+                  lessonScreen.screen_number.includes("-video");
+                if (isVideoByUrl || isVideoByScreenNumber) {
+                  isTrackableVideo = true;
+                }
+              }
+
+              if (isTrackableVideo) {
+                btnContinue.prop("disabled", true);
+              } else {
                 btnContinue.prop("disabled", false);
               }
 

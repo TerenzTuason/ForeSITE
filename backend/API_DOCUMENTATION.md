@@ -430,6 +430,61 @@ The API provides CRUD (Create, Read, Update, Delete) operations for the main ent
 }
 ```
 
+### 21. Notifications (`notifications` table)
+- **GET /api/v1/users/{user}/notifications**: Get all notifications for a user.
+- **POST /api/v1/notifications**: Create a new notification.
+- **GET /api/v1/notifications/{notification}**: Get a single notification.
+- **PUT /api/v1/notifications/{notification}**: Mark a notification as read.
+- **DELETE /api/v1/notifications/{notification}**: Delete a notification.
+- **POST /api/v1/users/{user}/notifications/mark-all-as-read**: Mark all notifications for a user as read.
+- **GET /api/v1/users/{user}/notifications/unread-count**: Get the number of unread notifications for a user.
+
+### Notification API Examples
+
+### Get all notifications for a user
+```json
+// GET /api/v1/users/1/notifications
+{
+  "data": [
+    {
+      "notification_id": 1,
+      "user_id": 1,
+      "message": "You have a new message from John Doe.",
+      "is_read": false,
+      "created_at": "2024-05-27T10:00:00Z",
+      "updated_at": "2024-05-27T10:00:00Z"
+    }
+  ]
+}
+```
+
+### Create a notification
+```json
+// POST /api/v1/notifications
+{
+  "user_id": 1,
+  "message": "Your submission has been graded."
+}
+```
+
+### Mark a notification as read
+```json
+// PUT /api/v1/notifications/1
+{
+  "is_read": true
+}
+```
+
+### Get unread notification count
+```json
+// GET /api/v1/users/1/notifications/unread-count
+{
+  "data": {
+    "count": 5
+  }
+}
+```
+
 ## Testing with Postman or APIdog
 
 1. Import the following cURL commands into your API client to test the API:

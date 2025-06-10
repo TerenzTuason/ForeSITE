@@ -24,7 +24,7 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     last_login TIMESTAMP NULL,
     is_active BOOLEAN DEFAULT TRUE,
-    FOREIGN KEY (role_id) REFERENCES roles(role_id)
+    FOREIGN KEY (role_id) REFERENCES roles(role_id) ON DELETE CASCADE
 );
 
 -- Laravel sessions table for database session driver
@@ -60,8 +60,8 @@ CREATE TABLE student_profiles (
     dominant_learning_style_id INT,
     profile_created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     last_updated TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(user_id),
-    FOREIGN KEY (dominant_learning_style_id) REFERENCES learning_styles(style_id)
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (dominant_learning_style_id) REFERENCES learning_styles(style_id) ON DELETE CASCADE
 );
 
 -- Courses table
@@ -73,7 +73,7 @@ CREATE TABLE courses (
     structure JSON NOT NULL,
     learning_style_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (learning_style_id) REFERENCES learning_styles(style_id)
+    FOREIGN KEY (learning_style_id) REFERENCES learning_styles(style_id) ON DELETE CASCADE
 );
 
 -- Insert default courses
@@ -211,8 +211,8 @@ CREATE TABLE assessment_results (
     course_id INT NOT NULL,
     answers JSON NOT NULL,
     result JSON NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(user_id),
-    FOREIGN KEY (course_id) REFERENCES courses(course_id)
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE
 );
 
 -- Student enrollment in courses
@@ -224,9 +224,9 @@ CREATE TABLE enrollments (
     enrollment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     completion_status ENUM('not_started', 'in_progress', 'completed') DEFAULT 'not_started',
     completion_date TIMESTAMP NULL,
-    FOREIGN KEY (user_id) REFERENCES users(user_id),
-    FOREIGN KEY (course_id) REFERENCES courses(course_id),
-    FOREIGN KEY (assessment_result_id) REFERENCES assessment_results(result_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE,
+    FOREIGN KEY (assessment_result_id) REFERENCES assessment_results(result_id) ON DELETE CASCADE,
     UNIQUE KEY unique_enrollment (user_id, course_id)
 );
 
@@ -276,6 +276,15 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
+  '1.2-video',
+  'Looking Ahead: The Three Horizons Model',
+  null,
+  null,
+  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1749389838/1.2_Looking_Ahead_The_Three_Horizons_Model_aemjrp.mp4',
+  '6 minutes 4 seconds'
+);
+
+INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   '1.2',
   'Looking Ahead: The Three Horizons Model',
   'A tool for thinking across short, medium, and long-term futures.',
@@ -296,6 +305,15 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
     ]',
     'https://res.cloudinary.com/dwn5t3o4j/image/upload/v1748186077/1.2_The_Three_Horizons_Model_b7t0si.png',
     '12 minutes'
+);
+
+INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
+  '1.3-video',
+  'Identifying Change Drivers',
+  null,
+  null,
+  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1749389385/1.3_Identifying_Change_Drivers_dvzt5f.mp4',
+  '2 minutes 44 seconds'
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
@@ -322,6 +340,24 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
+  '1.3.1-video',
+  'What is PESTLE Analysis?',
+  null,
+  null,
+  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1749389594/1.3.1_What_is_PESTLE_Analysis_iij5o2.mp4',
+  '4 minutes 4 seconds'
+);
+
+INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
+  '1.4-video',
+  'Identifying Weak Signals',
+  null,
+  null,
+  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1749564558/1.4_Identifying_Weak_Signals_imaqwk.mp4',
+  '3 minutes 5 seconds'
+);
+
+INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   '1.4',
   'Identifying Weak Signals',
   'Spotting early signs of future change.',
@@ -334,6 +370,15 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
     ]',
     null,
     '12 minutes'
+);
+
+INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
+  '1.5-video',
+  'Linking Futures Thinking to the Policy Cycle',
+  null,
+  null,
+  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1749566067/1.5_Linking_Futures_Thinking_to_the_Policy_Cycle_1_vokxbt.mp4',
+  '1 minute 54 seconds'
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
@@ -497,6 +542,15 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   '2.3-video',
+  'Understanding Weak Signals and Trends',
+  null,
+  null,
+  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1749388239/2.3_Understanding_Weak_Signals_and_Trends_wjvz6k.mp4',
+  '9 minutes 42 seconds'
+);
+
+INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
+  '2.4-video',
   'Trends Identification and Analysis',
   null,
   null,
@@ -907,7 +961,7 @@ CREATE TABLE module_assessment (
     assessment_objective TEXT NULL,
     assessment_scenario TEXT NULL,
     assessment_instructions JSON NULL,
-    FOREIGN KEY (course_id) REFERENCES courses(course_id)
+    FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE
 );
 
 INSERT INTO module_assessment (course_id, module_number, assessment_title, assessment_objective, assessment_scenario, assessment_instructions) VALUES (
@@ -1278,9 +1332,9 @@ CREATE TABLE module_assessment_progress (
     module_progress_id INT NOT NULL,
     status ENUM('not_started', 'in_progress', 'completed') DEFAULT 'not_started',
     file_url VARCHAR(255),  
-    FOREIGN KEY (module_assessment_id) REFERENCES module_assessment(assessment_id),
-    FOREIGN KEY (user_id) REFERENCES users(user_id),
-    FOREIGN KEY (module_progress_id) REFERENCES module_progress(progress_id)
+    FOREIGN KEY (module_assessment_id) REFERENCES module_assessment(assessment_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (module_progress_id) REFERENCES module_progress(progress_id) ON DELETE CASCADE
 );
 
 -- Certificates table
@@ -1290,8 +1344,8 @@ CREATE TABLE certificates (
     course_id INT NOT NULL,
     issue_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     certificate_url VARCHAR(255),
-    FOREIGN KEY (user_id) REFERENCES users(user_id),
-    FOREIGN KEY (course_id) REFERENCES courses(course_id)
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE
 );
 
 -- Scores table
@@ -1300,8 +1354,8 @@ CREATE TABLE scores (
     faculty_id INT NOT NULL,
     score INT NOT NULL CHECK (score BETWEEN 1 AND 5),
     module_assessment_progress_id INT NOT NULL,
-    FOREIGN KEY (faculty_id) REFERENCES users(user_id),
-    FOREIGN KEY (module_assessment_progress_id) REFERENCES module_assessment_progress(assessment_progress_id)
+    FOREIGN KEY (faculty_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (module_assessment_progress_id) REFERENCES module_assessment_progress(assessment_progress_id) ON DELETE CASCADE
 );
 
 -- Faculty feedback table
@@ -1310,8 +1364,8 @@ CREATE TABLE feedback (
     faculty_id INT NOT NULL,
     feedback TEXT NOT NULL,
     module_assessment_progress_id INT NOT NULL,
-    FOREIGN KEY (faculty_id) REFERENCES users(user_id),
-    FOREIGN KEY (module_assessment_progress_id) REFERENCES module_assessment_progress(assessment_progress_id)
+    FOREIGN KEY (faculty_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (module_assessment_progress_id) REFERENCES module_assessment_progress(assessment_progress_id) ON DELETE CASCADE
 );
 
 -- System log for monitoring and auditing
@@ -1323,7 +1377,7 @@ CREATE TABLE system_logs (
     ip_address VARCHAR(45),
     user_agent TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
 -- Insert default roles
@@ -1336,7 +1390,25 @@ INSERT INTO roles (role_name, description) VALUES
 INSERT INTO users (role_id, email, password, first_name, last_name) VALUES
 (3, 'admin@foresite.com', '$2y$10$nHipa0I9/v/SEy4HrI6mxOnBJ.a4kXnhgxyMC.2WaJnELzpikNiUi', 'System', 'Administrator');
 
--- Table for groups of students in a course (students only)
+-- Chat functionality tables
+-- Chat rooms table for learning style specific chat rooms
+CREATE TABLE chat_rooms (
+    room_id INT PRIMARY KEY AUTO_INCREMENT,
+    learning_style_id INT NOT NULL,
+    room_name VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (learning_style_id) REFERENCES learning_styles(style_id) ON DELETE CASCADE
+);
+
+-- Initialize default chat rooms for each learning style
+INSERT INTO chat_rooms (learning_style_id, room_name) VALUES
+(1, 'Activist Learning Chat'),
+(2, 'Reflector Learning Chat'),
+(3, 'Theorist Learning Chat'),
+(4, 'Pragmatist Learning Chat');
+
+-- Table for groups of students in a course
 CREATE TABLE `groups` (
   group_id int PRIMARY KEY AUTO_INCREMENT,
   course_id int NOT NULL,
@@ -1348,7 +1420,7 @@ CREATE TABLE `groups` (
   FOREIGN KEY (learning_style_id) REFERENCES learning_styles(style_id)
 );
 
--- Table to associate users (students) with groups
+-- Table to associate users with groups
 CREATE TABLE group_members (
   group_member_id int PRIMARY KEY AUTO_INCREMENT,
   group_id int NOT NULL,
@@ -1358,7 +1430,7 @@ CREATE TABLE group_members (
   UNIQUE KEY unique_user_group (user_id, group_id)
 );
 
--- Table to assign a faculty member to a group for supervision/grading
+-- Table to assign a faculty member to a group for supervision/gradingAdd commentMore actions
 CREATE TABLE faculty_assigned_groups (
     faculty_id INT NOT NULL,
     group_id INT NOT NULL,
@@ -1377,4 +1449,16 @@ CREATE TABLE chat_messages (
     updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (group_id) REFERENCES `groups`(group_id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+CREATE TABLE notifications (
+  notification_id INT PRIMARY KEY AUTO_INCREMENT,
+  user_id INT NOT NULL,
+  sender_id INT NULL,
+  message TEXT NOT NULL,
+  is_read BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+  FOREIGN KEY (sender_id) REFERENCES users(user_id) ON DELETE CASCADE
 );

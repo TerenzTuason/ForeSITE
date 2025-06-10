@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\ModuleAssessmentProgressController;
 use App\Http\Controllers\Api\ScoreController;
 use App\Http\Controllers\Api\GroupController;
 use App\Http\Controllers\Api\GroupMemberController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\FacultyController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -164,6 +165,17 @@ Route::prefix('v1')->group(function () {
     Route::post('group-members', [GroupMemberController::class, 'store']);
     Route::delete('group-members/{group_member}', [GroupMemberController::class, 'destroy']);
     Route::post('group-members/remove', [GroupMemberController::class, 'removeMember']);
+
+    // Notifications
+    Route::get('notifications', [NotificationController::class, 'index'])->middleware('auth:sanctum');
+    Route::post('notifications', [NotificationController::class, 'store']);
+    Route::get('notifications/{notification}', [NotificationController::class, 'show']);
+    Route::put('notifications/{notification}', [NotificationController::class, 'update']);
+    Route::delete('notifications/{notification}', [NotificationController::class, 'destroy']);
+    Route::post('notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->middleware('auth:sanctum');
+    Route::get('notifications/unread-count', [NotificationController::class, 'getUnreadCount'])->middleware('auth:sanctum');
+    Route::get('faculty/{faculty}/notifications', [NotificationController::class, 'getNotificationsByFaculty']);
+    Route::get('roles/{role}/notifications', [NotificationController::class, 'getNotificationsByRole']);
 
     // Scores routes
     Route::prefix('scores')->group(function () {

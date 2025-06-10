@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Feedback;
+use App\Models\ModuleAssessmentProgress;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -34,6 +36,25 @@ class FeedbackController extends Controller
         }
 
         $feedback = Feedback::create($request->all());
+
+        // Create a notification for the student
+        if ($feedback) {
+            $progress = ModuleAssessmentProgress::with(['user', 'assessment'])
+                ->find($request->input('module_assessment_progress_id'));
+
+            if ($progress && $progress->user) {
+                $studentId = $progress->user->user_id;
+                $facultyId = $request->input('faculty_id');
+                $assessmentTitle = $progress->assessment ? $progress->assessment->assessment_title : 'your assessment';
+                
+                Notification::create([
+                    'user_id' => $studentId,
+                    'sender_id' => $facultyId,
+                    'message' => "Your instructor has provided feedback for '{$assessmentTitle}'.",
+                ]);
+            }
+        }
+
         return response()->json(['data' => $feedback], 201);
     }
 
