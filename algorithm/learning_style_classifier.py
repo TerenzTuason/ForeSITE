@@ -4,6 +4,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, roc_auc_score
 from sklearn.preprocessing import LabelBinarizer
+from sklearn.model_selection import train_test_split
 import xgboost as xgb
 import tensorflow as tf
 import numpy as np
@@ -100,46 +101,55 @@ class LearningStyleClassifier:
         return metrics
 
     def _pretrain_models(self):
-        # Create training data
-        X_train, y_train = self._generate_training_data()
+        # Create training data and split into training and validation sets
+        X_data, y_data = self._generate_training_data()
+        X_train, X_val, y_train, y_val = train_test_split(
+            X_data, y_data, test_size=0.2, random_state=42, stratify=y_data
+        )
         
-        # Train and evaluate each model
+        # Train and evaluate each model on the validation set
         for name, clf in self.classifiers.items():
             start_time = time.time()
             clf.fit(X_train, y_train)
             training_time = time.time() - start_time
             
-            y_pred = clf.predict(X_train)
-            y_pred_proba = clf.predict_proba(X_train)
-            self._calculate_metrics(y_train, y_pred, y_pred_proba, name, training_time)
+            y_pred = clf.predict(X_val)
+            y_pred_proba = clf.predict_proba(X_val)
+            self._calculate_metrics(y_val, y_pred, y_pred_proba, name, training_time)
         
-        # Train and evaluate CNN
+        # Train and evaluate CNN on the validation set
         start_time = time.time()
         self.cnn_model.fit(
             X_train, y_train,
             epochs=MODEL_CONFIG['cnn']['epochs'],
             batch_size=MODEL_CONFIG['cnn']['batch_size'],
+            validation_data=(X_val, y_val),
             verbose=0
         )
         training_time = time.time() - start_time
         
-        y_pred = np.argmax(self.cnn_model.predict(X_train), axis=1)
-        y_pred_proba = self.cnn_model.predict(X_train)
-        self._calculate_metrics(y_train, y_pred, y_pred_proba, 'cnn', training_time)
+        y_pred = np.argmax(self.cnn_model.predict(X_val), axis=1)
+        y_pred_proba = self.cnn_model.predict(X_val)
+        self._calculate_metrics(y_val, y_pred, y_pred_proba, 'cnn', training_time)
         
-        # Train and evaluate blending ensemble
+        # Train the meta-learner on training data, then evaluate the blending ensemble on the validation set
         start_time = time.time()
-        base_predictions = np.column_stack([
+        base_predictions_train = np.column_stack([
             self.classifiers[model_name].predict_proba(X_train)
             for model_name in MODEL_CONFIG['blending_ensemble']['base_models']
         ])
         
-        self.blending_meta_learner.fit(base_predictions, y_train)
+        self.blending_meta_learner.fit(base_predictions_train, y_train)
         training_time = time.time() - start_time
         
-        y_pred = self.blending_meta_learner.predict(base_predictions)
-        y_pred_proba = self.blending_meta_learner.predict_proba(base_predictions)
-        self._calculate_metrics(y_train, y_pred, y_pred_proba, 'blending_ensemble', training_time)
+        base_predictions_val = np.column_stack([
+            self.classifiers[model_name].predict_proba(X_val)
+            for model_name in MODEL_CONFIG['blending_ensemble']['base_models']
+        ])
+        
+        y_pred = self.blending_meta_learner.predict(base_predictions_val)
+        y_pred_proba = self.blending_meta_learner.predict_proba(base_predictions_val)
+        self._calculate_metrics(y_val, y_pred, y_pred_proba, 'blending_ensemble', training_time)
 
     def _generate_training_data(self):
         # Convert question indices to 0-based indexing
