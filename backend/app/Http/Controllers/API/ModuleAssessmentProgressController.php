@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Notification;
+use App\Models\User;
 
 class ModuleAssessmentProgressController extends Controller
 {
@@ -80,17 +81,34 @@ class ModuleAssessmentProgressController extends Controller
             if ($student && $assessment && $assessment->course) {
                 // Find the group the student is in for this course
                 $group = $student->groups()->where('groups.course_id', $assessment->course_id)->first();
+                $studentName = $student->first_name . ' ' . $student->last_name;
+                $assessmentTitle = $assessment->assessment_title;
+                $faculties = collect();
 
                 if ($group) {
-                    // Find the faculty assigned to that group
                     $faculties = $group->assignedFaculty;
-                    $studentName = $student->first_name . ' ' . $student->last_name;
-                    $assessmentTitle = $assessment->assessment_title;
-                    $message = "{$studentName} has submitted the assessment '{$assessmentTitle}'.";
+                }
 
+                if ($faculties->isNotEmpty()) {
+                    $message = "Student {$studentName} has submitted the assessment '{$assessmentTitle}'.";
                     foreach ($faculties as $faculty) {
                         Notification::create([
                             'user_id' => $faculty->user_id,
+                            'sender_id' => $student->user_id,
+                            'message' => $message,
+                        ]);
+                    }
+                } else {
+                    // If no assigned faculty, notify all admins
+                    $admins = User::whereHas('role', function ($query) {
+                        $query->where('role_name', 'admin');
+                    })->get();
+
+                    $message = "Student {$studentName} submitted '{$assessmentTitle}' but no faculty is assigned to their group.";
+                    foreach ($admins as $admin) {
+                        Notification::create([
+                            'user_id' => $admin->user_id,
+                            'sender_id' => $student->user_id,
                             'message' => $message,
                         ]);
                     }
