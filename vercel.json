@@ -1,7 +1,4 @@
 {
-  "engines": {
-    "python": "3.11"
-  },
   "builds": [
     {
       "src": "algorithm/app.py",
