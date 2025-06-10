@@ -91,8 +91,8 @@
 
         .section-title {
             color: var(--maroon);
-            font-size: 1.5rem;
-            font-weight: 600;
+            font-size: 1.8rem;
+            font-weight: 700;
             margin-bottom: 1.5rem;
             position: relative;
             padding-bottom: 0.5rem;
@@ -103,8 +103,8 @@
             position: absolute;
             bottom: 0;
             left: 0;
-            width: 50px;
-            height: 3px;
+            width: 60px;
+            height: 4px;
             background: var(--gold);
             border-radius: 2px;
         }
@@ -299,6 +299,89 @@
                 align-items: center;
             }
         }
+
+        .course-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            position: relative;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .course-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--maroon);
+            border-radius: 4px 0 0 4px;
+        }
+
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .course-card h3 {
+            color: var(--maroon);
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .course-card p {
+            color: var(--dark-gray);
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+
+        .btn-enroll-card {
+            background-color: var(--maroon);
+            color: white;
+            border: none;
+            padding: 1rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: block;
+            margin: 2rem auto 0;
+            width: 150px;
+            text-align: center;
+            font-size: 1.2rem;
+            line-height: 1.4;
+        }
+
+        .btn-enroll-card:hover {
+            background-color: #600000;
+            transform: translateY(-2px);
+            color: white;
+            box-shadow: 0 6px 20px rgba(128, 0, 0, 0.4);
+        }
+
+        .recommendation-text {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--dark-gray);
+            font-weight: 500;
+            margin-top: 1rem;
+            font-size: 1rem;
+        }
+
+        .recommendation-text .fas {
+            color: var(--gold);
+            font-size: 1.2rem;
+        }
     </style>
 </head>
 <body>
@@ -306,73 +389,89 @@
     <div id="navbar-placeholder"></div>
 
     <div class="container" style="margin-top: 100px;">
-        <div class="welcome-message">
-            <h2>Welcome to Your Course!</h2>
-            <p>Loading Course Details...</p>
-            <div class="course-buttons">
-                <a href="module-view.html" class="btn-start-course me-2" id="startCourseBtn" disabled>
-                    Start Course <i class="fas fa-play"></i>
-                </a>
-                <a href="module-view.html" class="btn-start-course me-2" id="continueCourseBtn" disabled>
-                    Continue Course <i class="fas fa-forward"></i>
-                </a>
-                <a href="module-view.html" class="btn-start-course" id="completedCourseBtn" disabled>
-                    Completed Course <i class="fas fa-check"></i>
-                </a>
-            </div>
-        </div>
-
-        <div class="course-header">
-            <h1 class="course-title">Loading Course...</h1>
-            <div class="progress">
-                <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-            </div>
-            <div class="text-end">
-                <small class="text-muted">Overall Progress: 0%</small>
-            </div>
-        </div>
-
-        <div class="progress-stats">
-            <div class="stat-card">
-                <div class="stat-number">Loading...</div>
-                <div class="stat-label">Modules Completed</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">Loading...</div>
-                <div class="stat-label">Modules Remaining</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">0</div>
-                <div class="stat-label">Hours Spent Learning</div>
-            </div>
-        </div>
-
-        <div class="progress-section">
-            <h2 class="section-title">Course Modules</h2>
-            <div class="task-list">
-                <div class="task-item">
-                    <div class="task-status status-pending">
-                        <i class="fas fa-lock"></i>
-                    </div>
-                    <div class="task-content">
-                        <h3 class="task-title">Module 1: Loading...</h3>
-                        <p class="task-description">Loading Course Module...</p>
-                    </div>
-                </div>
-
-                <div class="task-item module-locked">
-                    <div class="task-status status-locked">
-                        <i class="fas fa-lock"></i>
-                    </div>
-                    <div class="task-content">
-                        <h3 class="task-title">Module 2: Loading...</h3>
-                        <p class="task-description">Locked - Complete Module 1 to unlock</p>
-                    </div>
+        <div id="course-details-container">
+            <div class="welcome-message">
+                <h2>Welcome to Your Course!</h2>
+                <p>Loading Course Details...</p>
+                <div class="course-buttons">
+                    <a href="module-view.html" class="btn-start-course me-2" id="startCourseBtn" disabled>
+                        Start Course <i class="fas fa-play"></i>
+                    </a>
+                    <a href="module-view.html" class="btn-start-course me-2" id="continueCourseBtn" disabled>
+                        Continue Course <i class="fas fa-forward"></i>
+                    </a>
+                    <a href="module-view.html" class="btn-start-course" id="completedCourseBtn" disabled>
+                        Completed Course <i class="fas fa-check"></i>
+                    </a>
                 </div>
             </div>
+
+            <div class="course-header">
+                <h1 class="course-title">Loading Course...</h1>
+                <div class="progress">
+                    <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <div class="text-end">
+                    <small class="text-muted">Overall Progress: 0%</small>
+                </div>
+            </div>
+
+            <div class="progress-stats">
+                <div class="stat-card">
+                    <div class="stat-number">Loading...</div>
+                    <div class="stat-label">Modules Completed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">Loading...</div>
+                    <div class="stat-label">Modules Remaining</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">0</div>
+                    <div class="stat-label">Hours Spent Learning</div>
+                </div>
+            </div>
+
+            <div class="progress-section">
+                <h2 class="section-title">Course Modules</h2>
+                <div class="task-list">
+                    <div class="task-item">
+                        <div class="task-status status-pending">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <div class="task-content">
+                            <h3 class="task-title">Module 1: Loading...</h3>
+                            <p class="task-description">Loading Course Module...</p>
+                        </div>
+                    </div>
+
+                    <div class="task-item module-locked">
+                        <div class="task-status status-locked">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <div class="task-content">
+                            <h3 class="task-title">Module 2: Loading...</h3>
+                            <p class="task-description">Locked - Complete Module 1 to unlock</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-
+        <div id="not-enrolled-container" style="display: none;">
+            <div class="welcome-message" style="text-align: center;">
+                <h2>Not Enrolled In a Course Yet</h2>
+                <p>You are not enrolled in any course. Check out the available courses below.</p>
+            </div>
+            <div class="progress-section">
+                <h2 class="section-title">Available Courses</h2>
+                <div class="course-list" id="available-courses">
+                    <div class="course-card">
+                        <h3>Loading available courses...</h3>
+                        <p>Please wait while we fetch course information.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Bootstrap JS -->
@@ -411,50 +510,82 @@
                 });
             }
 
-            // Fetch user's assessment result to get the recommended course
-            fetch(`http://127.0.0.1:8000/api/v1/users/${userData.user_id}/assessment-results`)
-                .then(response => response.json())
+            // Fetch user's enrollment to see if they are in a course
+            fetch(`http://127.0.0.1:8000/api/v1/users/${userData.user_id}/enrollments`)
+                .then(response => {
+                    if (!response.ok) {
+                        // If the endpoint doesn't exist or there's an error, assume not enrolled.
+                        // This handles cases where the enrollments endpoint might not be implemented yet.
+                        return Promise.resolve({ data: [] });
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     if (data.data && data.data.length > 0) {
-                        const assessmentResult = data.data[0]; // Get the most recent result
-                        fetchCourseDetails(assessmentResult.course_id);
+                        const enrollment = data.data[0]; // Get the most recent enrollment
+                        fetchCourseDetails(enrollment.course_id);
                     } else {
-                        console.error('No assessment results found');
+                        console.log('No enrollments found for user.');
                         // Show "Not enrolled in a course yet" message
-                        document.querySelector('.course-title').textContent = 'Not enrolled in a course yet';
-                        document.querySelector('.welcome-message h2').textContent = 'Welcome to ForeSITE';
-                        document.querySelector('.welcome-message p').textContent = 'You are not enrolled in any course. Check out the available courses below.';
-                        
-                        // Hide course progress section
-                        document.querySelector('.progress-stats').style.display = 'none';
-                        
-                        // Clear and update modules section to show available courses
-                        const moduleSection = document.querySelector('.progress-section');
-                        moduleSection.innerHTML = `
-                            <h2 class="section-title">Available Courses</h2>
-                            <div class="task-list" id="available-courses">
-                                <div class="task-item">
-                                    <div class="task-status status-pending">
-                                        <i class="fas fa-book"></i>
-                                    </div>
-                                    <div class="task-content">
-                                        <h3 class="task-title">Loading available courses...</h3>
-                                        <p class="task-description">Please wait while we fetch course information.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
+                        document.getElementById('course-details-container').style.display = 'none';
+                        document.getElementById('not-enrolled-container').style.display = 'block';
                         
                         // Fetch and display available courses
                         fetchAvailableCourses();
                     }
                 })
                 .catch(error => {
-                    console.error('Error fetching assessment results:', error);
+                    console.error('Error fetching enrollment data:', error);
+                    // Show "Not enrolled" state as a fallback on error
+                    document.getElementById('course-details-container').style.display = 'none';
+                    document.getElementById('not-enrolled-container').style.display = 'block';
+                    fetchAvailableCourses();
                 });
 
             function fetchAvailableCourses() {
-                // Fetch all courses
+                // Fetch user's assessment result to get the recommended course
+                fetch(`http://127.0.0.1:8000/api/v1/users/${userData.user_id}/assessment-results`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.data && data.data.length > 0) {
+                            const assessmentResult = data.data[0]; // Get the most recent result
+                            // Fetch only the recommended course details
+                            fetch(`http://127.0.0.1:8000/api/v1/courses/${assessmentResult.course_id}`)
+                                .then(response => response.json())
+                                .then(courseData => {
+                                    const course = courseData.data;
+                                    const courseList = document.getElementById('available-courses');
+                                    const learningStyle = assessmentResult.result.learning_style;
+                                    courseList.innerHTML = `
+                                        <div class="course-card">
+                                            <h3>${course.name}</h3>
+                                            <p>${course.description || 'No description available.'}</p>
+                                            <div class="recommendation-text">
+                                                <i class="fas fa-book-reader"></i>
+                                                <span><strong>Recommended based on your learning style:</strong> ${learningStyle.charAt(0).toUpperCase() + learningStyle.slice(1)}</span>
+                                            </div>
+                                            <a href="enrollment.html?course_id=${course.course_id}" class="btn-enroll-card">
+                                                Enroll<br>Now
+                                            </a>
+                                        </div>
+                                    `;
+                                })
+                                .catch(error => {
+                                    console.error('Error fetching recommended course details:', error);
+                                    document.getElementById('available-courses').innerHTML = `<div class="course-card"><h3>Could not load recommended course</h3><p>There was an error loading the course details. Please try again later.</p></div>`;
+                                });
+                        } else {
+                            // If no assessment result, then fetch all courses as a fallback
+                            fetchAllCourses();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching assessment results:', error);
+                        fetchAllCourses(); // Fallback to all courses on error
+                    });
+            }
+
+            function fetchAllCourses() {
                 fetch('http://127.0.0.1:8000/api/v1/courses')
                     .then(response => response.json())
                     .then(data => {
@@ -462,33 +593,22 @@
                             const courseList = document.getElementById('available-courses');
                             courseList.innerHTML = '';
                             
-                            // Display each course
                             data.data.forEach(course => {
                                 courseList.innerHTML += `
-                                    <div class="task-item">
-                                        <div class="task-status status-pending">
-                                            <i class="fas fa-book"></i>
-                                        </div>
-                                        <div class="task-content">
-                                            <h3 class="task-title">${course.name}</h3>
-                                            <p class="task-description">${course.description || 'No description available.'}</p>
-                                            <a href="enrollment.html?course_id=${course.course_id}" class="btn-start-course me-2" style="margin-top: 15px; max-width: 200px;">
-                                                Enroll Now <i class="fas fa-arrow-right"></i>
-                                            </a>
-                                        </div>
+                                    <div class="course-card">
+                                        <h3>${course.name}</h3>
+                                        <p>${course.description || 'No description available.'}</p>
+                                        <a href="enrollment.html?course_id=${course.course_id}" class="btn-enroll-card" style="margin-top: 15px;">
+                                            Enroll Now
+                                        </a>
                                     </div>
                                 `;
                             });
                         } else {
                             document.getElementById('available-courses').innerHTML = `
-                                <div class="task-item">
-                                    <div class="task-status status-pending">
-                                        <i class="fas fa-exclamation-circle"></i>
-                                    </div>
-                                    <div class="task-content">
-                                        <h3 class="task-title">No courses available</h3>
-                                        <p class="task-description">There are currently no courses available.</p>
-                                    </div>
+                                <div class="course-card">
+                                    <h3>No courses available</h3>
+                                    <p>There are currently no courses available for enrollment.</p>
                                 </div>
                             `;
                         }
@@ -496,14 +616,9 @@
                     .catch(error => {
                         console.error('Error fetching available courses:', error);
                         document.getElementById('available-courses').innerHTML = `
-                            <div class="task-item">
-                                <div class="task-status status-pending">
-                                    <i class="fas fa-exclamation-circle"></i>
-                                </div>
-                                <div class="task-content">
-                                    <h3 class="task-title">Error loading courses</h3>
-                                    <p class="task-description">There was an error loading the available courses. Please try again later.</p>
-                                </div>
+                            <div class="course-card">
+                                <h3>Error loading courses</h3>
+                                <p>There was an error loading the available courses. Please try again later.</p>
                             </div>
                         `;
                     });
@@ -618,15 +733,6 @@
                         document.querySelector('.course-title').textContent = 'Error loading course';
                         document.querySelector('.welcome-message p').textContent = 'There was an error loading the course details. Please try again later.';
                     });
-            }
-
-            // Check if user has any progress
-            const userProgress = localStorage.getItem('courseProgress');
-            const startButton = document.querySelector('.btn-start-course');
-            
-            if (userProgress) {
-                startButton.textContent = 'Continue Course';
-                startButton.innerHTML = 'Continue Course <i class="fas fa-forward"></i>';
             }
         });
     </script>
