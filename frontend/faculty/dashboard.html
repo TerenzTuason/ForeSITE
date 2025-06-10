@@ -358,39 +358,9 @@
 
         <div class="notifications-section">
             <h2 class="section-title">Notifications</h2>
-            <div class="notification-list">
-                <div class="notification-item">
-                    <div class="notification-icon">
-                        <i class="fas fa-edit"></i>
-                    </div>
-                    <div class="notification-content">
-                        <p><strong>Group A</strong> from <strong>Introduction to Programming</strong> is ready for scoring.</p>
-                        <small>Submitted 2 hours ago</small>
-                    </div>
-                    <a href="#" class="btn btn-sm">Score Now</a>
-                </div>
-                <div class="notification-item">
-                    <div class="notification-icon">
-                        <i class="fas fa-edit"></i>
-                    </div>
-                    <div class="notification-content">
-                        <p><strong>Team Alpha</strong> from <strong>Data Structures</strong> has submitted their project.</p>
-                        <small>Submitted 1 day ago</small>
-                    </div>
-                    <a href="#" class="btn btn-sm">Score Now</a>
-                </div>
-                <div class="notification-item">
-                    <div class="notification-icon">
-                        <i class="fas fa-exclamation-circle text-warning"></i>
-                    </div>
-                    <div class="notification-content">
-                        <p>Scoring for <strong>Group C</strong> in <strong>Algorithms</strong> is due in 3 days.</p>
-                        <small>Due: 2023-10-28</small>
-                    </div>
-                    <a href="#" class="btn btn-warning btn-sm">View Details</a>
-                </div>
+            <div class="notification-list" id="notificationList">
                 <div class="notification-item empty">
-                    <p>No new notifications at the moment.</p>
+                    <p>Loading notifications...</p>
                 </div>
             </div>
         </div>
@@ -402,7 +372,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const userData = JSON.parse(sessionStorage.getItem('user'));
             
-            if (!userData) {
+            if (!userData || !userData.user_id) {
                 window.location.href = '../admin/login.html';
                 return;
             }
@@ -433,6 +403,9 @@
             
             // Fetch module progress statistics
             fetchModuleProgressStats();
+
+            // Fetch notifications
+            fetchNotifications(userData.user_id);
             
             // Function to fetch students
             function fetchStudents() {
@@ -583,6 +556,85 @@
                         document.getElementById('completedModulesCard').classList.remove('loading');
                         document.getElementById('ongoingModulesCard').classList.remove('loading');
                     });
+            }
+
+            // Function to fetch notifications
+            function fetchNotifications(userId) {
+                const notificationList = document.getElementById('notificationList');
+                notificationList.innerHTML = '<div class="notification-item empty"><p>Loading notifications...</p></div>';
+
+                fetch(`${apiBaseUrl}/users/${userId}/notifications`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Network response was not ok. Status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        notificationList.innerHTML = ''; // Clear loading state
+                        const notifications = data.data;
+
+                        if (notifications && notifications.length > 0) {
+                            notifications.forEach(notification => {
+                                const item = document.createElement('div');
+                                item.classList.add('notification-item');
+
+                                const isReadClass = notification.is_read ? 'read' : 'unread';
+                                const iconClass = notification.is_read ? 'fa-check-circle' : 'fa-edit';
+
+                                // Very basic keyword detection for styling
+                                let actionButton = '<a href="learners.html" class="btn btn-sm">View</a>';
+                                if (notification.message.toLowerCase().includes('scoring')) {
+                                    actionButton = '<a href="#" class="btn btn-sm">Score Now</a>';
+                                }
+
+                                // Date formatting
+                                const notificationDate = new Date(notification.created_at);
+                                const timeAgo = getTimeAgo(notificationDate);
+
+                                item.innerHTML = `
+                                    <div class="notification-icon">
+                                        <i class="fas ${iconClass}"></i>
+                                    </div>
+                                    <div class="notification-content">
+                                        <p>${notification.message}</p>
+                                        <small>${timeAgo}</small>
+                                    </div>
+                                    ${actionButton}
+                                `;
+                                notificationList.appendChild(item);
+                            });
+                        } else {
+                            notificationList.innerHTML = '<div class="notification-item empty"><p>No new notifications at the moment.</p></div>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching notifications:', error);
+                        notificationList.innerHTML = '<div class="notification-item empty"><p>Failed to load notifications. Please try again later.</p></div>';
+                    });
+            }
+
+            // Helper function to calculate time ago
+            function getTimeAgo(date) {
+                const now = new Date();
+                const seconds = Math.floor((now - date) / 1000);
+                
+                let interval = seconds / 31536000;
+                if (interval > 1) return Math.floor(interval) + " years ago";
+                
+                interval = seconds / 2592000;
+                if (interval > 1) return Math.floor(interval) + " months ago";
+                
+                interval = seconds / 86400;
+                if (interval > 1) return Math.floor(interval) + " days ago";
+                
+                interval = seconds / 3600;
+                if (interval > 1) return Math.floor(interval) + " hours ago";
+                
+                interval = seconds / 60;
+                if (interval > 1) return Math.floor(interval) + " minutes ago";
+                
+                return Math.floor(seconds) + " seconds ago";
             }
         });
     </script>

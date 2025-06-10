@@ -7,6 +7,7 @@ use App\Models\ModuleAssessmentProgress;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Notification;
 
 class ModuleAssessmentProgressController extends Controller
 {
@@ -67,7 +68,36 @@ class ModuleAssessmentProgressController extends Controller
             return response()->json(['error' => $validator->errors()], 422);
         }
 
+        $originalStatus = $moduleAssessmentProgress->status;
+
         $moduleAssessmentProgress->update($request->all());
+
+        // If the assessment is marked as completed, create a notification for the faculty
+        if ($request->input('status') === 'completed' && $originalStatus !== 'completed') {
+            $student = $moduleAssessmentProgress->user;
+            $assessment = $moduleAssessmentProgress->assessment;
+
+            if ($student && $assessment && $assessment->course) {
+                // Find the group the student is in for this course
+                $group = $student->groups()->where('groups.course_id', $assessment->course_id)->first();
+
+                if ($group) {
+                    // Find the faculty assigned to that group
+                    $faculties = $group->assignedFaculty;
+                    $studentName = $student->first_name . ' ' . $student->last_name;
+                    $assessmentTitle = $assessment->assessment_title;
+                    $message = "{$studentName} has submitted the assessment '{$assessmentTitle}'.";
+
+                    foreach ($faculties as $faculty) {
+                        Notification::create([
+                            'user_id' => $faculty->user_id,
+                            'message' => $message,
+                        ]);
+                    }
+                }
+            }
+        }
+
         return response()->json(['data' => $moduleAssessmentProgress]);
     }
 

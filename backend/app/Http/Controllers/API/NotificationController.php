@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Notification;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,9 +15,8 @@ class NotificationController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index(Request $request)
+    public function index(Request $request, User $user)
     {
-        $user = $request->user();
         $notifications = Notification::where('user_id', $user->user_id)->orderBy('created_at', 'desc')->get();
         return response()->json(['data' => $notifications]);
     }
