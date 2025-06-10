@@ -1,0 +1,15 @@
+{
+    "builds": [
+      {
+        "src": "algorithm/app.py",
+        "use": "@vercel/python",
+        "config": { "pythonVersion": "3.9" }
+      }
+    ],
+    "routes": [
+      {
+        "src": "/(.*)",
+        "dest": "algorithm/app.py"
+      }
+    ]
+  } 
