@@ -14,10 +14,9 @@ class Notification extends Model
 
     protected $fillable = [
         'user_id',
+        'sender_id',
         'message',
         'is_read',
-        'role_id',
-        'faculty_id',
     ];
 
     protected $casts = [
@@ -29,13 +28,8 @@ class Notification extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function role()
+    public function sender()
     {
-        return $this->belongsTo(Role::class, 'role_id');
-    }
-
-    public function faculty()
-    {
-        return $this->belongsTo(User::class, 'faculty_id');
+        return $this->belongsTo(User::class, 'sender_id');
     }
 } 
