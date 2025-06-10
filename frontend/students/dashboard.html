@@ -814,7 +814,7 @@
                                 const facultyName = `${notification.sender.first_name} ${notification.sender.last_name}`;
                                 const assessmentTitleMatch = message.match(/'(.*?)'/);
                                 const assessmentTitle = assessmentTitleMatch ? assessmentTitleMatch[1] : 'your assessment';
-                                message = `<strong>${facultyName}</strong> has graded ${assessmentTitle}.`;
+                                message = `Faculty (<strong>${facultyName}</strong>) has scored and provided feedback to your ${assessmentTitle} assessment.`;
                             }
 
                             const notificationDate = new Date(notification.created_at);
@@ -829,6 +829,21 @@
                                     <small>${timeAgo}</small>
                                 </div>
                             `;
+
+                            // Add a "View" button if a URL is present
+                            if (notification.url) {
+                                const actionDiv = document.createElement('div');
+                                actionDiv.classList.add('notification-action');
+                                
+                                const viewButton = document.createElement('a');
+                                viewButton.href = `../${notification.url}`;
+                                viewButton.classList.add('btn', 'btn-sm', 'btn-outline-primary');
+                                viewButton.textContent = 'View';
+                                
+                                actionDiv.appendChild(viewButton);
+                                item.appendChild(actionDiv);
+                            }
+
                             notificationList.appendChild(item);
                         });
                     } else {

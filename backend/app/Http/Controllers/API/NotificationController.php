@@ -13,9 +13,10 @@ class NotificationController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param  \App\Models\User  $user
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index(Request $request, User $user)
+    public function index(User $user)
     {
         $notifications = Notification::where('user_id', $user->user_id)
             ->with('sender')

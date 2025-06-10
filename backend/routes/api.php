@@ -167,15 +167,10 @@ Route::prefix('v1')->group(function () {
     Route::post('group-members/remove', [GroupMemberController::class, 'removeMember']);
 
     // Notifications
-    Route::get('notifications', [NotificationController::class, 'index'])->middleware('auth:sanctum');
-    Route::post('notifications', [NotificationController::class, 'store']);
-    Route::get('notifications/{notification}', [NotificationController::class, 'show']);
-    Route::put('notifications/{notification}', [NotificationController::class, 'update']);
-    Route::delete('notifications/{notification}', [NotificationController::class, 'destroy']);
-    Route::post('notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->middleware('auth:sanctum');
-    Route::get('notifications/unread-count', [NotificationController::class, 'getUnreadCount'])->middleware('auth:sanctum');
-    Route::get('faculty/{faculty}/notifications', [NotificationController::class, 'getNotificationsByFaculty']);
-    Route::get('roles/{role}/notifications', [NotificationController::class, 'getNotificationsByRole']);
+    Route::get('users/{user}/notifications', [NotificationController::class, 'index']);
+    Route::post('users/{user}/notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead']);
+    Route::get('users/{user}/notifications/unread-count', [NotificationController::class, 'getUnreadCount']);
+    Route::apiResource('notifications', NotificationController::class)->except(['index']);
 
     // Scores routes
     Route::prefix('scores')->group(function () {
