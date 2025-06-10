@@ -1471,6 +1471,19 @@
 
           moduleProgressData.forEach((module) => {
             const isLocked = isModuleLocked(module.module_number);
+            let durationText = "";
+            if (module.module_title === "Foundations of Futures Thinking") {
+              durationText = "2 hours 40minutes";
+            } else if (
+              module.module_title === "Mapping Change and Building Insight"
+            ) {
+              durationText = "3 hours 30 minutes";
+            } else if (module.module_title === "Creating Strategic Pathways") {
+              durationText = "3 hours 30minutes";
+            }
+            const durationHtml = durationText
+              ? `<small class="d-block fw-normal" style="; margin-top: 4px;">${durationText}</small>`
+              : "";
             // Create module item with collapsible indicator
             const moduleItem = $(`
                         <li class="module-item" id="module-${
@@ -1486,13 +1499,16 @@
                                 : ""
                             }">
                                 <i class="fas ${
-                                  isLocked 
-                                    ? "fa-lock" 
+                                  isLocked
+                                    ? "fa-lock"
                                     : module.status === "completed"
                                     ? "fa-check-circle"
                                     : "fa-book"
                                 }"></i>
-                                <span>${module.module_title}</span>
+                                <div class="flex-grow-1">
+                                  <span>${module.module_title}</span>
+                                  ${durationHtml}
+                                </div>
                                 <i class="fas fa-chevron-down ms-auto"></i>
                                 ${
                                   module.status === "completed"
