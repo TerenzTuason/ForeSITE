@@ -60,22 +60,22 @@ MODEL_CONFIG = {
 
 # Training Data Generation Parameters
 TRAINING_CONFIG = {
-    'samples_per_style': 50,  # Number of training samples per learning style
-    'noise_level': 0.2,  # Proportion of random noise in training data (0.0 to 1.0)
-    'secondary_style_ratio': 0.3,  # Proportion of secondary style traits to include
+    'samples_per_style': 200,  # Number of training samples per learning style
+    'noise_level': 0.1,  # Proportion of random noise in training data (0.0 to 1.0)
+    'secondary_style_ratio': 0.4,  # Proportion of secondary style traits to include
 }
 
 # Style Classification Parameters
 CLASSIFICATION_CONFIG = {
-    'confidence_threshold': 0.6,  # Minimum confidence level for style prediction
+    'confidence_threshold': 0.5,  # Minimum confidence level for style prediction
     'style_weights': {  # Weights for each classifier in the voting
         'decision_tree': 1.0,
-        'random_forest': 1.2,
+        'random_forest': 1.3,
         'support_vector_machine': 1.0,
         'logistic_regression': 1.0,
-        'cnn': 1.2,
-        'xgboost': 1.2,
-        'blending_ensemble': 1.3
+        'cnn': 1.3,
+        'xgboost': 1.3,
+        'blending_ensemble': 1.5
     }
 }
 
@@ -83,19 +83,19 @@ CLASSIFICATION_CONFIG = {
 # Higher weights mean these questions have more influence on the final classification
 QUESTION_WEIGHTS = {
     'activist': {
-        'primary': [10, 23, 34, 48, 72],  # Most important activist questions
-        'weight': 1.5  # Multiplier for these questions
+        'primary': [2, 10, 23, 34, 72],  # Most important activist questions
+        'weight': 2.0  # Multiplier for these questions
     },
     'reflector': {
-        'primary': [7, 13, 29, 31, 67],
-        'weight': 1.5
+        'primary': [7, 15, 29, 31, 67],
+        'weight': 2.0
     },
     'theorist': {
-        'primary': [3, 14, 30, 51, 77],
-        'weight': 1.5
+        'primary': [3, 14, 51, 75, 77],
+        'weight': 2.0
     },
     'pragmatist': {
         'primary': [9, 35, 44, 49, 56],
-        'weight': 1.5
+        'weight': 2.0
     }
 } 
