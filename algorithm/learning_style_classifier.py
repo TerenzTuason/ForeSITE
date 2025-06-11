@@ -9,8 +9,6 @@ import xgboost as xgb
 import tensorflow as tf
 import numpy as np
 import time
-import joblib
-import os
 from classifier_config import (
     STYLE_QUESTIONS,
     MODEL_CONFIG,
@@ -20,7 +18,7 @@ from classifier_config import (
 )
 
 class LearningStyleClassifier:
-    def __init__(self, models_dir='models', train_mode=False):
+    def __init__(self):
         self.style_mapping = {
             0: 'activist',
             1: 'reflector',
@@ -30,38 +28,24 @@ class LearningStyleClassifier:
         
         # Initialize metrics storage
         self.model_metrics = {}
-
-        if train_mode:
-            # Initialize individual classifiers with config parameters
-            self.classifiers = {
-                'decision_tree': DecisionTreeClassifier(**MODEL_CONFIG['decision_tree']),
-                'random_forest': RandomForestClassifier(**MODEL_CONFIG['random_forest']),
-                'support_vector_machine': SVC(**MODEL_CONFIG['support_vector_machine'], probability=True),
-                'logistic_regression': LogisticRegression(**MODEL_CONFIG['logistic_regression']),
-                'xgboost': xgb.XGBClassifier(**MODEL_CONFIG['xgboost']),
-            }
-            # Initialize CNN model
-            self.cnn_model = self._build_cnn_model()
-            # Initialize blending ensemble
-            self.blending_meta_learner = LogisticRegression(**MODEL_CONFIG['blending_ensemble']['meta_learner_params'])
-        else:
-            # Load individual classifiers
-            self.classifiers = {}
-            for model_name in ['decision_tree', 'random_forest', 'support_vector_machine', 'logistic_regression', 'xgboost']:
-                model_path = os.path.join(models_dir, f'{model_name}.joblib')
-                self.classifiers[model_name] = joblib.load(model_path)
-
-            # Load CNN model
-            cnn_model_path = os.path.join(models_dir, 'cnn_model')
-            self.cnn_model = tf.keras.models.load_model(cnn_model_path)
-
-            # Load blending ensemble meta-learner
-            meta_learner_path = os.path.join(models_dir, 'blending_ensemble.joblib')
-            self.blending_meta_learner = joblib.load(meta_learner_path)
-
-            # Load metrics
-            metrics_path = os.path.join(models_dir, 'model_metrics.joblib')
-            self.model_metrics = joblib.load(metrics_path)
+        
+        # Initialize individual classifiers with config parameters
+        self.classifiers = {
+            'decision_tree': DecisionTreeClassifier(**MODEL_CONFIG['decision_tree']),
+            'random_forest': RandomForestClassifier(**MODEL_CONFIG['random_forest']),
+            'support_vector_machine': SVC(**MODEL_CONFIG['support_vector_machine'], probability=True),
+            'logistic_regression': LogisticRegression(**MODEL_CONFIG['logistic_regression']),
+            'xgboost': xgb.XGBClassifier(**MODEL_CONFIG['xgboost']),
+        }
+        
+        # Initialize CNN model
+        self.cnn_model = self._build_cnn_model()
+        
+        # Initialize blending ensemble
+        self.blending_meta_learner = LogisticRegression(**MODEL_CONFIG['blending_ensemble']['meta_learner_params'])
+        
+        # Pre-train the models
+        self._pretrain_models()
 
     def _build_cnn_model(self):
         model = tf.keras.Sequential()
@@ -116,18 +100,14 @@ class LearningStyleClassifier:
         self.model_metrics[model_name] = metrics
         return metrics
 
-    def train_and_save_models(self, models_dir='models'):
-        # Create models directory if it doesn't exist
-        if not os.path.exists(models_dir):
-            os.makedirs(models_dir)
-
+    def _pretrain_models(self):
         # Create training data and split into training and validation sets
         X_data, y_data = self._generate_training_data()
         X_train, X_val, y_train, y_val = train_test_split(
             X_data, y_data, test_size=0.2, random_state=42, stratify=y_data
         )
         
-        # Train, evaluate and save each model on the validation set
+        # Train and evaluate each model on the validation set
         for name, clf in self.classifiers.items():
             start_time = time.time()
             clf.fit(X_train, y_train)
@@ -136,11 +116,8 @@ class LearningStyleClassifier:
             y_pred = clf.predict(X_val)
             y_pred_proba = clf.predict_proba(X_val)
             self._calculate_metrics(y_val, y_pred, y_pred_proba, name, training_time)
-
-            # Save the trained model
-            joblib.dump(clf, os.path.join(models_dir, f'{name}.joblib'))
         
-        # Train, evaluate and save CNN on the validation set
+        # Train and evaluate CNN on the validation set
         start_time = time.time()
         self.cnn_model.fit(
             X_train, y_train,
@@ -154,9 +131,6 @@ class LearningStyleClassifier:
         y_pred = np.argmax(self.cnn_model.predict(X_val), axis=1)
         y_pred_proba = self.cnn_model.predict(X_val)
         self._calculate_metrics(y_val, y_pred, y_pred_proba, 'cnn', training_time)
-
-        # Save the CNN model
-        self.cnn_model.save(os.path.join(models_dir, 'cnn_model'))
         
         # Train the meta-learner on training data, then evaluate the blending ensemble on the validation set
         start_time = time.time()
@@ -176,12 +150,6 @@ class LearningStyleClassifier:
         y_pred = self.blending_meta_learner.predict(base_predictions_val)
         y_pred_proba = self.blending_meta_learner.predict_proba(base_predictions_val)
         self._calculate_metrics(y_val, y_pred, y_pred_proba, 'blending_ensemble', training_time)
-
-        # Save the meta-learner
-        joblib.dump(self.blending_meta_learner, os.path.join(models_dir, 'blending_ensemble.joblib'))
-
-        # Save the metrics
-        joblib.dump(self.model_metrics, os.path.join(models_dir, 'model_metrics.joblib'))
 
     def _generate_training_data(self):
         # Convert question indices to 0-based indexing
