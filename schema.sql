@@ -913,12 +913,12 @@ CREATE TABLE module_assessment (
 INSERT INTO module_assessment (course_id, module_number, assessment_title, assessment_objective, assessment_scenario, assessment_instructions) VALUES (
   1, 1, 
   'Future Shapers: Mapping Change Drivers', 
-  'Work within your group. Identify and analyze change drivers and weak signals using the PESTLE framework.', 
+  'A major tech company announces the development of a new AI-driven automation system that could replace a significant portion of the workforce in manufacturing industries. This development has sparked debates about its potential impact on labor markets, job opportunities, and societal norms.', 
   null, 
   JSON_ARRAY(
     JSON_OBJECT(
       'step_title', 'Spot the Current Change Driver',
-      'step_description', 'Find a current event (news, blog, tweet) that highlights a shift or trend influencing the future. Write a brief description of the change.'
+      'step_description', 'Write a brief description of the change.'
     ),
     JSON_OBJECT(
       'step_title', 'Categorize the PESTLE',
@@ -926,7 +926,7 @@ INSERT INTO module_assessment (course_id, module_number, assessment_title, asses
     ),
     JSON_OBJECT(
       'step_title', 'Identify a Weak Signal',
-      'step_description', 'Find a subtle early sign within your example that could lead to future change.'
+      'step_description', 'Identify a weak signal within the scenario that could become a major trend.'
     ),
     JSON_OBJECT(
       'step_title', 'Reflect',
@@ -938,24 +938,24 @@ INSERT INTO module_assessment (course_id, module_number, assessment_title, asses
 INSERT INTO module_assessment (course_id, module_number, assessment_title, assessment_objective, assessment_scenario, assessment_instructions) VALUES (
   1, 2, 
   'Future Force Field: Solving Tomorrow`s Challenges', 
-  'Collaborate with your team to apply Futures Thinking tools to solve a shared future challenge.', 
-  'Your team is a group of policy advisors preparing your city for a major shift in AI automation. The goal is to develop a strategy that helps the community adapt without negatively impacting jobs or social systems.', 
+  'Engage students in problem-solving by applying Futures Thinking tools to identify and address future challenges.', 
+  'You are a policy advisor preparing your city for a major shift in AI automation. Your goal is to help the community adapt without negatively impacting jobs or social systems.', 
   JSON_ARRAY(
     JSON_OBJECT(
       'step_title', 'Identify Key Drivers',
-      'step_description', 'As a team, use the PESTLE framework to collectively identify three key drivers (e.g., technological, political, social) influencing the shift. Discuss and assign each driver to a team member to research and explain its impact.'
+      'step_description', 'Use the PESTLE framework to identify three key drivers (e.g., technological, political, social) influencing the shift and explain their impact.'
     ),
     JSON_OBJECT(
       'step_title', 'Horizon Scanning',
-      'step_description', 'Each team member will choose one weak signal (early hint) related to their assigned driver. The team will discuss how these weak signals could evolve into major trends.'
+      'step_description', 'Choose two weak signals (early hints) related to your drivers and explain how they could evolve into major trends.'
     ),
     JSON_OBJECT(
       'step_title', 'Trend Identification',
-      'step_description', 'Use the Futures Wheel as a team to map out the first, second, and third-order impacts of the technological shift on sectors like employment, economy, and society.'
+      'step_description', 'Use the Futures Wheel to map out the first, second, and third-order impacts of the technological shift on sectors like employment, economy, and society.'
     ),
     JSON_OBJECT(
       'step_title', 'Brainstorm Solutions',
-      'step_description', 'As a group, develop three policy solutions that address the challenges of the shift. Focus on: Mitigating negative impacts, supporting vulnerable groups, encouraging public-private collaboration.'
+      'step_description', 'Propose three policy solutions to address the challenges of the shift, focusing on: Mitigating negative impacts, supporting vulnerable groups, encouraging public-private collaboration.'
     ),
     JSON_OBJECT(
       'step_title', 'Reflection',
@@ -971,24 +971,20 @@ INSERT INTO module_assessment (course_id, module_number, assessment_title, asses
   null, 
   JSON_ARRAY(
     JSON_OBJECT(
-      'step_title', 'Select an issue',
-      'step_description', 'As a group, choose an issue to explore. Each member can suggest one issue, and you`ll vote on the final choice.'
+      'step_title', 'Choose an issue',
+      'step_description', '(e.g., climate change, AI, public health) to explore future possibilities.'
     ),
     JSON_OBJECT(
       'step_title', 'CLA Exploration',
-      'step_description', 'Use Causal Layered Analysis as a group to explore: • Litany: The visible facts (e.g., trends, headlines) • Systemic Causes: The deeper causes (e.g., policies, economic systems) • Worldviews: The cultural beliefs influencing the issue • Myths/Metaphors: The deep, often unspoken narratives'
+      'step_description', 'Use Causal Layered Analysis to identify: • Litany: The visible facts (e.g., trends, headlines) • Systemic Causes: The deeper causes (e.g., policies, economic systems) • Worldviews: The cultural beliefs influencing the issue • Myths/Metaphors: The deep, often unspoken narratives'
     ),
     JSON_OBJECT(
       'step_title', 'Build Scenarios',
-      'step_description', 'As a group, create four future scenarios for your issue: • Best Case: Ideal future • Worst Case: Worst possible future • Middle Ground: Plausible future • Wildcard: Unlikely but possible future'
-    ),
-    JSON_OBJECT(
-      'step_title', 'Group Discussion',
-      'step_description', 'Discuss your scenarios and consolidate your ideas into one cohesive group submission.'
+      'step_description', 'Create four future scenarios for your issue: • Best Case: Ideal future • Worst Case: Worst possible future • Middle Ground: Plausible future • Wildcard: Unlikely but possible future'
     ),
     JSON_OBJECT(
       'step_title', 'Reflection',
-      'step_description', 'Write a 150–300-word group reflection on what you learned from this activity.'
+      'step_description', 'Write a 150–300 word reflection on what you learned from this activity.'
     )
   )
 );
@@ -1001,7 +997,7 @@ INSERT INTO module_assessment (course_id, module_number, assessment_title, asses
   JSON_ARRAY(
     JSON_OBJECT(
       'step_title', 'Short Answer Questions',
-      'step_description', 'As a group, discuss the following questions and create a collective response. One group member will write down the answers.
+      'step_description', 'Answer the following questions based on the Introduction to Futures Thinking concepts.
       1. What is Futures Thinking?
       2. What is the Three Horizons Model?
       3. What are Change Drivers?
@@ -1009,7 +1005,7 @@ INSERT INTO module_assessment (course_id, module_number, assessment_title, asses
     ),
     JSON_OBJECT(
       'step_title', 'Multiple-Choice Questions',
-      'step_description', 'As a group, answer the following questions. Discuss each one and come to a collective agreement on the answers.
+      'step_description', 'Answer the following questions.
       1. Which of the following is NOT a category in the PESTLE framework?
         a. Technological
         b. Ethical
@@ -1028,15 +1024,14 @@ INSERT INTO module_assessment (course_id, module_number, assessment_title, asses
     ),
     JSON_OBJECT(
       'step_title', 'Scenario Application',
-      'step_description', 'Given the global pandemic scenario, work together to:
+      'step_description', 'Based on the scenario given below, apply Futures Thinking tools and answer the questions:
+      Scenario: A global pandemic has disrupted global supply chains. Governments are now looking to restructure their economic strategies for future sustainability.
       • Identify at least three drivers influencing the future of global supply chains. Categorize them using the PESTLE framework.
       • Identify two weak signals in the context of supply chain disruptions and discuss how these signals might grow into major trends.'
     ),
     JSON_OBJECT(
       'step_title', 'Reflection',
-      'step_description', 'After completing the task, each group member will write a 150-300-word individual reflection on the activity. Focus on:
-      • How you worked together to identify key trends and signals.
-      • The role of Futures Thinking in planning for long-term challenges in your field of interest.'
+      'step_description', 'Write a 150-300-word reflection on what you learned from this activity, focusing on the practical application of Futures Thinking concepts. Consider how Futures Thinking could be used in your field of interest to shape long-term decisions.'
     )
   )
 );
@@ -1049,19 +1044,19 @@ INSERT INTO module_assessment (course_id, module_number, assessment_title, asses
   JSON_ARRAY(
     JSON_OBJECT(
       'step_title', 'Identify Key Drivers',
-      'step_description', 'As a group, use the PESTLE framework to identify three key drivers affecting workforce automation. Discuss their potential impacts on the workforce and society.'
+      'step_description', 'Use the PESTLE framework to identify three key drivers (technological, political, social) affecting AI automation in the workforce.'
     ),
     JSON_OBJECT(
       'step_title', 'Horizon Scanning',
-      'step_description', 'Each team member will identify one weak signal related to workforce changes and automation. Discuss how these weak signals might evolve into major trends.'
+      'step_description', 'Identify two weak signals related to workforce changes and explain how they could evolve into major trends.'
     ),
     JSON_OBJECT(
       'step_title', 'Trends Identification and Analysis',
-      'step_description', 'As a group, use the Futures Wheel to identify first, second, and third-order impacts of automation on the workforce, economy, and society. Discuss how these trends might shape future outcomes.'
+      'step_description', 'Use the Futures Wheel to analyze the potential first, second, and third-order impacts of automation on the workforce, economy, and society. Consider how these impacts might cascade throughout different sectors.'
     ),
     JSON_OBJECT(
       'step_title', 'Brainstorm Solutions',
-      'step_description', 'As a group, propose three strategic solutions to address workforce challenges created by automation. Focus on: Upskilling and reskilling strategies, Policy solutions for displaced workers, Strategies to adapt to a more automated workforce.'
+      'step_description', 'Propose three solutions for managing the impact of automation on employees, focusing on: Upskilling and reskilling strategies, Policy solutions for displaced workers, Strategies for adapting to new workforce needs.'
     ),
     JSON_OBJECT(
       'step_title', 'Reflect',
@@ -1081,14 +1076,12 @@ INSERT INTO module_assessment (course_id, module_number, assessment_title, asses
       'step_description', 'Select one significant issue or trend that may affect the future (e.g., climate change, technology advancement, geopolitical tensions). Write a brief description of the issue (3-5 sentences).'
     ),
     JSON_OBJECT(
-      'step_title', 'Divide the Task',
-      'step_description', 'Each member of the group will work on a different part of the task:
-      • CLA (Litany, Systemic Causes, Worldviews, Myths/Metaphors): One member will handle the Litany and Systemic Causes, while another will explore Worldviews and Myths/Metaphors.
-      • Futures Triangle: One member will focus on defining the Pull of the Future, another on the Push of the Present, and another on the Weight of the Past.'
+      'step_title', 'Apply Causal Layered Analysis (CLA):',
+      'step_description', '• Litany: Identify and describe the surface-level facts about this issue (e.g., current news or headlines). • Systemic Causes: Explore the underlying systems or structures that contribute to this issue. How is this issue supported by existing systems? • Worldviews: Reflect on the beliefs or values that influence how people view or respond to this issue. What assumptions are made about this issue in society? • Metaphors and Myths: Identify any metaphors or myths associated with this issue that might influence decision-making or policy.'
     ),
     JSON_OBJECT(
-      'step_title', 'Collaborative Problem-Solving',
-      'step_description', 'Once the individual parts are completed, come together as a group to discuss and integrate the findings. Then, collectively propose one or more solutions based on the CLA and Futures Triangle analysis.'
+      'step_title', 'Apply the Futures Triangle:',
+      'step_description', '• Pull (Vision): Define a possible vision for the future in relation to this issue. What is the ideal future youd like to see? • Push (Trends): List the current trends or megatrends pushing us towards this future. How are these trends shaping what will happen? • Weight (Barriers): Discuss the historical barriers that might prevent this future vision. What past decisions, systems, or traditions are limiting change?'
     ),
     JSON_OBJECT(
       'step_title', 'Problem-Solving',
@@ -1104,12 +1097,12 @@ INSERT INTO module_assessment (course_id, module_number, assessment_title, asses
   null, 
   JSON_ARRAY(
     JSON_OBJECT(
-      'step_title', 'Group Framework Development',
-      'step_description', 'In your group, work together to create a detailed Futures Thinking framework using a shared digital tool (like Google Docs or Miro). Each member should contribute to the sections: Overview, Tools, Horizon Model, and Change Drivers.'
+      'step_title', 'Create a Conceptual Framework',
+      'step_description', 'Create a formal framework using a diagram (e.g., flowchart or mind map) that outlines the key components of Futures Thinking. Include the following components: Futures Thinking Overview, Key Tools, Horizon Model, PESTLE/Change Drivers.'
     ),
     JSON_OBJECT(
-      'step_title', 'Group Discussion',
-      'step_description', 'After creating the framework, each group member should share their thoughts on how Futures Thinking tools could influence a policy area of their choice. Have a discussion on which tools are most beneficial for anticipating change and guiding policy.'
+      'step_title', 'Analysis and Reflection.',
+      'step_description', 'Reflect on how these tools and models can be applied in real-world policy scenarios. Write a brief description (200-300 words) explaining how Futures Thinking could benefit a specific policy issue you are familiar with (e.g., climate change, healthcare, technology).'
     )
   )
 );
@@ -1148,16 +1141,16 @@ INSERT INTO module_assessment (course_id, module_number, assessment_title, asses
   null, 
   JSON_ARRAY(
     JSON_OBJECT(
-      'step_title', 'Form Teams & Select Two Scenarios',
-      'step_description', 'Work together to choose two distinct scenarios based on a key issue. One scenario could focus on technological advancement, and the other could address environmental or policy constraints.'
+      'step_title', 'Select Two Scenarios',
+      'step_description', 'Create two distinct scenarios based on a key issue. Scenario 1 could be an optimistic future driven by technological advancements, while Scenario 2 might reflect a future constrained by environmental challenges or policy shifts.'
     ),
     JSON_OBJECT(
-      'step_title', 'Assign Drivers to Team Members',
-      'step_description', 'Assign each team member to research and analyze specific key drivers (e.g., technology, economy, climate). Ensure that everyone has a driver to explore in detail.'
+      'step_title', 'Identify Key Drivers',
+      'step_description', 'Choose the major drivers (e.g., technological change, economic trends, climate change, policy shifts) that influence both scenarios. List them for comparison.'
     ),
     JSON_OBJECT(
       'step_title', 'Create a Comparison Chart',
-      'step_description', 'Using the table below, collaborate to compare how each driver influences the future in both scenarios. Each member should contribute their findings for the chart.
+      'step_description', 'Use the table below to compare how each key driver affects the future in both scenarios. For each driver, note its impact in each case (positive, negative, or neutral)..
       | Key Drivers | Scenario 1: Tech-Driven Future | Scenario 2: Environmentally Constrained Future |
       |-------------|-------------------------------|--------------------------------------------|
       | Technology Advancement | Positive Impact | Neutral Impact |
@@ -1166,13 +1159,9 @@ INSERT INTO module_assessment (course_id, module_number, assessment_title, asses
       | Global Policy Shifts | Positive Impact | Mixed Impact |'
     ),
     JSON_OBJECT(
-      'step_title', 'Group Discussion',
-      'step_description', 'After completing the comparison chart, hold a discussion to analyze how these drivers interact in each scenario. How does each driver influence the future? What insights did you gain from comparing the scenarios? Each member should share their perspective on the drivers they researched.'
+      'step_title', 'Analysis & Reflection:',
+      'step_description', 'Reflect on the comparison. How do the different drivers shape the direction of each scenario? What surprises you about their interactions? Write a short paragraph explaining what you learned from comparing these futures.'
     ),
-    JSON_OBJECT(
-      'step_title', 'Write a Collaborative Reflection',
-      'step_description', 'After the discussion, write a joint reflection summarizing the group`s findings. Address how the interaction between drivers influences the scenarios and discuss the broader implications for future planning.'
-    )
   )
 );
 
@@ -1183,18 +1172,16 @@ INSERT INTO module_assessment (course_id, module_number, assessment_title, asses
   null, 
   JSON_ARRAY(
     JSON_OBJECT(
-      'step_title', 'Classify key concepts',
-      'step_description', 'As a group, classify the key concepts into three categories (as defined above). Discuss each concept in the categories. Consider:
-      • How do these concepts intersect with your community or professional experiences?
-      • Which concepts might be most challenging to apply, and why?'
+      'step_title', 'Classify the key concepts from the Introduction to Futures Thinking into three categories:',
+      'step_description', '• Key Themes (Multiple Futures, Drivers of Change, Scenarios, Uncertainty, Systems Thinking) • Benefits of Futures Thinking (Understand Forces, Spot Gaps, Build Consensus, Adapt Strategies, Encourage Action) • Tools and Methods (PESTLE, Horizon Scanning, Three Horizons Model)'
     ),
     JSON_OBJECT(
-      'step_title', 'Create a shared list',
-      'step_description', 'Create a shared list of questions or points for further exploration.'
+      'step_title', 'Create a list',
+      'step_description', 'For each category, write down a short description of each concept, along with how it might apply to real-world issues you are familiar with.'
     ),
     JSON_OBJECT(
       'step_title', 'Individual reflection',
-      'step_description', 'After discussion, each participant should individually reflect on the classification and note their personal insights.'
+      'step_description', 'Reflect on any personal insights or questions that arose as you classified these concepts.'
     )
   )
 );
@@ -1206,27 +1193,32 @@ INSERT INTO module_assessment (course_id, module_number, assessment_title, asses
   null, 
   JSON_ARRAY(
     JSON_OBJECT(
-      'step_title', 'Futures Thinking Reflection (Group Discussion)',
-      'step_description', 'As a group, discuss your personal understandings of Futures Thinking. Share how you each interpret the concept and its importance. Afterward, summarize your group`s collective thoughts on: What does Futures Thinking mean for your community or area of interest?'
+      'step_title', 'Futures Thinking Reflection',
+      'step_description', 'Take 5 minutes to reflect on the definition and key principles of Futures Thinking. Write down: What does Futures Thinking mean to you personally? Why do you think it is important in today’s world?'
     ),
     JSON_OBJECT(
-      'step_title', 'Driver Mapping (Group PESTLE Analysis)',
-      'step_description', 'In your group, choose a current global issue (e.g., COVID-19 recovery, technological advancements, or climate change). Use the PESTLE Framework to collaboratively identify potential drivers affecting this issue. Afterward, collectively discuss:
-      • Which drivers do you think will shape the future most significantly, and why?'
+      'step_title', 'Driver Mapping (PESTLE Framework)',
+      'step_description', 'Think about a current issue that you care about (e.g., climate change, education, or technology). Use the PESTLE Framework to identify the political, economic, social, technological, legal, and environmental drivers related to the issue. Write these drivers down and reflect on:
+      • Which of these drivers do you think will have the most impact on the future of your chosen issue?
+      • How do you feel about the potential outcomes shaped by these drivers?'
     ),
     JSON_OBJECT(
-      'step_title', 'Horizon Scanning (Group Signal Exploration)',
-      'step_description', 'Each member of the group finds a weak signal in a news article, blog post, or tweet related to a global issue. Share your findings and discuss:
-      • What signals did you find, and why might they be important?'
+      'step_title', 'Horizon Scanning (Signals Exploration)',
+      'step_description', 'Find a news article or blog that discusses an emerging trend. Read it carefully and identify any weak signals (small indicators of larger trends). Reflect and write: What signals did you find, and why might they be important?
+      • What is the weak signal you identified?
+      • Why do you think this might be important in the future?'
     ),
     JSON_OBJECT(
-      'step_title', 'Trends Identification and Futures Wheel (Group Mapping)',
-      'step_description', 'Together, select a trend affecting your group (e.g., social media`s influence, remote work, or environmental sustainability). As a group, create a Futures Wheel to analyze the trend`s impact. Reflect on:
-      • Which ripple effect was most unexpected, and how might it impact future developments?'
+      'step_title', 'Trends Identification and Futures Wheel',
+      'step_description', 'Select one trend that is currently impacting your community, such as remote work, climate change, or social media. Create a Futures Wheel (write, dont draw) to explore the first, second, and third-order effects of this trend. Which ripple effect was most unexpected, and how might it impact future developments?
+      • First-order effects: Immediate impacts.
+      • Second-order effects: Resulting changes from the first effects.
+      • Third-order effects: Long-term or less obvious consequences.
+      • Reflect on: Which effect surprised you the most and why?'
     ),
     JSON_OBJECT(
-      'step_title', 'Final Reflection (Group Reflection and Discussion)',
-      'step_description', 'As a group, discuss how Futures Thinking can influence your chosen issue. Reflect on how you might incorporate Futures Thinking into your professional or academic practices. Summarize your group`s final thoughts.'
+      'step_title', 'Final Reflection',
+      'step_description', 'Based on the activities above, write a short paragraph (3-5 sentences) reflecting on how Futures Thinking can be applied to real-world issues and how it might help in planning for the future.'
     )
   )
 );
@@ -1238,34 +1230,33 @@ INSERT INTO module_assessment (course_id, module_number, assessment_title, asses
   null, 
   JSON_ARRAY(
     JSON_OBJECT(
-      'step_title', 'Group Selection',
-      'step_description', 'As a group, choose a common issue that interests everyone (e.g., global health, urban development, digital privacy).'
+      'step_title', 'Select an Issue',
+      'step_description', 'Choose a current issue from any field (e.g., climate change, education, technology, healthcare).'
     ),
     JSON_OBJECT(
       'step_title', 'Causal Layered Analysis (CLA)',
-      'step_description', 'Each group member will take one of the CLA layers and analyze the chosen issue from that perspective:
-      • Litany: What are the visible symptoms or headlines surrounding this issue?
+      'step_description', ' • Litany: What are the visible symptoms or headlines surrounding this issue?
       • Systemic Causes: What are the systemic or structural factors that contribute to this issue?
       • Worldview: What beliefs or ideologies are shaping this issue? 
       • Myth/Metaphor: What deeper narratives or collective metaphors influence this issue?'
     ),
     JSON_OBJECT(
       'step_title', 'Futures Triangle',
-      'step_description', 'Discuss and agree on the Pulls of the Future, Pushes of the Present, and Weights of the Past as a group. Identify how these elements interact with each other.'
+      'step_description', 'Reflect on the Pulls of the Future (desirable future), Pushes of the Present (current trends), and Weights of the Past (historical inertia) that influence your issue.'
     ),
     JSON_OBJECT(
       'step_title', 'Scenario Planning',
-      'step_description', 'As a team, develop 3 different scenarios for the future:
+      'step_description', 'Develop 3 different scenarios for the future of your issue:
       • Exploratory Scenario: Based on current trends.
       • Normative Scenario: A future you wish to see and how to achieve it.
       • Wildcard Scenario: An unlikely but impactful event that could change the course.'
     ),
     JSON_OBJECT(
-      'step_title', 'Group Reflection',
+      'step_title', 'Reflection',
       'step_description', 'Write a 300-word reflection on:
-      • Discuss the most plausible and impactful scenario.
-      • Share insights on how the past and present have shaped the future possibilities.
-      • Reflect on the insights gained from each member`s contribution and how collaboration shaped the final scenarios.'
+      • Which scenario seems most plausible?
+      • How does understanding the past and present help you shape your future vision?
+      • What assumptions did you challenge in this process?'
     )
   )
 );
