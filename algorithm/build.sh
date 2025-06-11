@@ -3,8 +3,8 @@
 # Exit script on any error
 set -e
 
-echo "Installing dependencies..."
-pip install -r requirements.txt
+echo "Installing build dependencies..."
+pip install -r requirements-build.txt
 
 echo "Training models..."
 python train.py
