@@ -1,3 +1,4 @@
+import os
 from flask import Flask, request, jsonify
 from learning_style_classifier import LearningStyleClassifier
 from flask_cors import CORS
@@ -5,8 +6,16 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
+# Check if models are available
+MODELS_DIR = 'models'
+if not os.path.exists(MODELS_DIR) or not os.listdir(MODELS_DIR):
+    print(f"Error: Models not found in '{MODELS_DIR}' directory.")
+    print("Please run 'python train.py' to train and save the models first.")
+    # Exit if models are not found, so the app doesn't start
+    exit()
+
 # Initialize the classifier
-classifier = LearningStyleClassifier()
+classifier = LearningStyleClassifier(models_dir=MODELS_DIR)
 
 @app.route('/')
 def index():
