@@ -1134,11 +1134,19 @@ INSERT INTO module_assessment (course_id, module_number, assessment_title, asses
   )
 );
 
-INSERT INTO module_assessment (course_id, module_number, assessment_title, assessment_objective, assessment_scenario, assessment_instructions) VALUES (
-  3, 3, 
+INSERT INTO module_assessment (
+  course_id, 
+  module_number, 
+  assessment_title, 
+  assessment_objective, 
+  assessment_scenario, 
+  assessment_instructions
+) VALUES (
+  3, 
+  3, 
   'Comparative Analysis of Future Scenarios', 
-  'To understand and compare different future scenarios based on key drivers of change, exploring how variations in these drivers could shape the future through teamwork and collective analysis. As a team, you will compare two future scenarios using the Futures Triangle  or Causal Layered Analysis methods. Together, you will analyze how different trends and  drivers can shape the future, focusing on the collective impact of these drivers on society, technology, and the environment.',
-  null, 
+  'To understand and compare different future scenarios based on key drivers of change, exploring how variations in these drivers could shape the future through teamwork and collective analysis. As a team, you will compare two future scenarios using the Futures Triangle or Causal Layered Analysis methods. Together, you will analyze how different trends and drivers can shape the future, focusing on the collective impact of these drivers on society, technology, and the environment.',
+  NULL, 
   JSON_ARRAY(
     JSON_OBJECT(
       'step_title', 'Select Two Scenarios',
@@ -1150,20 +1158,15 @@ INSERT INTO module_assessment (course_id, module_number, assessment_title, asses
     ),
     JSON_OBJECT(
       'step_title', 'Create a Comparison Chart',
-      'step_description', 'Use the table below to compare how each key driver affects the future in both scenarios. For each driver, note its impact in each case (positive, negative, or neutral)..
-      | Key Drivers | Scenario 1: Tech-Driven Future | Scenario 2: Environmentally Constrained Future |
-      |-------------|-------------------------------|--------------------------------------------|
-      | Technology Advancement | Positive Impact | Neutral Impact |
-      | Economic Growth | Strong Growth | Slower Growth |
-      | Climate Change | Neutral Impact | Significant Negative Impact |
-      | Global Policy Shifts | Positive Impact | Mixed Impact |'
+      'step_description', 'Use the table below to compare how each key driver affects the future in both scenarios. For each driver, note its impact in each case (positive, negative, or neutral). | Key Drivers | Scenario 1: Tech-Driven Future | Scenario 2: Environmentally Constrained Future | |-------------|-------------------------------|--------------------------------------------| | Technology Advancement | Positive Impact | Neutral Impact | | Economic Growth | Strong Growth | Slower Growth | | Climate Change | Neutral Impact | Significant Negative Impact | | Global Policy Shifts | Positive Impact | Mixed Impact |'
     ),
     JSON_OBJECT(
       'step_title', 'Analysis & Reflection:',
       'step_description', 'Reflect on the comparison. How do the different drivers shape the direction of each scenario? What surprises you about their interactions? Write a short paragraph explaining what you learned from comparing these futures.'
-    ),
+    )
   )
 );
+
 
 INSERT INTO module_assessment (course_id, module_number, assessment_title, assessment_objective, assessment_scenario, assessment_instructions) VALUES (
   2, 1, 
