@@ -653,8 +653,29 @@
       <!-- Main Content -->
       <div class="main-content">
         <div class="content-container">
-          <div class="content-header">
+          <div class="content-header d-flex justify-content-between align-items-center">
             <h2 class="content-title"></h2>
+            <button type="button" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#rubricsModal">
+              View Rubrics
+            </button>
+          </div>
+
+          <!-- Rubrics Modal -->
+          <div class="modal fade" id="rubricsModal" tabindex="-1" aria-labelledby="rubricsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="rubricsModalLabel">Activity Rubrics</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <img src="../assets/rubrics/rubrics.PNG" alt="Activity Rubrics" class="img-fluid">
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="content-body">
             <!-- Content will be loaded dynamically -->
@@ -912,9 +933,6 @@
                     // Click the lesson item
                     lessonItem.click();
 
-                    // Make sure continue button is enabled
-                    $(".btn-continue").prop("disabled", false);
-
                     // Hide loading overlay and exit
                     setTimeout(() => {
                       loadingOverlay.classList.remove("active");
@@ -941,8 +959,6 @@
                 );
                 if (firstLesson.length) {
                   firstLesson.click();
-                  // Make sure continue button is clickable for first screen
-                  $(".btn-continue").prop("disabled", false);
                 }
               }
 
@@ -1793,7 +1809,7 @@
           $(".content-body").html(contentHtml);
 
           // Update navigation buttons
-          updateNavigationButtons(lessonScreen.screen_number);
+          updateNavigationButtons(lessonScreen.screen_number, isVideo);
 
           // Start assessment progress checking
           checkAssessmentProgress();
@@ -1918,14 +1934,12 @@
         /**
          * Update navigation buttons based on current content
          */
-        function updateNavigationButtons(currentId) {
+        function updateNavigationButtons(currentId, isVideo) {
           const btnBack = $(".btn-back");
           const btnContinue = $(".btn-continue");
 
           // Find current lesson item
-          const currentItem = $(`#${currentId}`).length
-            ? $(`#${currentId}`)
-            : $(`.lesson-item.active`);
+          const currentItem = $(`.lesson-item.active`);
 
           // Get current module number
           const currentModuleNumber = parseInt(
@@ -2115,16 +2129,15 @@
             } else {
               // For videos, the button is enabled when the video is complete
               // For non-video content, enable the button immediately
-              if (
-                !currentId.includes("video") ||
-                currentItem.is(":first-child")
-              ) {
+              if (isVideo) {
+                btnContinue.prop("disabled", true);
+              } else {
                 btnContinue.prop("disabled", false);
               }
 
               btnContinue.off("click").on("click", function () {
                 // Get current screen progress ID and next screen ID
-                const currentScreenNumber = getScreenNumberFromId(currentId);
+                const currentScreenNumber = currentId;
                 const nextScreenNumber = getScreenNumberFromId(
                   nextItem.attr("id")
                 );
@@ -2353,6 +2366,10 @@
               return `${parts.slice(1, -1).join(".")}-video`;
             } else {
               // For regular screens
+              if (parts.length === 2) {
+                // Handle formats like 'screen-1' -> 1
+                return parts[1];
+              }
               if (parts.length === 3) {
                 // Handle formats like 'screen-1-2' -> 1.2
                 return `${parts[1]}.${parts[2]}`;
