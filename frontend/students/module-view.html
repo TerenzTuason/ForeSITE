@@ -570,6 +570,10 @@
           display: block;
         }
       }
+
+      #rubricsModal .modal-body {
+        padding: 2rem;
+      }
     </style>
   </head>
   <body>
@@ -581,6 +585,21 @@
       <i class="fas fa-clipboard-check"></i>
       Take Assessment
     </a>
+
+    <!-- Rubrics Modal -->
+    <div class="modal fade" id="rubricsModal" tabindex="-1" aria-labelledby="rubricsModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="rubricsModalLabel">Rubrics for activities with open-ended questions:</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body text-center">
+            <img src="../assets/rubrics/rubrics.PNG" class="img-fluid" alt="Rubrics">
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Add modal HTML before the loading overlay -->
     <div class="modal fade" id="lockedModuleModal" tabindex="-1" aria-labelledby="lockedModuleModalLabel" aria-hidden="true">
@@ -658,7 +677,9 @@
         <div class="content-container">
           <div class="content-header">
             <h2 class="content-title"></h2>
-            <span class="content-duration" style="font-size: 1rem; font-weight: 400;"></span>
+            <button type="button" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#rubricsModal">
+              View Rubrics
+            </button>
           </div>
           <div class="content-body">
             <!-- Content will be loaded dynamically -->
