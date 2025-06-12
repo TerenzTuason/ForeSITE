@@ -1156,9 +1156,9 @@ INSERT INTO module_assessment (
       'step_title', 'Identify Key Drivers',
       'step_description', 'Choose the major drivers (e.g., technological change, economic trends, climate change, policy shifts) that influence both scenarios. List them for comparison.'
     ),
-    JSON_OBJECT(
-      'step_title', 'Create a Comparison Chart',
-      'step_description', 'Use the table below to compare how each key driver affects the future in both scenarios. For each driver, note its impact in each case (positive, negative, or neutral). | Key Drivers | Scenario 1: Tech-Driven Future | Scenario 2: Environmentally Constrained Future | |-------------|-------------------------------|--------------------------------------------| | Technology Advancement | Positive Impact | Neutral Impact | | Economic Growth | Strong Growth | Slower Growth | | Climate Change | Neutral Impact | Significant Negative Impact | | Global Policy Shifts | Positive Impact | Mixed Impact |'
+  JSON_OBJECT(
+    'step_title', 'Create a Comparison Chart',
+    'step_description', 'Use the table below to compare how each key driver affects the future in both scenarios. For each driver, note its impact in each case (positive, negative, or neutral). <table style="border-collapse: collapse; width: 100%;"><thead><tr><th style="border: 1px solid #ccc; padding: 8px;">Key Drivers</th><th style="border: 1px solid #ccc; padding: 8px;">Scenario 1: Tech-Driven Future</th><th style="border: 1px solid #ccc; padding: 8px;">Scenario 2: Environmentally Constrained Future</th></tr></thead><tbody><tr><td style="border: 1px solid #ccc; padding: 8px;">Technology Advancement</td><td style="border: 1px solid #ccc; padding: 8px;">Positive Impact</td><td style="border: 1px solid #ccc; padding: 8px;">Neutral Impact</td></tr><tr><td style="border: 1px solid #ccc; padding: 8px;">Economic Growth</td><td style="border: 1px solid #ccc; padding: 8px;">Strong Growth</td><td style="border: 1px solid #ccc; padding: 8px;">Slower Growth</td></tr><tr><td style="border: 1px solid #ccc; padding: 8px;">Climate Change</td><td style="border: 1px solid #ccc; padding: 8px;">Neutral Impact</td><td style="border: 1px solid #ccc; padding: 8px;">Significant Negative Impact</td></tr><tr><td style="border: 1px solid #ccc; padding: 8px;">Global Policy Shifts</td><td style="border: 1px solid #ccc; padding: 8px;">Positive Impact</td><td style="border: 1px solid #ccc; padding: 8px;">Mixed Impact</td></tr></tbody></table>'
     ),
     JSON_OBJECT(
       'step_title', 'Analysis & Reflection:',
