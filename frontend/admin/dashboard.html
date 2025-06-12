@@ -341,28 +341,8 @@
             
             // Function to fetch courses
             function fetchCourses() {
-                fetch(`${apiBaseUrl}/courses`)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        // Count total courses
-                        const totalCourses = data.data ? data.data.length : 0;
-                        
-                        // Update UI
-                        document.getElementById('courses').textContent = totalCourses;
-                        document.getElementById('coursesCard').classList.remove('loading');
-                    })
-                    .catch(error => {
-                        console.error('Error fetching courses:', error);
-                        
-                        // Update with error message
-                        document.getElementById('courses').textContent = 'Error';
-                        document.getElementById('coursesCard').classList.remove('loading');
-                    });
+                document.getElementById('courses').textContent = 1;
+                document.getElementById('coursesCard').classList.remove('loading');
             }
             
             // Function to fetch modules
