@@ -436,7 +436,7 @@
       const questionsPerPage = 10;
       let currentQuestionPage = 0;
       // Add storage for answers
-      // const savedAnswers = new Array(questions.length).fill(null);
+      const savedAnswers = new Array(questions.length).fill(null);
 
       // Pre-fill answers for testing (1 for agree, 0 for disagree)
       // const savedAnswers = Array(questions.length).fill(0).map((_, index) => index % 2); // Alternates between 0 and 1
@@ -450,12 +450,12 @@
       //   ];
 
       // Pre-fill answers for Pragmatist style
-      const savedAnswers = [
-        0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0,
-        0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
-        1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0,
-        1, 1, 0, 0, 0, 0, 0, 1,
-      ];
+      // const savedAnswers = [
+      //   0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0,
+      //   0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
+      //   1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0,
+      //   1, 1, 0, 0, 0, 0, 0, 1,
+      // ];
 
       // Add a console log to show the request body that will be sent
       console.log("Request body that will be sent:", { answers: savedAnswers });
