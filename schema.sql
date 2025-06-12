@@ -1211,13 +1211,7 @@ INSERT INTO module_assessment (course_id, module_number, assessment_title, asses
     ),
     JSON_OBJECT(
       'step_title', 'Create a Comparison Chart',
-      'step_description', 'Using the table below, collaborate to compare how each driver influences the future in both scenarios. Each member should contribute their findings for the chart.
-      | Key Drivers | Scenario 1: Tech-Driven Future | Scenario 2: Environmentally Constrained Future |
-      |-------------|-------------------------------|--------------------------------------------|
-      | Technology Advancement | Positive Impact | Neutral Impact |
-      | Economic Growth | Strong Growth | Slower Growth |
-      | Climate Change | Neutral Impact | Significant Negative Impact |
-      | Global Policy Shifts | Positive Impact | Mixed Impact |'
+    'step_description', 'Using the table below, collaborate to compare how each driver influences the future in both scenarios. Each member should contribute their findings for the chart. <table style="border-collapse: collapse; width: 100%;"><thead><tr><th style="border: 1px solid #ccc; padding: 8px;">Key Drivers</th><th style="border: 1px solid #ccc; padding: 8px;">Scenario 1: Tech-Driven Future</th><th style="border: 1px solid #ccc; padding: 8px;">Scenario 2: Environmentally Constrained Future</th></tr></thead><tbody><tr><td style="border: 1px solid #ccc; padding: 8px;">Technology Advancement</td><td style="border: 1px solid #ccc; padding: 8px;">Positive Impact</td><td style="border: 1px solid #ccc; padding: 8px;">Neutral Impact</td></tr><tr><td style="border: 1px solid #ccc; padding: 8px;">Economic Growth</td><td style="border: 1px solid #ccc; padding: 8px;">Strong Growth</td><td style="border: 1px solid #ccc; padding: 8px;">Slower Growth</td></tr><tr><td style="border: 1px solid #ccc; padding: 8px;">Climate Change</td><td style="border: 1px solid #ccc; padding: 8px;">Neutral Impact</td><td style="border: 1px solid #ccc; padding: 8px;">Significant Negative Impact</td></tr><tr><td style="border: 1px solid #ccc; padding: 8px;">Global Policy Shifts</td><td style="border: 1px solid #ccc; padding: 8px;">Positive Impact</td><td style="border: 1px solid #ccc; padding: 8px;">Mixed Impact</td></tr></tbody></table>'
     ),
     JSON_OBJECT(
       'step_title', 'Group Discussion',
