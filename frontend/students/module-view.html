@@ -1358,13 +1358,20 @@
             const moduleHeader = $(
               `#module-${module.module_number} .module-header`
             );
+            const isModuleCompleted = module.status === "completed";
 
             // Remove existing classes
             moduleHeader.removeClass("active completed locked");
 
             // Add appropriate class based on status
-            if (module.status === "completed") {
+            if (isModuleCompleted) {
               moduleHeader.addClass("completed");
+
+              // If module is completed, ensure all its lessons are also marked as completed
+              const lessonItems = $(`#module-${module.module_number}-lessons .lesson-item`);
+              lessonItems.removeClass("in-progress disabled").addClass("completed");
+              lessonItems.find("i").removeClass("fa-file-alt fa-video").addClass("fa-check-circle");
+              
             } else if (module.status === "in_progress") {
               moduleHeader.addClass("active");
             }
@@ -1487,6 +1494,8 @@
 
           moduleProgressData.forEach((module) => {
             const isLocked = isModuleLocked(module.module_number);
+            const isModuleCompleted = module.status === "completed";
+
             let durationText = "";
             if (module.module_title === "Foundations of Futures Thinking") {
               durationText = "2 hours 40minutes";
@@ -1508,7 +1517,7 @@
                             <div class="module-header ${
                               isLocked
                                 ? "locked"
-                                : module.status === "completed"
+                                : isModuleCompleted
                                 ? "completed"
                                 : module.status === "in_progress"
                                 ? "active"
@@ -1517,7 +1526,7 @@
                                 <i class="fas ${
                                   isLocked
                                     ? "fa-lock"
-                                    : module.status === "completed"
+                                    : isModuleCompleted
                                     ? "fa-check-circle"
                                     : "fa-book"
                                 }"></i>
@@ -1527,7 +1536,7 @@
                                 </div>
                                 <i class="fas fa-chevron-down ms-auto"></i>
                                 ${
-                                  module.status === "completed"
+                                  isModuleCompleted
                                     ? '<span class="badge bg-success">Completed</span>'
                                     : ""
                                 }
@@ -1607,6 +1616,7 @@
               // Create lesson item with appropriate icon based on content type
               const lessonItem = $(`
                             <li class="lesson-item ${
+                              isModuleCompleted ? "completed" :
                               screen.status === "completed"
                                 ? "completed"
                                 : screen.status === "in_progress"
@@ -1614,6 +1624,7 @@
                                 : ""
                             }" id="${screenId}">
                                 <i class="fas ${
+                                  isModuleCompleted ? "fa-check-circle" :
                                   isVideo
                                     ? "fa-video"
                                     : screen.status === "completed"
@@ -1941,6 +1952,19 @@
           // Find current lesson item
           const currentItem = $(`.lesson-item.active`);
 
+          // Check if the current screen is already completed
+          const isCurrentScreenCompleted = currentItem.hasClass("completed");
+
+          // If the screen is completed, disable the continue button and exit
+          if (isCurrentScreenCompleted) {
+            btnContinue.prop("disabled", true);
+            // Also disable the back button if it's the first item
+            if (!currentItem.prev(".lesson-item").length) {
+              btnBack.prop("disabled", true);
+            }
+            return; // Stop further processing
+          }
+
           // Get current module number
           const currentModuleNumber = parseInt(
             currentItem.closest(".module-item").attr("id").split("-")[1]
@@ -1969,9 +1993,12 @@
             btnBack.prop("disabled", true);
           }
 
-          // Check if current screen is completed
-          const isCurrentScreenCompleted = currentItem.hasClass("completed");
-
+          // If the screen is already completed, we've already disabled the button.
+          // The rest of the logic should only apply to non-completed screens.
+          if (isCurrentScreenCompleted) {
+            return;
+          }
+          
           // For the last screen (no next item), enable continue button to allow completion
           if (!nextItem.length) {
             if (!isCurrentScreenCompleted) {
@@ -1979,143 +2006,51 @@
               btnContinue.off("click").on("click", function () {
                 const currentScreenNumber = getScreenNumberFromId(currentId);
 
-                // First, mark all in-progress screens as completed
-                const resetInProgressScreens = function (callback) {
-                  // Get all current in-progress screen progress items
-                  const currentInProgressScreens = screenProgressData.filter(
-                    (progress) => progress.status === "in_progress"
-                  );
-
-                  if (currentInProgressScreens.length === 0) {
-                    if (callback) callback();
-                    return;
-                  }
-
-                  // Keep track of how many screens have been processed
-                  let processedCount = 0;
-
-                  // Update each in-progress screen to completed
-                  currentInProgressScreens.forEach((screen) => {
-                    // Find the lesson screen for this progress
-                    const lessonScreen = allLessonScreens.find(
-                      (s) => s.lesson_screen_id === screen.lesson_screen_id
+                // On the last screen, we only mark this screen as complete,
+                // then update the module progress percentage without marking the module itself as "completed".
+                // The assessment modal will then be triggered.
+                updateLessonScreenProgress(
+                  currentScreenNumber,
+                  "completed",
+                  100,
+                  function () {
+                    // Update UI to reflect completion of the lesson
+                    currentItem.addClass("completed");
+                    if (currentItem.find("i").length) {
+                      currentItem
+                        .find("i")
+                        .removeClass("fa-file-alt fa-video in-progress")
+                        .addClass("fa-check-circle");
+                    }
+                    // Update progress data in memory
+                    const screenProgress = screenProgressData.find(
+                      (progress) => {
+                        const screen = allLessonScreens.find(
+                          (s) =>
+                            s.lesson_screen_id ===
+                            progress.lesson_screen_id
+                        );
+                        return (
+                          screen &&
+                          screen.screen_number === currentScreenNumber
+                        );
+                      }
                     );
-                    if (lessonScreen) {
-                      // Mark all other in-progress screens as completed
-                      updateLessonScreenProgress(
-                        lessonScreen.screen_number,
-                        "completed",
-                        100,
-                        function () {
-                          processedCount++;
-                          if (
-                            processedCount ===
-                              currentInProgressScreens.length &&
-                            callback
-                          ) {
-                            callback();
-                          }
-                        }
-                      );
-                    } else {
-                      processedCount++;
-                      if (
-                        processedCount === currentInProgressScreens.length &&
-                        callback
-                      ) {
-                        callback();
-                      }
+                    if (screenProgress) {
+                      screenProgress.status = "completed";
+                      screenProgress.progress_percentage = 100;
                     }
-                  });
-                };
-
-                // First reset all in-progress screens, then update current screen
-                resetInProgressScreens(function () {
-                  // Mark current screen as completed
-                  updateLessonScreenProgress(
-                    currentScreenNumber,
-                    "completed",
-                    100,
-                    function () {
-                      // Mark current module as completed
-                      if (currentModuleProgress) {
-                        currentModuleProgress.status = "completed";
-                        currentModuleProgress.progress_percentage = 100;
-
-                        // Update module progress in database
-                        fetch(
-                          `http://127.0.0.1:8000/api/v1/module-progress/${currentModuleProgress.progress_id}`,
-                          {
-                            method: "PUT",
-                            headers: {
-                              "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify({
-                              status: "completed",
-                              progress_percentage: 100,
-                            }),
-                          }
-                        )
-                          .then((response) => response.json())
-                          .then(() => {
-                            // Update UI to reflect completion
-                            currentItem.addClass("completed");
-                            if (currentItem.find("i").length) {
-                              currentItem
-                                .find("i")
-                                .removeClass("fa-file-alt fa-video")
-                                .addClass("fa-check-circle");
-                            }
-
-                            // Find the screen element in the sidebar
-                            const sidebarItem = $(
-                              `.lesson-item[id*="${currentId}"]`
-                            );
-                            if (sidebarItem.length) {
-                              sidebarItem.addClass("completed");
-                              if (sidebarItem.find("i").length) {
-                                sidebarItem
-                                  .find("i")
-                                  .removeClass("fa-file-alt fa-video")
-                                  .addClass("fa-check-circle");
-                              }
-                            }
-
-                            // Update the screen progress data in memory
-                            const screenProgress = screenProgressData.find(
-                              (progress) => {
-                                const screen = allLessonScreens.find(
-                                  (s) =>
-                                    s.lesson_screen_id ===
-                                    progress.lesson_screen_id
-                                );
-                                return (
-                                  screen &&
-                                  screen.screen_number === currentScreenNumber
-                                );
-                              }
-                            );
-                            if (screenProgress) {
-                              screenProgress.status = "completed";
-                              screenProgress.progress_percentage = 100;
-                            }
-
-                            // Disable continue button after completion
-                            btnContinue.prop("disabled", true);
-
-                            // Update progress UI
-                            updateProgressUI();
-                          })
-                          .catch((error) => {
-                            console.error(
-                              "Error updating final module progress:",
-                              error
-                            );
-                          });
-                      }
-                    }
-                  );
-                });
+                    
+                    // Recalculate module progress, but don't mark as complete
+                    updateModuleProgress();
+                    
+                    // Disable continue button after action
+                    btnContinue.prop("disabled", true);
+                    
+                    // Trigger assessment check
+                    checkAssessmentProgress();
+                  }
+                );
               });
             } else {
               // If already completed, disable continue button
@@ -2170,10 +2105,7 @@
                 const resetInProgressScreens = function (callback) {
                   // Get all current in-progress screen progress items
                   const currentInProgressScreens = screenProgressData.filter(
-                    (progress) =>
-                      progress.status === "in_progress" &&
-                      getScreenNumberFromId(currentId) !==
-                        progress.screen_number
+                    (progress) => progress.status === "in_progress"
                   );
 
                   if (currentInProgressScreens.length === 0) {
