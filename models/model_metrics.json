@@ -6,7 +6,7 @@
     "recall": 1.0,
     "specificity": 1.0,
     "auc_roc": 1.0,
-    "training_time": 0.0010004043579101562
+    "training_time": 0.002502918243408203
   },
   "random_forest": {
     "accuracy": 1.0,
@@ -15,7 +15,7 @@
     "recall": 1.0,
     "specificity": 1.0,
     "auc_roc": 1.0,
-    "training_time": 0.10221743583679199
+    "training_time": 0.15800094604492188
   },
   "support_vector_machine": {
     "accuracy": 1.0,
@@ -24,7 +24,7 @@
     "recall": 1.0,
     "specificity": 1.0,
     "auc_roc": 1.0,
-    "training_time": 0.06196713447570801
+    "training_time": 0.07715129852294922
   },
   "logistic_regression": {
     "accuracy": 1.0,
@@ -33,7 +33,7 @@
     "recall": 1.0,
     "specificity": 1.0,
     "auc_roc": 1.0,
-    "training_time": 0.012176752090454102
+    "training_time": 0.01969432830810547
   },
   "xgboost": {
     "accuracy": 1.0,
@@ -42,7 +42,7 @@
     "recall": 1.0,
     "specificity": 1.0,
     "auc_roc": 1.0,
-    "training_time": 0.0806436538696289
+    "training_time": 0.1424119472503662
   },
   "cnn": {
     "accuracy": 1.0,
@@ -51,7 +51,7 @@
     "recall": 1.0,
     "specificity": 1.0,
     "auc_roc": 1.0,
-    "training_time": 6.307222127914429
+    "training_time": 6.354793310165405
   },
   "blending_ensemble": {
     "accuracy": 1.0,
@@ -60,6 +60,6 @@
     "recall": 1.0,
     "specificity": 1.0,
     "auc_roc": 1.0,
-    "training_time": 0.004006385803222656
+    "training_time": 0.004999876022338867
   }
 }

@@ -3,9 +3,9 @@
 
 flask==3.0.2
 flask-cors==4.0.0
-scikit-learn==1.2.2
+scikit-learn==1.3.2
 numpy==1.26.4
-xgboost==1.7.5
+xgboost==1.7.6
 pandas==2.1.4
 joblib==1.5.1
 tensorflow==2.16.1 # Use the full tensorflow for local training

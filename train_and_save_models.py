@@ -162,7 +162,12 @@ def train_and_save_models():
         y_pred_proba = clf.predict_proba(X_val)
         model_metrics[name] = _calculate_metrics(y_val, y_pred, y_pred_proba, training_time)
         
-        joblib.dump(clf, f'models/{name}.joblib')
+        # Save the model
+        if name == 'xgboost':
+            clf.save_model(f'models/{name}.json')
+        else:
+            joblib.dump(clf, f'models/{name}.joblib')
+            
     print("Base models trained and saved.")
 
     # --- Train and Evaluate CNN Model ---

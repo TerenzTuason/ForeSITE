@@ -1,10 +1,11 @@
 import joblib
 import numpy as np
+import xgboost as xgb
 
 # Use a try-except block for compatibility between local dev and Heroku
 try:
     # This will work locally if you have tensorflow installed
-    from tensorflow.lite.python.interpreter import Interpreter
+    from tensorflow.lite import Interpreter
 except ImportError:
     # This will work on Heroku with tflite_runtime
     from tflite_runtime.interpreter import Interpreter
@@ -32,7 +33,7 @@ class LearningStyleClassifier:
             'random_forest': 'random_forest.joblib',
             'support_vector_machine': 'support_vector_machine.joblib',
             'logistic_regression': 'logistic_regression.joblib',
-            'xgboost': 'xgboost.joblib',
+            'xgboost': 'xgboost.json',
             'blending_meta_learner': 'blending_meta_learner.joblib',
             'cnn': 'cnn_model.tflite',
             'metrics': 'model_metrics.json'
@@ -52,6 +53,9 @@ class LearningStyleClassifier:
                 self.cnn_interpreter.allocate_tensors()
                 self.cnn_input_details = self.cnn_interpreter.get_input_details()
                 self.cnn_output_details = self.cnn_interpreter.get_output_details()
+            elif name == 'xgboost':
+                self.classifiers[name] = xgb.XGBClassifier()
+                self.classifiers[name].load_model(path)
             elif name == 'blending_meta_learner':
                 self.blending_meta_learner = joblib.load(path)
             elif name == 'metrics':
