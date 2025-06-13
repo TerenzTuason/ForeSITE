@@ -8,7 +8,7 @@ try:
     from tensorflow.lite import Interpreter
 except ImportError:
     # This will work on Heroku with tflite_runtime
-    from tflite_runtime.interpreter import Interpreter
+    from tflite_runtime.interpreter import Interpreter  # type: ignore
 
 import os
 import json
