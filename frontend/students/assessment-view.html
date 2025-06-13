@@ -620,11 +620,11 @@
           <div class="modal-body">
             <div class="file-upload-container" id="dropZone">
               <label class="file-upload-label">
-                <i class="fas fa-cloud-upload-alt fa-3x"></i>
-                <p class="mb-1">Drag & Drop your file here</p>
-                <p class="text-muted small mb-0">or</p>
+                <i class="fas fa-file-word fa-3x"></i>
+                <p class="mb-1">Drag & Drop your .docx file here</p>
+                <p class="text-muted small mb-0">Only .docx files are accepted.</p>
                 <button type="button" class="btn btn-outline-primary mt-2" id="browseButton">Browse Files</button>
-                <input type="file" class="file-upload-input" id="fileUpload">
+                <input type="file" class="file-upload-input" id="fileUpload" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
               </label>
             </div>
             <div class="file-upload-preview">
@@ -1214,13 +1214,29 @@
           uploadPreset: 'ml_default'
         };
 
-        // Updated handleFile function to support all file types
+        // Updated handleFile function to only accept .docx files
         function handleFile(file) {
           if (!file) return;
 
           const preview = document.querySelector('.file-upload-preview');
           const fileTypeIcon = preview.querySelector('.file-type-icon i');
           const submitBtn = document.getElementById('uploadSubmitBtn');
+          const fileInput = document.getElementById('fileUpload');
+
+          // Check if the file is a .docx file
+          if (!file.name.toLowerCase().endsWith('.docx')) {
+            alert('Please select a .docx file.');
+            fileInput.value = ''; // Reset the input
+            
+            // Hide preview and disable button
+            preview.style.display = 'none';
+            document.getElementById('fileName').textContent = 'No file selected';
+            document.getElementById('fileSize').textContent = '';
+            document.getElementById('fileType').textContent = '';
+            submitBtn.disabled = true;
+            
+            return;
+          }
 
           // Enable submit button
           submitBtn.disabled = false;
@@ -1228,10 +1244,10 @@
           // Show file details
           document.getElementById('fileName').textContent = file.name;
           document.getElementById('fileSize').textContent = formatFileSize(file.size);
-          document.getElementById('fileType').textContent = file.type || 'Unknown type';
+          document.getElementById('fileType').textContent = 'Microsoft Word Document';
 
-          // Set appropriate icon based on file type
-          fileTypeIcon.className = getFileIcon(file.type);
+          // Set icon for docx
+          fileTypeIcon.className = 'fas fa-file-word';
 
           // Show preview
           preview.style.display = 'block';
@@ -1244,23 +1260,6 @@
           const sizes = ['Bytes', 'KB', 'MB', 'GB'];
           const i = Math.floor(Math.log(bytes) / Math.log(k));
           return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-
-        // Helper function to get appropriate file icon
-        function getFileIcon(mimeType) {
-          if (!mimeType) return 'fas fa-file';
-          
-          if (mimeType.startsWith('image/')) return 'fas fa-file-image';
-          if (mimeType.startsWith('video/')) return 'fas fa-file-video';
-          if (mimeType.startsWith('audio/')) return 'fas fa-file-audio';
-          if (mimeType.startsWith('text/')) return 'fas fa-file-alt';
-          if (mimeType.includes('pdf')) return 'fas fa-file-pdf';
-          if (mimeType.includes('word') || mimeType.includes('document')) return 'fas fa-file-word';
-          if (mimeType.includes('excel') || mimeType.includes('spreadsheet')) return 'fas fa-file-excel';
-          if (mimeType.includes('powerpoint') || mimeType.includes('presentation')) return 'fas fa-file-powerpoint';
-          if (mimeType.includes('zip') || mimeType.includes('archive')) return 'fas fa-file-archive';
-          
-          return 'fas fa-file';
         }
 
         // Update uploadToCloudinary function to show progress
