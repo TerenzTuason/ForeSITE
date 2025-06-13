@@ -54,8 +54,12 @@ class LearningStyleClassifier:
                 self.cnn_input_details = self.cnn_interpreter.get_input_details()
                 self.cnn_output_details = self.cnn_interpreter.get_output_details()
             elif name == 'xgboost':
-                self.classifiers[name] = xgb.XGBClassifier()
-                self.classifiers[name].load_model(path)
+                clf = xgb.XGBClassifier()
+                clf.load_model(path)
+                # Manually set attributes to be scikit-learn compatible
+                clf.classes_ = np.array([0, 1, 2, 3])
+                clf.n_classes_ = 4
+                self.classifiers[name] = clf
             elif name == 'blending_meta_learner':
                 self.blending_meta_learner = joblib.load(path)
             elif name == 'metrics':
