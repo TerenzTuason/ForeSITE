@@ -4,7 +4,7 @@ import numpy as np
 # Use a try-except block for compatibility between local dev and Heroku
 try:
     # This will work locally if you have tensorflow installed
-    from tensorflow.lite import Interpreter
+    from tensorflow.lite.python.interpreter import Interpreter
 except ImportError:
     # This will work on Heroku with tflite_runtime
     from tflite_runtime.interpreter import Interpreter
