@@ -1,0 +1,65 @@
+{
+  "decision_tree": {
+    "accuracy": 1.0,
+    "f1_score": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "specificity": 1.0,
+    "auc_roc": 1.0,
+    "training_time": 0.0020093917846679688
+  },
+  "random_forest": {
+    "accuracy": 1.0,
+    "f1_score": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "specificity": 1.0,
+    "auc_roc": 1.0,
+    "training_time": 0.10722184181213379
+  },
+  "support_vector_machine": {
+    "accuracy": 1.0,
+    "f1_score": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "specificity": 1.0,
+    "auc_roc": 1.0,
+    "training_time": 0.061571598052978516
+  },
+  "logistic_regression": {
+    "accuracy": 1.0,
+    "f1_score": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "specificity": 1.0,
+    "auc_roc": 1.0,
+    "training_time": 0.012064456939697266
+  },
+  "xgboost": {
+    "accuracy": 1.0,
+    "f1_score": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "specificity": 1.0,
+    "auc_roc": 1.0,
+    "training_time": 0.08000493049621582
+  },
+  "cnn": {
+    "accuracy": 1.0,
+    "f1_score": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "specificity": 1.0,
+    "auc_roc": 1.0,
+    "training_time": 5.985788583755493
+  },
+  "blending_ensemble": {
+    "accuracy": 1.0,
+    "f1_score": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "specificity": 1.0,
+    "auc_roc": 1.0,
+    "training_time": 0.005038022994995117
+  }
+}

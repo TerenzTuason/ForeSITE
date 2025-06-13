@@ -1,0 +1,18 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.git/
+.ipynb_checkpoints/
+docs/
+tests/
+*.ipynb
+# data/
+# models/
+# *.csv
+# *.pkl
+# *.joblib
+# *.h5 
