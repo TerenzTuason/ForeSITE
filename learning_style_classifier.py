@@ -1,6 +1,14 @@
 import joblib
 import numpy as np
-from tensorflow.lite.python.interpreter import Interpreter as tflite
+
+# Use a try-except block for compatibility between local dev and Heroku
+try:
+    # This will work locally if you have tensorflow installed
+    from tensorflow.lite import Interpreter
+except ImportError:
+    # This will work on Heroku with tflite_runtime
+    from tflite_runtime.interpreter import Interpreter
+
 import os
 import json
 from classifier_config import (
@@ -36,10 +44,11 @@ class LearningStyleClassifier:
     def _load_models_and_metrics(self):
         """Loads all pre-trained models and metrics from disk."""
         self.classifiers = {}
+        self.model_metrics = {}
         for name, filename in self.model_files.items():
             path = os.path.join(self.model_path, filename)
             if name == 'cnn':
-                self.cnn_interpreter = tflite(model_path=path)
+                self.cnn_interpreter = Interpreter(model_path=path)
                 self.cnn_interpreter.allocate_tensors()
                 self.cnn_input_details = self.cnn_interpreter.get_input_details()
                 self.cnn_output_details = self.cnn_interpreter.get_output_details()
