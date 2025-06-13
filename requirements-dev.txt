@@ -1,0 +1,12 @@
+# This file is for setting up the local development and training environment.
+# It ensures that the library versions used for training match the deployment environment.
+
+flask==3.0.2
+flask-cors==4.0.0
+scikit-learn==1.4.1.post1
+numpy==1.26.4
+xgboost==2.0.3
+pandas==2.1.4
+joblib==1.5.1
+tensorflow==2.16.1 # Use the full tensorflow for local training
+ipython # Useful for interactive debugging 
