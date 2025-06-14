@@ -1,138 +1,61 @@
-# ForeSITE Learning System
+<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-## Frontend
-*Frontend setup instructions will be added once the frontend development begins.*
+<p align="center">
+<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+</p>
 
-## Backend Setup
+## About Laravel
 
-### Prerequisites
-1. XAMPP (Download from [https://www.apachefriends.org/](https://www.apachefriends.org/))
-2. Composer (Download from [https://getcomposer.org/download/](https://getcomposer.org/download/))
-3. PHP 8.1 or higher
-4. MySQL 5.7 or higher
-5. Laravel CLI (Install using `composer global require laravel/installer`)
+Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-### Database Setup
-1. Install XAMPP and start Apache and MySQL services from the XAMPP Control Panel
-2. Import the schema.sql file directly into the database using phpMyAdmin:
-   - Click on the "Import" tab
-   - Click "Choose File" and select the schema.sql file from the project root
-   - Click "Go" to import the schema
+- [Simple, fast routing engine](https://laravel.com/docs/routing).
+- [Powerful dependency injection container](https://laravel.com/docs/container).
+- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
+- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
+- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
+- [Robust background job processing](https://laravel.com/docs/queues).
+- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
-### Backend Installation
-1. Clone the repository:
-   ```bash
-   git clone [repository-url]
-   cd ForeSITE
-   ```
+Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
-2. Navigate to the backend directory:
-   ```bash
-   cd backend
-   ```
+## Learning Laravel
 
-3. Install PHP dependencies using Composer:
-   ```bash
-   composer install
-   ```
+Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
 
-4. Generate application key:
-   ```bash
-   php artisan key:generate
-   ```
+You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
 
-5. Configure your database connection in `.env` file:
-   ```
-   DB_CONNECTION=mysql
-   DB_HOST=127.0.0.1
-   DB_PORT=3306
-   DB_DATABASE=foresite_db
-   DB_USERNAME=root
-   DB_PASSWORD=
-   ```
+If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
 
-6. Start the Laravel development server:
-   ```bash
-   php artisan serve
-   ```
+## Laravel Sponsors
 
-The backend API will be available at `http://127.0.0.1:8000/api/v1`
+We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
 
-## Learning Style Classifier API
+### Premium Partners
 
-The project includes a machine learning-based API that classifies users into Honey-Mumford learning styles based on their questionnaire responses.
+- **[Vehikl](https://vehikl.com/)**
+- **[Tighten Co.](https://tighten.co)**
+- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
+- **[64 Robots](https://64robots.com)**
+- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
+- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
+- **[Redberry](https://redberry.international/laravel-development/)**
+- **[Active Logic](https://activelogic.com)**
 
-### Prerequisites
+## Contributing
 
-1. Python 3.11 (Download from [https://www.python.org/downloads/release/python-3110/](https://www.python.org/downloads/release/python-3110/))
+Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
 
-### Setup and Running
+## Code of Conduct
 
-1. Install the required dependencies:
-```bash
-cd algorithm
-pip install -r requirements.txt
-```
+In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
 
-2. Run the Flask application:
-```bash
-python app.py
-```
+## Security Vulnerabilities
 
-The server will start on `http://localhost:5000` or `http://127.0.0.1:5000`.
+If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
-### API Usage
+## License
 
-#### Predict Learning Style
-
-**Endpoint:** `POST /predict`
-
-**Request Body:**
-```json
-{
-    "answers": [0, 1, 0, 1, ...] // Array of 80 binary values (0 or 1)
-}
-```
-
-**Example Request for Pragmatist Style:**
-```json
-{
-    "answers": [
-        0, 0, 0, 0, 1, 0, 0, 0, 1, 0,  // 1-10
-        1, 0, 0, 0, 0, 0, 0, 0, 1, 0,  // 11-20
-        1, 0, 0, 0, 0, 0, 1, 0, 0, 0,  // 21-30
-        0, 0, 0, 0, 1, 0, 1, 0, 0, 0,  // 31-40
-        0, 0, 0, 1, 0, 0, 0, 0, 1, 1,  // 41-50
-        0, 0, 1, 1, 0, 1, 0, 0, 1, 0,  // 51-60
-        0, 0, 0, 0, 1, 0, 0, 1, 1, 1,  // 61-70
-        0, 0, 1, 1, 0, 0, 0, 0, 0, 1   // 71-80
-    ]
-}
-```
-
-**Example Request for Reflector Style:**
-```json
-{
-    "answers": [
-        0, 0, 0, 0, 0, 0, 1, 0, 0, 0,  // 1-10: Yes to Q7 (likes thorough preparation)
-        0, 0, 1, 0, 1, 1, 0, 0, 0, 0,  // 11-20: Yes to Q13,15,16 (thorough job, careful interpretation, weighing alternatives)
-        0, 0, 0, 0, 1, 1, 0, 1, 1, 0,  // 21-30: Yes to Q25,26,28,29 (meticulous, careful, gathering information)
-        1, 0, 1, 0, 0, 1, 0, 0, 1, 0,  // 31-40: Yes to Q31,33,36,39 (listens first, observes others, worries about rushing)
-        0, 1, 0, 0, 0, 1, 0, 0, 0, 0,  // 41-50: Yes to Q41,46 (thorough analysis, standing back)
-        0, 1, 0, 0, 1, 0, 0, 0, 0, 1,  // 51-60: Yes to Q52,55,60 (specific discussions, multiple drafts, many alternatives)
-        0, 1, 0, 0, 0, 1, 1, 0, 0, 0,  // 61-70: Yes to Q62,66,67 (low profile, careful thinking, listening)
-        0, 0, 0, 0, 0, 1, 1, 0, 0, 0   // 71-80: Yes to Q76,77 (interested in others' thoughts, methodical)
-    ]
-}
-```
-
-This example emphasizes Reflector characteristics by setting positive responses (1) to questions that indicate:
-- Preference for thorough preparation and implementation
-- Careful observation and analysis before action
-- Interest in gathering multiple perspectives
-- Tendency to listen more than speak
-- Methodical and detailed approach to work
-- Preference for standing back and observing
-
-**Response:**
-```
+The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
