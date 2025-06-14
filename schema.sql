@@ -2,9 +2,9 @@
 -- Based on Adaptive Learning System Architecture
 
 -- Drop database if exists
-DROP DATABASE IF EXISTS foresite_db;
-CREATE DATABASE foresite_db;
-USE foresite_db;
+DROP DATABASE IF EXISTS foresite_db_no_collaboration;
+CREATE DATABASE foresite_db_no_collaboration;
+USE foresite_db_no_collaboration;
 
 -- User roles table
 CREATE TABLE roles (
