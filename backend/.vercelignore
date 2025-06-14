@@ -1,0 +1,9 @@
+# Files and folders to ignore on Vercel
+/storage
+/vendor
+node_modules
+.env
+.env.example
+.git
+.gitignore
+README.md 
