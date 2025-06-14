@@ -43,8 +43,8 @@ MODEL_CONFIG = {
             {'filters': 32, 'kernel_size': 3, 'batch_norm': True},
             {'filters': 64, 'kernel_size': 3, 'batch_norm': True}
         ],
-        'dense_layers': [128, 64],
-        'dropout_rate': 0.4
+        'dense_layers': [128],
+        'dropout_rate': 0.5
     },
     'xgboost': {
         'n_estimators': 300,
@@ -68,7 +68,7 @@ MODEL_CONFIG = {
 TRAINING_CONFIG = {
     'samples_per_style': 2000,
     'noise_level': 0.05,
-    'secondary_style_ratio': 0.25,
+    'secondary_style_ratio': 0.4,
 }
 
 # Style Classification Parameters
