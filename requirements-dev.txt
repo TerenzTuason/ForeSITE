@@ -8,5 +8,5 @@ numpy==1.26.4
 xgboost==1.7.6
 pandas==2.1.4
 joblib==1.5.1
-tensorflow==2.16.1 # Use the full tensorflow for local training
+tensorflow==2.15.0 # Use the full tensorflow for local training
 ipython # Useful for interactive debugging 

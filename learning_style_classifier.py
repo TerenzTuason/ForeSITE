@@ -5,8 +5,9 @@ import xgboost as xgb
 # Use a try-except block for compatibility between local dev and Heroku
 try:
     # This will work locally if you have tensorflow installed
-    from tensorflow.lite import Interpreter
-except ImportError:
+    import tensorflow as tf
+    Interpreter = tf.lite.Interpreter
+except (ImportError, AttributeError):
     # This will work on Heroku with tflite_runtime
     from tflite_runtime.interpreter import Interpreter  # type: ignore
 

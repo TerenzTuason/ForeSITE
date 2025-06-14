@@ -8,74 +8,80 @@ STYLE_QUESTIONS = {
     'pragmatist': [5, 9, 11, 19, 21, 27, 35, 37, 44, 49, 50, 53, 54, 56, 59, 65, 69, 70, 73, 80]
 }
 
-# Model Parameters
+# Model Hyperparameters
 MODEL_CONFIG = {
     'decision_tree': {
         'random_state': 42,
-        'max_depth': 10,
-        'min_samples_split': 2
+        'max_depth': 8,
+        'min_samples_split': 5,
+        'min_samples_leaf': 2
     },
     'random_forest': {
-        'n_estimators': 100,
+        'n_estimators': 400,
         'random_state': 42,
-        'max_depth': 10,
-        'min_samples_split': 2
+        'max_depth': 12,
+        'min_samples_split': 10,
+        'min_samples_leaf': 4
     },
     'support_vector_machine': {
         'kernel': 'rbf',
-        'random_state': 42,
-        'C': 1.0
+        'gamma': 'scale',
+        'C': 1.0,
+        'random_state': 42
     },
     'logistic_regression': {
         'random_state': 42,
-        'max_iter': 1000,
+        'max_iter': 2000,
         'multi_class': 'multinomial',
         'solver': 'lbfgs'
     },
     'cnn': {
-        'epochs': 50,
+        'epochs': 60,
         'batch_size': 32,
         'learning_rate': 0.001,
         'conv_layers': [
-            {'filters': 32, 'kernel_size': 3},
-            {'filters': 64, 'kernel_size': 3}
+            {'filters': 32, 'kernel_size': 3, 'batch_norm': True},
+            {'filters': 64, 'kernel_size': 3, 'batch_norm': True}
         ],
-        'dense_layers': [128, 64]
+        'dense_layers': [128, 64],
+        'dropout_rate': 0.4
     },
     'xgboost': {
-        'n_estimators': 100,
-        'learning_rate': 0.1,
+        'n_estimators': 300,
+        'learning_rate': 0.05,
         'max_depth': 6,
+        'subsample': 0.8,
+        'colsample_bytree': 0.8,
         'random_state': 42
     },
     'blending_ensemble': {
         'meta_learner': 'logistic_regression',
-        'base_models': ['decision_tree', 'random_forest', 'support_vector_machine', 'xgboost'],
+        'base_models': ['decision_tree', 'random_forest', 'xgboost'],
         'meta_learner_params': {
             'random_state': 42,
-            'max_iter': 1000
+            'max_iter': 2000
         }
     }
 }
 
 # Training Data Generation Parameters
 TRAINING_CONFIG = {
-    'samples_per_style': 200,  # Number of training samples per learning style
-    'noise_level': 0.1,  # Proportion of random noise in training data (0.0 to 1.0)
-    'secondary_style_ratio': 0.4,  # Proportion of secondary style traits to include
+    'samples_per_style': 2000,
+    'noise_level': 0.05,
+    'secondary_style_ratio': 0.25,
 }
 
 # Style Classification Parameters
 CLASSIFICATION_CONFIG = {
-    'confidence_threshold': 0.5,  # Minimum confidence level for style prediction
-    'style_weights': {  # Weights for each classifier in the voting
-        'decision_tree': 1.0,
-        'random_forest': 1.3,
-        'support_vector_machine': 1.0,
-        'logistic_regression': 1.0,
-        'cnn': 1.3,
-        'xgboost': 1.3,
-        'blending_ensemble': 1.5
+    'confidence_threshold': 0.4,
+    'style_weights': {
+        'decision_tree': 0.0,
+        'random_forest': 0.20,
+        'support_vector_machine': 0.0,
+        'logistic_regression': 0.0,
+        'cnn': 0.15,
+        'xgboost': 0.25,
+        'blending_ensemble': 0.40
     }
 }
 
@@ -84,18 +90,18 @@ CLASSIFICATION_CONFIG = {
 QUESTION_WEIGHTS = {
     'activist': {
         'primary': [2, 10, 23, 34, 72],  # Most important activist questions
-        'weight': 2.0  # Multiplier for these questions
+        'weight': 3.0
     },
     'reflector': {
         'primary': [7, 15, 29, 31, 67],
-        'weight': 2.0
+        'weight': 1.5
     },
     'theorist': {
         'primary': [3, 14, 51, 75, 77],
-        'weight': 2.0
+        'weight': 4.0
     },
     'pragmatist': {
         'primary': [9, 35, 44, 49, 56],
-        'weight': 2.0
+        'weight': 4.0
     }
 } 
