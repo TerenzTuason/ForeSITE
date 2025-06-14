@@ -1,7 +1,24 @@
 import joblib
 import numpy as np
 import xgboost as xgb
-from tflite_runtime.interpreter import Interpreter
+
+# Use a try-except block for compatibility between local dev and Heroku >> Uncomment this for local dev
+# try:
+#     # This will work locally if you have tensorflow installed
+#     import tensorflow as tf
+#     Interpreter = tf.lite.Interpreter
+# except (ImportError, AttributeError):
+#     # This will work on Heroku with tflite_runtime
+#     from tflite_runtime.interpreter import Interpreter  # type: ignore
+
+# Use a try-except block for compatibility between local dev and Heroku >> Uncomment this for heroku
+try:
+    # This will work locally if you have tensorflow installed
+    from tensorflow.lite import Interpreter
+except ImportError:
+    # This will work on Heroku with tflite_runtime
+    from tflite_runtime.interpreter import Interpreter  # type: ignore
+
 import os
 import json
 from classifier_config import (
