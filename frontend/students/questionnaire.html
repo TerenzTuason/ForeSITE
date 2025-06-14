@@ -436,7 +436,7 @@
       const questionsPerPage = 10;
       let currentQuestionPage = 0;
       // Add storage for answers
-      const savedAnswers = new Array(questions.length).fill(null);
+      // const savedAnswers = new Array(questions.length).fill(null);
 
       // Pre-fill answers for testing (1 for agree, 0 for disagree)
       // const savedAnswers = Array(questions.length).fill(0).map((_, index) => index % 2); // Alternates between 0 and 1
@@ -450,12 +450,12 @@
         // ];
 
       // Pre-fill answers for Pragmatist style
-    //   const savedAnswers = [
-    //     1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1,
-    //     1, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1,
-    //     1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1,
-    //     0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 0
-    // ];
+      const savedAnswers = [
+        1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1,
+        1, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1,
+        1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1,
+        0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 0
+    ];
 
       // Add a console log to show the request body that will be sent
       console.log("Request body that will be sent:", { answers: savedAnswers });
@@ -478,7 +478,7 @@
         });
 
         // Check if user has already taken the assessment
-        fetch(`http://127.0.0.1:8000/api/v1/users/${userData.user_id}/assessment-results`)
+        fetch(`https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/users/${userData.user_id}/assessment-results`)
           .then(response => response.json())
           .then(data => {
             if (data.data && data.data.length > 0) {
@@ -699,7 +699,7 @@
                   .then((response) => response.json())
                   .then((data) => {
                     // Fetch courses and find matching learning style
-                    fetch("http://127.0.0.1:8000/api/v1/courses")
+                    fetch("https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/courses")
                       .then((response) => response.json())
                       .then((coursesData) => {
                         // Find the course matching the predicted learning style
@@ -718,7 +718,7 @@
                           ).value;
 
                           // Store assessment results in database with course_id
-                          fetch("http://127.0.0.1:8000/api/v1/assessment-results", {
+                          fetch("https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/assessment-results", {
                             method: "POST",
                             headers: {
                               "Content-Type": "application/json",
@@ -821,7 +821,7 @@
             window.location.href = "dashboard.html";
           };
 
-          fetch(`http://127.0.0.1:8000/api/v1/groups?course_id=${courseId}`)
+          fetch(`https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/groups?course_id=${courseId}`)
             .then(response => response.json())
             .then(groupsData => {
               const groups = groupsData.data || [];
@@ -844,7 +844,7 @@
         }
 
         function createGroupAndAddUser(userId, courseId, groupName, callback) {
-          fetch("http://127.0.0.1:8000/api/v1/groups", {
+          fetch("https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/groups", {
             method: "POST",
             headers: { "Content-Type": "application/json", Accept: "application/json" },
             body: JSON.stringify({ course_id: courseId, group_name: groupName }),
@@ -863,7 +863,7 @@
         }
 
         function addUserToGroup(userId, groupId, callback) {
-          fetch("http://127.0.0.1:8000/api/v1/group-members", {
+          fetch("https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/group-members", {
             method: "POST",
             headers: { "Content-Type": "application/json", Accept: "application/json" },
             body: JSON.stringify({ user_id: userId, group_id: groupId }),
