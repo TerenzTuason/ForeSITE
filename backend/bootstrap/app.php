@@ -30,7 +30,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
 */
 if (isset($_ENV['VERCEL'])) {
     $app->useStoragePath('/tmp/storage');
-    $app->useBootstrapPath('/tmp/bootstrap/cache');
+    $app->useBootstrapPath('/tmp/bootstrap');
 }
 
 return $app;
