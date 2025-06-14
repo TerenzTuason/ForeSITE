@@ -10,8 +10,8 @@ venv/
 docs/
 tests/
 *.ipynb
-# data/
-# models/
+data/
+models/
 # *.csv
 # *.pkl
 # *.joblib
