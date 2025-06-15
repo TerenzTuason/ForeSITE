@@ -777,7 +777,7 @@
             }
             
             // Check if user is enrolled in any courses
-            fetch(`http://127.0.0.1:8000/api/v1/users/${userData.user_id}/enrollments`)
+            fetch(`https://foresite-backend-no-collaborative-czqhjr.laravel.cloud/api/v1/users/${userData.user_id}/enrollments`)
                 .then(response => response.json())
                 .then(data => {
                     // If user has enrollments, hide the available course section
@@ -818,14 +818,14 @@
             }
             
             // Fetch user's assessment results
-            fetch(`http://127.0.0.1:8000/api/v1/users/${userData.user_id}/assessment-results`)
+            fetch(`https://foresite-backend-no-collaborative-czqhjr.laravel.cloud/api/v1/users/${userData.user_id}/assessment-results`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.data && data.data.length > 0) {
                         const assessmentResult = data.data[0]; // Get the most recent result
                         
                         // Fetch all progress data for the user
-                        fetch(`http://127.0.0.1:8000/api/v1/users/${userData.user_id}/all-progress`)
+                        fetch(`https://foresite-backend-no-collaborative-czqhjr.laravel.cloud/api/v1/users/${userData.user_id}/all-progress`)
                             .then(response => response.json())
                             .then(progressData => {
                                 if (progressData.data && progressData.data.length > 0) {
@@ -878,7 +878,7 @@
                             });
                         
                         // Fetch course details using the course_id from assessment result
-                        fetch(`http://127.0.0.1:8000/api/v1/courses/${assessmentResult.course_id}`)
+                        fetch(`https://foresite-backend-no-collaborative-czqhjr.laravel.cloud/api/v1/courses/${assessmentResult.course_id}`)
                             .then(response => response.json())
                             .then(courseData => {
                                 const course = courseData.data;

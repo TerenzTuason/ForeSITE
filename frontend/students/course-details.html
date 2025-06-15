@@ -412,7 +412,7 @@
             }
 
             // Fetch user's assessment result to get the recommended course
-            fetch(`http://127.0.0.1:8000/api/v1/users/${userData.user_id}/assessment-results`)
+            fetch(`https://foresite-backend-no-collaborative-czqhjr.laravel.cloud/api/v1/users/${userData.user_id}/assessment-results`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.data && data.data.length > 0) {
@@ -455,7 +455,7 @@
 
             function fetchAvailableCourses() {
                 // Fetch all courses
-                fetch('http://127.0.0.1:8000/api/v1/courses')
+                fetch('https://foresite-backend-no-collaborative-czqhjr.laravel.cloud/api/v1/courses')
                     .then(response => response.json())
                     .then(data => {
                         if (data.data && data.data.length > 0) {
@@ -511,7 +511,7 @@
 
             function fetchCourseDetails(courseId) {
                 // First fetch course details
-                fetch(`http://127.0.0.1:8000/api/v1/courses/${courseId}`)
+                fetch(`https://foresite-backend-no-collaborative-czqhjr.laravel.cloud/api/v1/courses/${courseId}`)
                     .then(response => response.json())
                     .then(data => {
                         const course = data.data;
@@ -542,7 +542,7 @@
                         startButton.href = `module-view.html`;
 
                         // Now fetch all progress data to calculate overall progress
-                        fetch(`http://127.0.0.1:8000/api/v1/users/${userData.user_id}/all-progress`)
+                        fetch(`https://foresite-backend-no-collaborative-czqhjr.laravel.cloud/api/v1/users/${userData.user_id}/all-progress`)
                             .then(response => response.json())
                             .then(progressData => {
                                 if (!progressData.data || progressData.data.length === 0) {

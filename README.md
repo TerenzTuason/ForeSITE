@@ -56,7 +56,7 @@
    php artisan serve
    ```
 
-The backend API will be available at `http://127.0.0.1:8000/api/v1`
+The backend API will be available at `https://foresite-backend-no-collaborative-czqhjr.laravel.cloud/api/v1`
 
 ## Learning Style Classifier API
 
