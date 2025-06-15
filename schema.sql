@@ -2,9 +2,9 @@
 -- Based on Adaptive Learning System Architecture
 
 -- Drop database if exists
-DROP DATABASE IF EXISTS foresite_db;
-CREATE DATABASE foresite_db;
-USE foresite_db;
+DROP DATABASE IF EXISTS foresite_db_no_collaboration;
+CREATE DATABASE foresite_db_no_collaboration;
+USE foresite_db_no_collaboration;
 
 -- User roles table
 CREATE TABLE roles (
@@ -276,6 +276,15 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
+  '1.2-video',
+  'Looking Ahead: The Three Horizons Model',
+  null,
+  null,
+  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1749389838/1.2_Looking_Ahead_The_Three_Horizons_Model_aemjrp.mp4',
+  '6 minutes 4 seconds'
+);
+
+INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   '1.2',
   'Looking Ahead: The Three Horizons Model',
   'A tool for thinking across short, medium, and long-term futures.',
@@ -296,6 +305,15 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
     ]',
     'https://res.cloudinary.com/dwn5t3o4j/image/upload/v1748186077/1.2_The_Three_Horizons_Model_b7t0si.png',
     '12 minutes'
+);
+
+INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
+  '1.3-video',
+  'Identifying Change Drivers',
+  null,
+  null,
+  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1749389385/1.3_Identifying_Change_Drivers_dvzt5f.mp4',
+  '2 minutes 44 seconds'
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
@@ -322,6 +340,24 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
+  '1.3.1-video',
+  'What is PESTLE Analysis?',
+  null,
+  null,
+  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1749389594/1.3.1_What_is_PESTLE_Analysis_iij5o2.mp4',
+  '4 minutes 4 seconds'
+);
+
+INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
+  '1.4-video',
+  'Identifying Weak Signals',
+  null,
+  null,
+  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1749564558/1.4_Identifying_Weak_Signals_imaqwk.mp4',
+  '3 minutes 5 seconds'
+);
+
+INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   '1.4',
   'Identifying Weak Signals',
   'Spotting early signs of future change.',
@@ -334,6 +370,15 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
     ]',
     null,
     '12 minutes'
+);
+
+INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
+  '1.5-video',
+  'Linking Futures Thinking to the Policy Cycle',
+  null,
+  null,
+  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1749566067/1.5_Linking_Futures_Thinking_to_the_Policy_Cycle_1_vokxbt.mp4',
+  '1 minute 54 seconds'
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
@@ -497,6 +542,15 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   '2.3-video',
+  'Understanding Weak Signals and Trends',
+  null,
+  null,
+  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1749388239/2.3_Understanding_Weak_Signals_and_Trends_wjvz6k.mp4',
+  '9 minutes 42 seconds'
+);
+
+INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
+  '2.4-video',
   'Trends Identification and Analysis',
   null,
   null,
