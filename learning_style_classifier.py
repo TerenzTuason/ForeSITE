@@ -77,27 +77,46 @@ class LearningStyleClassifier:
             else:
                 self.classifiers[name] = joblib.load(path)
 
-    def predict(self, answers):
+    def predict(self, answers, models_to_use=None):
         X = np.array(answers, dtype=np.float32).reshape(1, -1)
+
+        available_models = list(self.classifiers.keys()) + ['cnn', 'blending_ensemble']
+        if models_to_use is None:
+            models_to_use = available_models
         
         predictions = {}
-        
-        # Base classifier predictions
-        for name, clf in self.classifiers.items():
-            predictions[name] = int(clf.predict(X)[0])
-        
-        # CNN prediction
-        self.cnn_interpreter.set_tensor(self.cnn_input_details[0]['index'], X.reshape(1, 80))
-        self.cnn_interpreter.invoke()
-        cnn_proba = self.cnn_interpreter.get_tensor(self.cnn_output_details[0]['index'])
-        predictions['cnn'] = int(np.argmax(cnn_proba))
-        
-        # Blending ensemble prediction
-        base_models_for_blending = MODEL_CONFIG['blending_ensemble']['base_models']
-        base_predictions_proba = np.column_stack([
-            self.classifiers[model_name].predict_proba(X) for model_name in base_models_for_blending
-        ])
-        predictions['blending_ensemble'] = int(self.blending_meta_learner.predict(base_predictions_proba)[0])
+        for model_name in models_to_use:
+            if model_name in self.classifiers:
+                predictions[model_name] = int(self.classifiers[model_name].predict(X)[0])
+            elif model_name == 'cnn':
+                self.cnn_interpreter.set_tensor(self.cnn_input_details[0]['index'], X.reshape(1, 80))
+                self.cnn_interpreter.invoke()
+                cnn_proba = self.cnn_interpreter.get_tensor(self.cnn_output_details[0]['index'])
+                predictions['cnn'] = int(np.argmax(cnn_proba))
+            elif model_name == 'blending_ensemble':
+                base_models_for_blending = MODEL_CONFIG['blending_ensemble']['base_models']
+                
+                base_predictions_proba_list = []
+                for name in base_models_for_blending:
+                    if name == 'xgboost':
+                        # XGBoost doesn't have predict_proba in the same way after loading
+                        # We use the raw predictions and assume it's okay for the meta-learner
+                        # Or ideally, the meta-learner was trained on this type of output
+                        base_predictions_proba_list.append(self.classifiers[name].predict_proba(X))
+                    else:
+                        base_predictions_proba_list.append(self.classifiers[name].predict_proba(X))
+
+                base_predictions_proba = np.hstack(base_predictions_proba_list)
+                predictions['blending_ensemble'] = int(self.blending_meta_learner.predict(base_predictions_proba)[0])
+
+        if not predictions:
+            return {
+                'learning_style': 'undetermined',
+                'confidence': 0,
+                'individual_votes': {},
+                'model_metrics': {},
+                'warning': 'No valid models were specified for prediction.'
+            }
         
         # Apply weights to votes to determine the final style
         weighted_votes = {}
@@ -113,20 +132,27 @@ class LearningStyleClassifier:
         
         # Calculate confidence
         total_weight_for_voted_style = weighted_votes[voted_style_id]
-        total_weight_of_all_models = sum(CLASSIFICATION_CONFIG['style_weights'].values())
-        confidence = total_weight_for_voted_style / total_weight_of_all_models if total_weight_of_all_models > 0 else 0
+        total_weight_of_selected_models = sum(CLASSIFICATION_CONFIG['style_weights'].get(model, 0) for model in models_to_use)
+        confidence = total_weight_for_voted_style / total_weight_of_selected_models if total_weight_of_selected_models > 0 else 0
 
         # Format individual votes for the response
         individual_votes = {
             name: self.style_mapping[pred_id]
             for name, pred_id in predictions.items()
         }
+
+        # Filter model metrics
+        filtered_metrics = {
+            model: self.model_metrics[model] 
+            for model in models_to_use
+            if model in self.model_metrics
+        }
         
         result = {
             'learning_style': predicted_style_name,
             'confidence': confidence,
             'individual_votes': individual_votes,
-            'model_metrics': self.model_metrics
+            'model_metrics': filtered_metrics
         }
         
         if confidence < CLASSIFICATION_CONFIG.get('confidence_threshold', 0.5):

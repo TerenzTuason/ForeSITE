@@ -27,8 +27,14 @@ def predict_learning_style():
             
         if not all(isinstance(x, int) and x in [0, 1] for x in answers):
             return jsonify({'error': 'All answers must be binary (0 or 1)'}), 400
-            
-        result = classifier.predict(answers)
+
+        # Specify the models to use for prediction.
+        # Options: 'decision_tree', 'random_forest', 'support_vector_machine', 
+        # 'logistic_regression', 'xgboost', 'cnn', 'blending_ensemble'
+        # models_to_use = ['blending_ensemble', 'cnn', 'decision_tree', 'random_forest', 'support_vector_machine', 'logistic_regression', 'xgboost']
+        models_to_use = ['logistic_regression']
+
+        result = classifier.predict(answers, models_to_use=models_to_use)
         return jsonify(result)
         
     except Exception as e:

@@ -75,13 +75,13 @@ TRAINING_CONFIG = {
 CLASSIFICATION_CONFIG = {
     'confidence_threshold': 0.4,
     'style_weights': {
-        'decision_tree': 0.0,
-        'random_forest': 0.20,
-        'support_vector_machine': 0.0,
-        'logistic_regression': 0.0,
+        'decision_tree': 0.05,
+        'random_forest': 0.15,
+        'support_vector_machine': 0.10,
+        'logistic_regression': 0.10,
         'cnn': 0.15,
         'xgboost': 0.25,
-        'blending_ensemble': 0.40
+        'blending_ensemble': 0.20
     }
 }
 

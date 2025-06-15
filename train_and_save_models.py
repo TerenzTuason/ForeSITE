@@ -47,17 +47,7 @@ def _generate_training_data():
         )
         pattern[noise_indices] = 1
 
-        return _apply_question_weights(pattern, primary_style)
-
-    def _apply_question_weights(pattern, style):
-        """Apply weights to certain questions based on their importance"""
-        weighted_pattern = pattern.copy()
-        primary_questions = QUESTION_WEIGHTS[style.lower()]['primary']
-        weight = QUESTION_WEIGHTS[style.lower()]['weight']
-
-        primary_questions = [q - 1 for q in primary_questions]
-        weighted_pattern[primary_questions] *= weight
-        return weighted_pattern
+        return pattern
 
     X_train = []
     y_train = []
