@@ -1,22 +1,22 @@
 <?php
 
-use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\CourseController;
-use App\Http\Controllers\Api\LearningStyleController;
-use App\Http\Controllers\Api\AssessmentResultController;
-use App\Http\Controllers\Api\RoleController;
-use App\Http\Controllers\Api\StudentProfileController;
-use App\Http\Controllers\Api\UserController;
-use App\Http\Controllers\Api\ModuleController;
-use App\Http\Controllers\Api\ModuleProgressController;
-use App\Http\Controllers\Api\FeedbackController;
-use App\Http\Controllers\Api\CertificateController;
-use App\Http\Controllers\Api\EnrollmentController;
-use App\Http\Controllers\Api\LessonScreenController;
-use App\Http\Controllers\Api\LessonScreenProgressController;
-use App\Http\Controllers\Api\ModuleAssessmentController;
-use App\Http\Controllers\Api\ModuleAssessmentProgressController;
-use App\Http\Controllers\Api\ScoreController;
+use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\CourseController;
+use App\Http\Controllers\API\LearningStyleController;
+use App\Http\Controllers\API\AssessmentResultController;
+use App\Http\Controllers\API\RoleController;
+use App\Http\Controllers\API\StudentProfileController;
+use App\Http\Controllers\API\UserController;
+use App\Http\Controllers\API\ModuleController;
+use App\Http\Controllers\API\ModuleProgressController;
+use App\Http\Controllers\API\FeedbackController;
+use App\Http\Controllers\API\CertificateController;
+use App\Http\Controllers\API\EnrollmentController;
+use App\Http\Controllers\API\LessonScreenController;
+use App\Http\Controllers\API\LessonScreenProgressController;
+use App\Http\Controllers\API\ModuleAssessmentController;
+use App\Http\Controllers\API\ModuleAssessmentProgressController;
+use App\Http\Controllers\API\ScoreController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
