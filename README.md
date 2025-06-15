@@ -122,4 +122,36 @@ models_to_use = ['logistic_regression'] # Example: using only logistic regressio
 result = classifier.predict(answers, models_to_use=models_to_use)
 ```
 
-You can include any combination of the available models in this list. The final prediction is a weighted vote based on the `style_weights` defined in `CLASSIFICATION_CONFIG` within `classifier_config.py`. 
+You can include any combination of the available models in this list. The final prediction is a weighted vote based on the `style_weights` defined in `CLASSIFICATION_CONFIG` within `classifier_config.py`.
+
+## How the Prediction Works
+
+The model predicts the learning style through a sophisticated ensemble approach that combines the outputs of multiple machine learning models. Here is a step-by-step explanation of how it works:
+
+### 1. Input: Questionnaire Answers
+The process begins when a user provides answers to an 80-question learning style questionnaire. These answers are represented as a list of 80 binary values (0s or 1s).
+
+### 2. The Ensemble of Models
+Instead of relying on a single algorithm, the system employs a diverse set of seven different classification models to analyze the answers. This multi-model approach, known as an ensemble, is often more robust and accurate. The models are:
+-   **Decision Tree**
+-   **Random Forest**
+-   **Support Vector Machine (SVM)**
+-   **Logistic Regression**
+-   **XGBoost**
+-   **Convolutional Neural Network (CNN)**
+-   **Blending Ensemble**: A "meta-model" that uses the predictions from other models as its input.
+
+### 3. Core Logic: Weighted Voting
+The final decision is made through a weighted vote. Each of the seven models is assigned a "weight" in `classifier_config.py`, which represents how much its vote "counts."
+
+1.  Each model makes its own prediction, "voting" for one of the four learning styles: **Activist, Reflector, Theorist, or Pragmatist**.
+2.  The system sums the weights of all the models that voted for each style.
+3.  The learning style that accumulates the highest total weight is declared the winner.
+
+For example, XGBoost has the highest weight (0.25), making its vote the most influential, while the Decision Tree has the lowest (0.05).
+
+### 4. Confidence Score
+The system also calculates a confidence score by dividing the winning style's total weight by the sum of the weights of all models used. This score reflects the level of agreement among the models.
+
+### 5. Model Training
+The models are trained on **synthetically generated data**. The `train_and_save_models.py` script creates thousands of example answer sheets by generating "perfect" profiles for each style and then making them more realistic by introducing noise and adding characteristics of a secondary style. 
