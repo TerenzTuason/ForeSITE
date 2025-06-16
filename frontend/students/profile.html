@@ -258,7 +258,7 @@
 
             try {
                 // 1. Find and remove user from their current group in the old course
-                const oldGroupsResponse = await fetch(`https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/groups?course_id=${oldCourseId}`);
+                const oldGroupsResponse = await fetch(`https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/groups?course_id=${oldCourseId}`);
                 if (oldGroupsResponse.ok) {
                     const oldGroupsData = await oldGroupsResponse.json();
                     const oldGroups = oldGroupsData.data || [];
@@ -267,7 +267,7 @@
                         const member = group.group_members.find(m => m.user_id === userId);
                         if (member) {
                             // User found in a group, remove them
-                            await fetch(`https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/group-members/remove`, {
+                            await fetch(`https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/group-members/remove`, {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({
@@ -282,7 +282,7 @@
                 }
 
                 // 2. Assign user to a new group in the new course
-                const assignResponse = await fetch(`https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/groups?course_id=${newCourseId}`);
+                const assignResponse = await fetch(`https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/groups?course_id=${newCourseId}`);
                 const assignData = await assignResponse.json();
                 const groups = assignData.data || [];
 
@@ -290,7 +290,7 @@
 
                 if (targetGroup) {
                     // Add to existing group
-                    await fetch(`https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/group-members`, {
+                    await fetch(`https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/group-members`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ group_id: targetGroup.group_id, user_id: userId })
@@ -301,7 +301,7 @@
                     const newGroupNumber = groups.length + 1;
                     const newGroupName = `${newLearningStyle.charAt(0).toUpperCase() + newLearningStyle.slice(1)} Group ${newGroupNumber}`;
                     
-                    const createGroupResponse = await fetch(`https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/groups`, {
+                    const createGroupResponse = await fetch(`https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/groups`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ course_id: newCourseId, group_name: newGroupName })
@@ -312,7 +312,7 @@
                         const newGroupId = newGroupData.data.group_id;
                         
                         // Add user to the newly created group
-                        await fetch(`https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/group-members`, {
+                        await fetch(`https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/group-members`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ group_id: newGroupId, user_id: userId })
@@ -345,7 +345,7 @@
                 // --- Start Deletion ---
 
                 // 1. Delete Module Assessment Progress and its dependencies (Scores, Feedback)
-                const assessmentProgressResponse = await fetch(`https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/users/${userId}/assessment-progress`);
+                const assessmentProgressResponse = await fetch(`https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/users/${userId}/assessment-progress`);
                 if (!assessmentProgressResponse.ok) {
                     if (assessmentProgressResponse.status !== 404) {
                         throw new Error('Failed to fetch assessment progress for deletion.');
@@ -359,22 +359,22 @@
                         await Promise.all(assessmentProgresses.map(async (progress) => {
                             const progressId = progress.assessment_progress_id;
                             // Delete scores
-                            const scoresResponse = await fetch(`https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/scores/assessment-progress/${progressId}`);
+                            const scoresResponse = await fetch(`https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/scores/assessment-progress/${progressId}`);
                             if (scoresResponse.ok) {
                                 const scoresData = await scoresResponse.json();
                                 if (scoresData.data && scoresData.data.length > 0) {
                                     await Promise.all(scoresData.data.map(score => 
-                                        fetch(`https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/scores/${score.score_id}`, { method: 'DELETE' })
+                                        fetch(`https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/scores/${score.score_id}`, { method: 'DELETE' })
                                     ));
                                 }
                             }
                             // Delete feedback
-                            const feedbackResponse = await fetch(`https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/feedback/assessment-progress/${progressId}`);
+                            const feedbackResponse = await fetch(`https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/feedback/assessment-progress/${progressId}`);
                             if (feedbackResponse.ok) {
                                 const feedbackData = await feedbackResponse.json();
                                 if (feedbackData.data && feedbackData.data.length > 0) {
                                     await Promise.all(feedbackData.data.map(fb => 
-                                        fetch(`https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/feedback/${fb.feedback_id}`, { method: 'DELETE' })
+                                        fetch(`https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/feedback/${fb.feedback_id}`, { method: 'DELETE' })
                                     ));
                                 }
                             }
@@ -382,13 +382,13 @@
 
                         // 1b. Now, delete the module assessment progress records.
                         await Promise.all(assessmentProgresses.map(progress =>
-                            fetch(`https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/module-assessment-progress/${progress.assessment_progress_id}`, { method: 'DELETE' })
+                            fetch(`https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/module-assessment-progress/${progress.assessment_progress_id}`, { method: 'DELETE' })
                         ));
                     }
                 }
 
                 // 2. Delete all enrollments for the user.
-                const enrollmentsResponse = await fetch(`https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/users/${userId}/enrollments`);
+                const enrollmentsResponse = await fetch(`https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/users/${userId}/enrollments`);
                 if(!enrollmentsResponse.ok) {
                     if (enrollmentsResponse.status !== 404) {
                         throw new Error('Failed to fetch enrollments for deletion.');
@@ -398,13 +398,13 @@
                     const enrollments = enrollmentsData.data;
                     if (enrollments && enrollments.length > 0) {
                         await Promise.all(enrollments.map(enrollment =>
-                            fetch(`https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/courses/${enrollment.course_id}/enrollments/${enrollment.enrollment_id}`, { method: 'DELETE' })
+                            fetch(`https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/courses/${enrollment.course_id}/enrollments/${enrollment.enrollment_id}`, { method: 'DELETE' })
                         ));
                     }
                 }
 
                 // 3. Delete module progress (which cascades to lesson_screen_progress).
-                const moduleProgressResponse = await fetch(`https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/users/${userId}/module-progress`);
+                const moduleProgressResponse = await fetch(`https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/users/${userId}/module-progress`);
                 if (!moduleProgressResponse.ok) {
                     if (moduleProgressResponse.status !== 404) {
                         throw new Error('Failed to fetch module progress for deletion.');
@@ -414,7 +414,7 @@
                     const moduleProgresses = moduleProgressData.data;
                     if (moduleProgresses && moduleProgresses.length > 0) {
                         await Promise.all(moduleProgresses.map(progress =>
-                            fetch(`https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/module-progress/${progress.progress_id}`, { method: 'DELETE' })
+                            fetch(`https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/module-progress/${progress.progress_id}`, { method: 'DELETE' })
                         ));
                     }
                 }
@@ -428,7 +428,7 @@
         // Fetch available learning styles
         async function loadLearningStyles() {
             try {
-                const response = await fetch(`https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/learning-styles`);
+                const response = await fetch(`https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/learning-styles`);
                 if (!response.ok) throw new Error('Failed to fetch learning styles');
                 const learningStylesData = await response.json();
                 allLearningStyles = learningStylesData.data;
@@ -441,7 +441,7 @@
         // Fetch available courses
         async function loadCourses() {
             try {
-                const response = await fetch(`https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/courses`);
+                const response = await fetch(`https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/courses`);
                 if (!response.ok) throw new Error('Failed to fetch courses');
                 const coursesData = await response.json();
                 allCourses = coursesData.data;
@@ -464,12 +464,12 @@
                 const userId = currentUser.user_id;
                 
                 // Fetch user details with profile information
-                const userResponse = await fetch(`https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/users/${userId}`);
+                const userResponse = await fetch(`https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/users/${userId}`);
                 if (!userResponse.ok) throw new Error('Failed to fetch user data');
                 const userData = await userResponse.json();
                 
                 // Fetch assessment results
-                const assessmentResponse = await fetch(`https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/users/${userId}/assessment-results`);
+                const assessmentResponse = await fetch(`https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/users/${userId}/assessment-results`);
                 if (!assessmentResponse.ok) throw new Error('Failed to fetch assessment results');
                 const assessmentData = await assessmentResponse.json();
                 
@@ -674,7 +674,7 @@
                     userUpdateData.password = password;
                 }
                 
-                promises.push(fetch(`https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/users/${userId}`, {
+                promises.push(fetch(`https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/users/${userId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(userUpdateData)
@@ -718,7 +718,7 @@
 
                     delete assessmentUpdateData.course; // This is a nested object from GET, not a column in the table
 
-                    promises.push(fetch(`https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/assessment-results/${resultId}`, {
+                    promises.push(fetch(`https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/assessment-results/${resultId}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(assessmentUpdateData)

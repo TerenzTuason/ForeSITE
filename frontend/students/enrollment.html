@@ -546,7 +546,7 @@
 
         // Check if user has any enrollments
         fetch(
-          `https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/users/${userData.user_id}/enrollments`
+          `https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/users/${userData.user_id}/enrollments`
         )
           .then((response) => response.json())
           .then((data) => {
@@ -558,7 +558,7 @@
 
             // Check if user has taken the assessment
             fetch(
-              `https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/users/${userData.user_id}/assessment-results`
+              `https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/users/${userData.user_id}/assessment-results`
             )
               .then((response) => response.json())
               .then((data) => {
@@ -592,7 +592,7 @@
         }
 
         function fetchCourseDetails(id) {
-          fetch(`https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/courses/${id}`)
+          fetch(`https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/courses/${id}`)
             .then((response) => response.json())
             .then((data) => {
               const course = data.data;
@@ -649,7 +649,7 @@
                 try {
                   // Get assessment result ID from the assessment results
                   const assessmentResponse = await fetch(
-                    `https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/users/${userData.user_id}/assessment-results`
+                    `https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/users/${userData.user_id}/assessment-results`
                   );
                   const assessmentData = await assessmentResponse.json();
 
@@ -682,7 +682,7 @@
 
                   // Send enrollment request
                   const enrollResponse = await fetch(
-                    "https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/enrollments",
+                    "https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/enrollments",
                     {
                       method: "POST",
                       headers: {
@@ -721,7 +721,7 @@
 
                   // Send module progress request
                   const moduleProgressResponse = await fetch(
-                    "https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/module-progress",
+                    "https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/module-progress",
                     {
                       method: "POST",
                       headers: {
@@ -761,7 +761,7 @@
                         try {
                           // First fetch module assessments for this course
                           const moduleAssessmentsResponse = await fetch(
-                            `https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/courses/${course.course_id}/module-assessments`
+                            `https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/courses/${course.course_id}/module-assessments`
                           );
 
                           if (!moduleAssessmentsResponse.ok) {
@@ -793,7 +793,7 @@
                             };
 
                             const moduleAssessmentProgressResponse = await fetch(
-                              "https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/module-assessment-progress",
+                              "https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/module-assessment-progress",
                               {
                                 method: "POST",
                                 headers: {
@@ -824,7 +824,7 @@
 
                         // API endpoint for lesson screens
                         const lessonScreensUrl =
-                          "https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/lesson-screens";
+                          "https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/lesson-screens";
                         console.log("Requesting lesson screens from:", lessonScreensUrl);
 
                         const lessonScreensResponse = await fetch(lessonScreensUrl);
@@ -922,7 +922,7 @@
                                 };
 
                                 // Send lesson screen progress request for this individual screen
-                                const lessonScreenProgressUrl = `https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/module-progress/${moduleProgressId}/screen-progress`;
+                                const lessonScreenProgressUrl = `https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/module-progress/${moduleProgressId}/screen-progress`;
                                 console.log(`Posting to URL: ${lessonScreenProgressUrl}`);
 
                                 try {

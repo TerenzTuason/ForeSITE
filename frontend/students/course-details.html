@@ -511,7 +511,7 @@
             }
 
             // Fetch user's enrollment to see if they are in a course
-            fetch(`https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/users/${userData.user_id}/enrollments`)
+            fetch(`https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/users/${userData.user_id}/enrollments`)
                 .then(response => {
                     if (!response.ok) {
                         // If the endpoint doesn't exist or there's an error, assume not enrolled.
@@ -544,13 +544,13 @@
 
             function fetchAvailableCourses() {
                 // Fetch user's assessment result to get the recommended course
-                fetch(`https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/users/${userData.user_id}/assessment-results`)
+                fetch(`https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/users/${userData.user_id}/assessment-results`)
                     .then(response => response.json())
                     .then(data => {
                         if (data.data && data.data.length > 0) {
                             const assessmentResult = data.data[0]; // Get the most recent result
                             // Fetch only the recommended course details
-                            fetch(`https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/courses/${assessmentResult.course_id}`)
+                            fetch(`https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/courses/${assessmentResult.course_id}`)
                                 .then(response => response.json())
                                 .then(courseData => {
                                     const course = courseData.data;
@@ -586,7 +586,7 @@
             }
 
             function fetchAllCourses() {
-                fetch('https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/courses')
+                fetch('https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/courses')
                     .then(response => response.json())
                     .then(data => {
                         if (data.data && data.data.length > 0) {
@@ -626,7 +626,7 @@
 
             function fetchCourseDetails(courseId) {
                 // First fetch course details
-                fetch(`https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/courses/${courseId}`)
+                fetch(`https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/courses/${courseId}`)
                     .then(response => response.json())
                     .then(data => {
                         const course = data.data;
@@ -657,7 +657,7 @@
                         startButton.href = `module-view.html`;
 
                         // Now fetch all progress data to calculate overall progress
-                        fetch(`https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/users/${userData.user_id}/all-progress`)
+                        fetch(`https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/users/${userData.user_id}/all-progress`)
                             .then(response => response.json())
                             .then(progressData => {
                                 if (!progressData.data || progressData.data.length === 0) {

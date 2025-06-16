@@ -569,13 +569,13 @@
             currentUserId = userData.user_id;
 
             // First, get assessment results to determine the course ID.
-            fetch(`https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/users/${currentUserId}/assessment-results`)
+            fetch(`https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/users/${currentUserId}/assessment-results`)
                 .then(response => response.json())
                 .then(assessmentData => {
                     if (assessmentData.data && assessmentData.data.length > 0) {
                         const courseId = assessmentData.data[0].course_id;
                         // Now, find or create the group for this user and course
-                        fetch(`https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/chat/courses/${courseId}/users/${currentUserId}/group`)
+                        fetch(`https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/chat/courses/${courseId}/users/${currentUserId}/group`)
                             .then(response => response.json())
                             .then(chatInfo => {
                                 if (chatInfo.data && chatInfo.data.group) {
@@ -692,7 +692,7 @@
 
         function loadLatestMessages() {
             if (!currentGroupId) return;
-            fetch(`https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/chat/groups/${currentGroupId}/messages`)
+            fetch(`https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/chat/groups/${currentGroupId}/messages`)
                 .then(response => response.json())
                 .then(data => {
                     if(data.data) {
@@ -719,7 +719,7 @@
             const sendButton = $('.btn-send');
             sendButton.prop('disabled', true).html('Sending... <i class="fas fa-spinner fa-spin"></i>');
 
-            fetch('https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/chat/messages', {
+            fetch('https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/chat/messages', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -756,7 +756,7 @@
                 if (currentGroupId) {
                     loadLatestMessages();
                     // Optionally refresh group members too if they can change
-                    // fetch(`https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/chat/groups/${currentGroupId}/members`).then...
+                    // fetch(`https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/chat/groups/${currentGroupId}/members`).then...
                 }
             }, 5000);
         }

@@ -478,7 +478,7 @@
         });
 
         // Check if user has already taken the assessment
-        fetch(`https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/users/${userData.user_id}/assessment-results`)
+        fetch(`https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/users/${userData.user_id}/assessment-results`)
           .then(response => response.json())
           .then(data => {
             if (data.data && data.data.length > 0) {
@@ -699,7 +699,7 @@
                   .then((response) => response.json())
                   .then((data) => {
                     // Fetch courses and find matching learning style
-                    fetch("https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/courses")
+                    fetch("https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/courses")
                       .then((response) => response.json())
                       .then((coursesData) => {
                         // Find the course matching the predicted learning style
@@ -718,7 +718,7 @@
                           ).value;
 
                           // Store assessment results in database with course_id
-                          fetch("https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/assessment-results", {
+                          fetch("https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/assessment-results", {
                             method: "POST",
                             headers: {
                               "Content-Type": "application/json",
@@ -821,7 +821,7 @@
             window.location.href = "dashboard.html";
           };
 
-          fetch(`https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/groups?course_id=${courseId}`)
+          fetch(`https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/groups?course_id=${courseId}`)
             .then(response => response.json())
             .then(groupsData => {
               const groups = groupsData.data || [];
@@ -844,7 +844,7 @@
         }
 
         function createGroupAndAddUser(userId, courseId, groupName, callback) {
-          fetch("https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/groups", {
+          fetch("https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/groups", {
             method: "POST",
             headers: { "Content-Type": "application/json", Accept: "application/json" },
             body: JSON.stringify({ course_id: courseId, group_name: groupName }),
@@ -863,7 +863,7 @@
         }
 
         function addUserToGroup(userId, groupId, callback) {
-          fetch("https://foresite-backend-deployment-qspo9z.laravel.cloud/api/v1/group-members", {
+          fetch("https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1/group-members", {
             method: "POST",
             headers: { "Content-Type": "application/json", Accept: "application/json" },
             body: JSON.stringify({ user_id: userId, group_id: groupId }),
