@@ -781,7 +781,7 @@
         }
 
         function createAssessmentCard(assessment) {
-          const isModuleLocked = !assessment.module_progress?.status || assessment.module_progress.status !== 'completed';
+          const isModuleLocked = !assessment.module_progress?.progress_percentage || assessment.module_progress.progress_percentage < 80;
           const isCompleted = assessment.status === "completed";
           
           const card = $(`
@@ -790,7 +790,7 @@
                 <h3 class="assessment-title">${assessment.assessment.assessment_title}</h3>
                 <div class="assessment-module">Module ${assessment.assessment.module_number}</div>
                 ${!isCompleted && isModuleLocked ? 
-                  '<div class="alert alert-warning mt-2 mb-0"><i class="fas fa-exclamation-triangle me-2"></i>You must complete this module before submitting the assessment.</div>' 
+                  '<div class="alert alert-warning mt-2 mb-0"><i class="fas fa-exclamation-triangle me-2"></i>You must complete at least 80% of this module before submitting the assessment.</div>' 
                   : ''}
                 ${isCompleted && assessment.file_url ? 
                   `<div class="alert alert-success mt-2 mb-0">
@@ -1098,7 +1098,7 @@
                 <ul class="assessment-list" style="display: none;">
                   ${moduleAssessments.map(assessment => {
                     const isAssessmentCompleted = assessment.status === "completed";
-                    const isModuleLocked = !assessment.module_progress?.status || assessment.module_progress.status !== 'completed';
+                    const isModuleLocked = !assessment.module_progress?.progress_percentage || assessment.module_progress.progress_percentage < 80;
                     const shouldDisable = !isAssessmentCompleted && isModuleLocked;
                     
                     return `
@@ -1440,9 +1440,9 @@
         window.completeAssessment = async function(assessmentProgressId) {
           const assessment = allAssessments.find(a => a.assessment_progress_id === assessmentProgressId);
           
-          // Check if module is completed by the current user
-          if (!assessment.module_progress?.status || assessment.module_progress.status !== 'completed') {
-            alert('You must complete the module before submitting the assessment.');
+          // Check if module progress is at least 80% by the current user
+          if (!assessment.module_progress?.progress_percentage || assessment.module_progress.progress_percentage < 80) {
+            alert('You must complete at least 80% of the module before submitting the assessment.');
             return;
           }
 
