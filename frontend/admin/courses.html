@@ -727,7 +727,7 @@
         async function fetchLearningStyles() {
             try {
                 console.log('Fetching learning styles from API...');
-                const response = await fetch('https://foresite-backend-no-collaborative-czqhjr.laravel.cloud/api/v1/learning-styles');
+                const response = await fetch('https://foresite-backend-no-collaborative-dsb4yx.laravel.cloud/api/v1/learning-styles');
                 
                 if (!response.ok) {
                     throw new Error(`Failed to fetch learning styles: ${response.status} ${response.statusText}`);
@@ -749,7 +749,7 @@
         async function fetchCourses() {
             try {
                 console.log('Fetching courses from API...');
-                const response = await fetch('https://foresite-backend-no-collaborative-czqhjr.laravel.cloud/api/v1/courses');
+                const response = await fetch('https://foresite-backend-no-collaborative-dsb4yx.laravel.cloud/api/v1/courses');
                 console.log('API response status:', response.status);
                 
                 if (!response.ok) {
@@ -1088,7 +1088,7 @@
         async function fetchLessonScreens() {
             try {
                 console.log('Fetching lesson screens from API...');
-                const response = await fetch('https://foresite-backend-no-collaborative-czqhjr.laravel.cloud/api/v1/lesson-screens');
+                const response = await fetch('https://foresite-backend-no-collaborative-dsb4yx.laravel.cloud/api/v1/lesson-screens');
                 console.log('Lesson screens API response status:', response.status);
                 
                 if (!response.ok) {
@@ -1332,7 +1332,7 @@
             // Add new event listener
             newConfirmButton.addEventListener('click', async () => {
                 try {
-                    const response = await fetch(`https://foresite-backend-no-collaborative-czqhjr.laravel.cloud/api/v1/lesson-screens/${screenId}`, {
+                    const response = await fetch(`https://foresite-backend-no-collaborative-dsb4yx.laravel.cloud/api/v1/lesson-screens/${screenId}`, {
                         method: 'DELETE',
                         headers: {
                             'Content-Type': 'application/json'
@@ -1407,14 +1407,14 @@
                 console.log('Sending data to API:', {
                     method: screenId ? 'PUT' : 'POST',
                     url: screenId 
-                        ? `https://foresite-backend-no-collaborative-czqhjr.laravel.cloud/api/v1/lesson-screens/${screenId}`
-                        : 'https://foresite-backend-no-collaborative-czqhjr.laravel.cloud/api/v1/lesson-screens',
+                        ? `https://foresite-backend-no-collaborative-dsb4yx.laravel.cloud/api/v1/lesson-screens/${screenId}`
+                        : 'https://foresite-backend-no-collaborative-dsb4yx.laravel.cloud/api/v1/lesson-screens',
                     data: screenData
                 });
 
                 if (screenId) {
                     // Edit existing screen
-                    response = await fetch(`https://foresite-backend-no-collaborative-czqhjr.laravel.cloud/api/v1/lesson-screens/${screenId}`, {
+                    response = await fetch(`https://foresite-backend-no-collaborative-dsb4yx.laravel.cloud/api/v1/lesson-screens/${screenId}`, {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json'
@@ -1423,7 +1423,7 @@
                     });
                 } else {
                     // Create new screen
-                    response = await fetch('https://foresite-backend-no-collaborative-czqhjr.laravel.cloud/api/v1/lesson-screens', {
+                    response = await fetch('https://foresite-backend-no-collaborative-dsb4yx.laravel.cloud/api/v1/lesson-screens', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'

@@ -478,7 +478,7 @@
         });
 
         // Check if user has already taken the assessment
-        fetch(`https://foresite-backend-no-collaborative-czqhjr.laravel.cloud/api/v1/users/${userData.user_id}/assessment-results`)
+        fetch(`https://foresite-backend-no-collaborative-dsb4yx.laravel.cloud/api/v1/users/${userData.user_id}/assessment-results`)
           .then(response => response.json())
           .then(data => {
             if (data.data && data.data.length > 0) {
@@ -699,7 +699,7 @@
                   .then((response) => response.json())
                   .then((data) => {
                     // Fetch courses and find matching learning style
-                    fetch("https://foresite-backend-no-collaborative-czqhjr.laravel.cloud/api/v1/courses")
+                    fetch("https://foresite-backend-no-collaborative-dsb4yx.laravel.cloud/api/v1/courses")
                       .then((response) => response.json())
                       .then((coursesData) => {
                         // Find the course matching the predicted learning style
@@ -718,7 +718,7 @@
                           ).value;
 
                           // Store assessment results in database with course_id
-                          fetch("https://foresite-backend-no-collaborative-czqhjr.laravel.cloud/api/v1/assessment-results", {
+                          fetch("https://foresite-backend-no-collaborative-dsb4yx.laravel.cloud/api/v1/assessment-results", {
                             method: "POST",
                             headers: {
                               "Content-Type": "application/json",

@@ -839,7 +839,7 @@
          */
         function fetchModuleProgress(userId) {
           loadingText.textContent = "Loading your course data...";
-          fetch(`https://foresite-backend-no-collaborative-czqhjr.laravel.cloud/api/v1/users/${userId}/all-progress`)
+          fetch(`https://foresite-backend-no-collaborative-dsb4yx.laravel.cloud/api/v1/users/${userId}/all-progress`)
             .then((response) => response.json())
             .then((data) => {
               // Store the complete API response in the global variable
@@ -852,7 +852,7 @@
               if (success) {
                 // Fetch assessment progress after processing module data
                 loadingText.textContent = "Loading assessment scores...";
-                return fetch(`https://foresite-backend-no-collaborative-czqhjr.laravel.cloud/api/v1/users/${userId}/assessment-progress`);
+                return fetch(`https://foresite-backend-no-collaborative-dsb4yx.laravel.cloud/api/v1/users/${userId}/assessment-progress`);
               } else {
                 return Promise.reject("Failed to process module progress");
               }
@@ -861,7 +861,7 @@
             .then(assessmentData => {
                 assessmentProgressData = assessmentData.data || [];
                 const scorePromises = assessmentProgressData.map(progress =>
-                    fetch(`https://foresite-backend-no-collaborative-czqhjr.laravel.cloud/api/v1/scores/assessment-progress/${progress.assessment_progress_id}`)
+                    fetch(`https://foresite-backend-no-collaborative-dsb4yx.laravel.cloud/api/v1/scores/assessment-progress/${progress.assessment_progress_id}`)
                         .then(res => res.json())
                         .then(scoreRes => (scoreRes.data && scoreRes.data.length > 0) ? scoreRes.data[0] : null)
                         .catch(() => null) // Handle cases where score fetching fails for one item
@@ -1074,7 +1074,7 @@
             };
 
             fetch(
-              `https://foresite-backend-no-collaborative-czqhjr.laravel.cloud/api/v1/screen-progress/${screenProgress.screen_progress_id}`,
+              `https://foresite-backend-no-collaborative-dsb4yx.laravel.cloud/api/v1/screen-progress/${screenProgress.screen_progress_id}`,
               {
                 method: "PUT",
                 headers: {
@@ -1285,7 +1285,7 @@
           };
 
           fetch(
-            `https://foresite-backend-no-collaborative-czqhjr.laravel.cloud/api/v1/module-progress/${currentModuleProgress.progress_id}`,
+            `https://foresite-backend-no-collaborative-dsb4yx.laravel.cloud/api/v1/module-progress/${currentModuleProgress.progress_id}`,
             {
               method: "PUT",
               headers: {
@@ -2184,7 +2184,7 @@
 
                           // Update module progress in database
                           fetch(
-                            `https://foresite-backend-no-collaborative-czqhjr.laravel.cloud/api/v1/module-progress/${currentModuleProgress.progress_id}`,
+                            `https://foresite-backend-no-collaborative-dsb4yx.laravel.cloud/api/v1/module-progress/${currentModuleProgress.progress_id}`,
                             {
                               method: "PUT",
                               headers: {
@@ -2334,7 +2334,7 @@
 
           console.log("Checking assessment progress");
 
-          fetch(`https://foresite-backend-no-collaborative-czqhjr.laravel.cloud/api/v1/users/${userData.user_id}/assessment-progress`)
+          fetch(`https://foresite-backend-no-collaborative-dsb4yx.laravel.cloud/api/v1/users/${userData.user_id}/assessment-progress`)
             .then((response) => response.json())
             .then((data) => {
               console.log("Assessment progress API response:", data);
