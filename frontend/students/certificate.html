@@ -72,6 +72,7 @@
         .assessment-title {
             font-weight: 600;
             color: #800000;
+            font-size: 20px;
             display: inline-block;
             margin-top: 5px;
         }
@@ -110,11 +111,13 @@
         <p class="subtitle">This certificate is proudly presented to</p>
         <h2 class="student-name" id="studentName">Student Name</h2>
         <p class="achievement-text">
-            For successfully completing the Module <span id="moduleNumber"> of the course </span>
+            For successfully completing Module <span id="moduleNumber"></span>:
             <br>
-            Applied Strategic Foresight: Practical Tools for Future-Ready Decision Making, titled:
+            <strong class="assessment-title" id="moduleTitle">Module Title</strong>           
             <br>
-            <strong class="assessment-title" id="assessmentTitle">Assessment Title</strong>
+            Of the course
+            <br>
+            Applied Strategic Foresight: Practical Tools for Future-Ready Decision Making
         </p>
         <div class="footer">
             <p>Date</p>
@@ -127,11 +130,11 @@
         document.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
             const studentName = urlParams.get('studentName');
-            const assessmentTitle = urlParams.get('assessmentTitle');
+            const moduleTitle = urlParams.get('moduleTitle');
             const moduleNumber = urlParams.get('moduleNumber');
 
             document.getElementById('studentName').textContent = studentName || 'Sample Student';
-            document.getElementById('assessmentTitle').textContent = assessmentTitle || 'Sample Assessment';
+            document.getElementById('moduleTitle').textContent = moduleTitle || 'Sample Module';
             document.getElementById('moduleNumber').textContent = moduleNumber || 'X';
             
             const dateElement = document.querySelector('.footer p');
@@ -156,8 +159,8 @@
                     pdf.addImage(imgData, 'PNG', 0, 0, certificate.offsetWidth, certificate.offsetHeight);
 
                     const studentName = document.getElementById('studentName').textContent.trim();
-                    const assessmentTitle = document.getElementById('assessmentTitle').textContent.trim();
-                    const fileName = `Certificate-${studentName.replace(/ /g, '_')}-${assessmentTitle.replace(/ /g, '_')}.pdf`;
+                    const moduleTitle = document.getElementById('moduleTitle').textContent.trim();
+                    const fileName = `Certificate-${studentName.replace(/ /g, '_')}-${moduleTitle.replace(/ /g, '_')}.pdf`;
 
                     pdf.save(fileName);
                 });
