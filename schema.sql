@@ -411,7 +411,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
   'Driver Mapping',
   null,
   null,
-  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185724/2.1_Driver_Mapping_lmspxt.mp4',
+  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1750122897/2.1_Driver_Mapping_gsnxf4.mp4',
   '56 seconds'
 );
 
@@ -474,7 +474,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
   'Horizon Scanning',
   null,
   null,
-  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185779/2.2_Horizon_Scanning_yhuel4.mp4',
+  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1750122961/2.2_Horizon_Scanning_zfbdbm.mp4',
   '2 minutes 4 seconds'
 );
 
@@ -602,7 +602,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
   'Causal Layered Analysis',
   null,
   null,
-  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185859/3.1_Causal_Layered_Analysis_u1pfwq.mp4',
+  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1750123304/3.1_Causal_Layered_Analysis_ffuvr6.mp4',
   '19 minutes 11 seconds'
 );
 
@@ -689,7 +689,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
   'Futures Triangle',
   null,
   null,
-  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185745/3.2_Futures_Triangle_l837ah.mp4',
+  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1750123037/3.2_Futures_Triangle_g8ac4w.mp4',
   '2 minutes 59 seconds'
 );
 
@@ -789,7 +789,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
   'Scenario Planning',
   null,
   null,
-  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185751/3.3_Scenario_Planning_viem5x.mp4',
+  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1750123049/3.3_Scenario_Planning_pfo05y.mp4',
   '2 minutes 15 seconds'
 );
 
