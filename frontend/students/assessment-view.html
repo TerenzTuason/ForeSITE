@@ -1002,9 +1002,9 @@
 
         function openCertificateWindow(assessment) {
             const studentName = `${userData.first_name} ${userData.last_name}`;
-            const assessmentTitle = assessment.assessment.assessment_title;
+            const moduleTitle = assessment.module_progress.module_title;
             const moduleNumber = assessment.assessment.module_number;
-            const url = `certificate.html?studentName=${encodeURIComponent(studentName)}&assessmentTitle=${encodeURIComponent(assessmentTitle)}&moduleNumber=${encodeURIComponent(moduleNumber)}`;
+            const url = `certificate.html?studentName=${encodeURIComponent(studentName)}&moduleTitle=${encodeURIComponent(moduleTitle)}&moduleNumber=${encodeURIComponent(moduleNumber)}`;
             window.open(url, '_blank');
         }
 
