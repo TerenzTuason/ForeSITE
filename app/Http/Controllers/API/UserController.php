@@ -133,7 +133,7 @@ class UserController extends Controller
 
             // Handle records where the user could be a student or faculty
             Feedback::where('student_id', $id)->orWhere('faculty_id', $id)->delete();
-            Score::where('student_id', $id)->orWhere('faculty_id', $id)->delete();
+            Score::where('student_id', $id)->orWhere('faculty_id',id)->delete();
 
             // Finally, delete the user
             $user->delete();
