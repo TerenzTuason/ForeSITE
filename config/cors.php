@@ -19,7 +19,11 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'],
+    'allowed_origins' => [
+        'http://localhost:3000',
+        'http://localhost:8000',
+        'https://foresite-nocollaborative.vercel.app'
+    ],
 
     'allowed_origins_patterns' => [],
 
