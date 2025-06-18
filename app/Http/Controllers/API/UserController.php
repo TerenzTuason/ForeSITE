@@ -1,305 +1,1198 @@
-<?php
-
-namespace App\Http\Controllers\Api;
-
-use App\Http\Controllers\Controller;
-use App\Models\User;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
-use App\Models\Enrollment;
-use App\Models\AssessmentAttempt;
-use App\Models\Certificate;
-use App\Models\Feedback;
-use App\Models\AssessmentResult;
-use Illuminate\Support\Facades\DB;
-use App\Models\ModuleProgress;
-use App\Models\Notification;
-use App\Models\QuestionnaireResponse;
-use App\Models\Score;
-use App\Models\StudentProfile;
-
-class UserController extends Controller
-{
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(): JsonResponse
-    {
-        $users = User::with('role')->get();
-        return response()->json(['data' => $users], Response::HTTP_OK);
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request): JsonResponse
-    {
-        $validator = Validator::make($request->all(), [
-            'role_id' => 'required|exists:roles,role_id',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:8',
-            'first_name' => 'required|string|max:50',
-            'last_name' => 'required|string|max:50',
-            'is_active' => 'boolean',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()], Response::HTTP_BAD_REQUEST);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management - ForeSITE</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --maroon: #800000;
+            --gold: #FFB81C;
+            --light-gray: #f5f5f5;
+            --dark-gray: #333;
+            --border-radius: 8px;
+            --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
-        $userData = $request->all();
-        $userData['password'] = Hash::make($request->password);
-        
-        $user = User::create($userData);
-        
-        return response()->json(['data' => $user], Response::HTTP_CREATED);
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id): JsonResponse
-    {
-        $user = User::with('role', 'studentProfile.learningStyle')->find($id);
-        
-        if (!$user) {
-            return response()->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
-        }
-        
-        return response()->json(['data' => $user], Response::HTTP_OK);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id): JsonResponse
-    {
-        $user = User::find($id);
-        
-        if (!$user) {
-            return response()->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
-        }
-        
-        $validator = Validator::make($request->all(), [
-            'role_id' => 'sometimes|required|exists:roles,role_id',
-            'email' => 'sometimes|required|email|unique:users,email,' . $id . ',user_id',
-            'password' => 'sometimes|required|min:8',
-            'first_name' => 'sometimes|required|string|max:50',
-            'last_name' => 'sometimes|required|string|max:50',
-            'is_active' => 'boolean',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()], Response::HTTP_BAD_REQUEST);
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--light-gray);
+            min-height: 100vh;
         }
 
-        $userData = $request->all();
-        
-        if ($request->has('password')) {
-            $userData['password'] = Hash::make($request->password);
+        /* Navigation Styles */
+        .navbar {
+            background: var(--maroon);
+            padding: 1rem 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            color: white !important;
+            font-weight: 600;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .navbar-brand img {
+            height: 35px;
+        }
+
+        .nav-link {
+            color: rgba(255,255,255,0.9) !important;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.75rem 1.5rem !important;
+            border-radius: 50px;
+            margin: 0 0.5rem;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--gold) !important;
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+        }
+
+        .nav-link.btn-logout {
+            background-color: var(--gold);
+            color: var(--maroon) !important;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .nav-link.btn-logout:hover {
+            background-color: #fff;
+            transform: translateY(-2px);
+        }
+
+        /* User Management Styles */
+        .users-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .section-title {
+            color: var(--maroon);
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+        }
+
+        .filter-bar {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .user-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            margin-bottom: 0;
+            border-left: 5px solid var(--maroon);
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .user-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .student-card {
+            border-left-color: var(--maroon);
+        }
+
+        .faculty-card {
+            border-left-color: var(--gold);
         }
         
-        $user->update($userData);
+        /* Add margin between rows in the grid */
+        .row.g-3 {
+            margin-bottom: 0.5rem;
+        }
         
-        return response()->json(['data' => $user], Response::HTTP_OK);
-    }
+        /* Make sure the grid columns are properly spaced */
+        .col-md-6 {
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id): JsonResponse
-    {
-        DB::beginTransaction();
-        try {
-            $user = User::find($id);
+        .user-card .card-header {
+            background: transparent;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            padding: 0.75rem 1rem;
+        }
 
-            if (!$user) {
-                DB::rollBack();
-                return response()->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
+        .user-card .card-body {
+            padding: 0.5rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--light-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--maroon);
+            margin-right: 0.75rem;
+        }
+
+        .user-meta {
+            color: #666;
+            font-size: 0.85rem;
+        }
+
+        .badge-role {
+            background: var(--maroon);
+            color: white;
+            padding: 0.35rem 0.75rem;
+            border-radius: 50px;
+            font-weight: 500;
+            font-size: 0.75rem;
+            text-transform: lowercase;
+        }
+
+        .badge-role.faculty {
+            background: var(--gold);
+            color: var(--dark-gray);
+        }
+        
+        /* Specific styling for student badge */
+        .badge-role.student {
+            background: var(--maroon);
+            color: white;
+        }
+        
+        /* Specific styling for admin badge */
+        .badge-role.admin {
+            background: #ffb700;
+            color: #333;
+        }
+
+        .action-buttons .btn {
+            border-radius: 50px;
+            padding: 0.35rem 0.65rem;
+            font-weight: 500;
+            margin-left: 0.5rem;
+        }
+
+        .btn-edit {
+            background-color: var(--gold);
+            color: var(--dark-gray);
+            border: none;
+        }
+
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .btn-delete:hover {
+            background-color: #c82333;
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--maroon);
+            margin-bottom: 1rem;
+        }
+
+        .empty-state h3 {
+            color: var(--dark-gray);
+            margin-bottom: 1rem;
+        }
+
+        .empty-state p {
+            color: #666;
+            max-width: 500px;
+            margin: 0 auto 1.5rem;
+        }
+
+        .pagination-container {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .pagination {
+            margin-bottom: 2rem;
+        }
+        
+        .pagination .page-item .page-link {
+            color: var(--maroon);
+            border-color: #dee2e6;
+            min-width: 40px;
+            text-align: center;
+        }
+        
+        .pagination .page-item .page-link:hover {
+            background-color: #f8f9fa;
+            color: var(--maroon);
+            border-color: #dee2e6;
+        }
+        
+        .pagination .page-item.active .page-link {
+            background-color: var(--maroon);
+            border-color: var(--maroon);
+            color: white;
+            font-weight: 500;
+            z-index: 3;
+        }
+        
+        .pagination .page-item.disabled .page-link {
+            color: #6c757d;
+            pointer-events: none;
+            background-color: #fff;
+            border-color: #dee2e6;
+        }
+
+        .spinner-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+        }
+
+        .spinner-container .spinner-border {
+            color: var(--maroon);
+            width: 3rem;
+            height: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            .action-buttons {
+                margin-top: 1rem;
             }
-
-            // Delete related records
-            StudentProfile::where('user_id', $id)->delete();
-            Enrollment::where('user_id', $id)->delete();
-            AssessmentAttempt::where('user_id', $id)->delete();
-            AssessmentResult::where('user_id', $id)->delete();
-            Certificate::where('user_id', $id)->delete();
-            ModuleProgress::where('user_id', $id)->delete();
-            Notification::where('user_id', $id)->delete();
-            QuestionnaireResponse::where('user_id', $id)->delete();
-
-            // Handle records where the user could be a student or faculty
-            Feedback::where('student_id', $id)->orWhere('faculty_id', $id)->delete();
-            Score::where('student_id', $id)->orWhere('faculty_id', $id)->delete();
-
-            // Finally, delete the user
-            $user->delete();
-
-            DB::commit();
-
-            return response()->json(null, Response::HTTP_NO_CONTENT);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            // Log the error for debugging purposes
-            \Log::error("Error deleting user with ID {$id}: " . $e->getMessage());
-            return response()->json(['error' => 'An unexpected error occurred while deleting the user.'], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    /**
-     * Get the role associated with the user.
-     */
-    public function getRole(string $id): JsonResponse
-    {
-        $user = User::find($id);
-        
-        if (!$user) {
-            return response()->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
-        }
-        
-        $role = $user->role;
-        
-        if (!$role) {
-            return response()->json(['error' => 'Role not found for this user'], Response::HTTP_NOT_FOUND);
-        }
-        
-        return response()->json(['data' => $role], Response::HTTP_OK);
-    }
-
-    /**
-     * Update the role for a user.
-     */
-    public function updateRole(Request $request, string $id): JsonResponse
-    {
-        $user = User::find($id);
-        
-        if (!$user) {
-            return response()->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
-        }
-        
-        $validator = Validator::make($request->all(), [
-            'role_id' => 'required|exists:roles,role_id',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()], Response::HTTP_BAD_REQUEST);
+            .navbar-brand img {
+                height: 30px;
+            }
+            .nav-link {
+                padding: 0.5rem 1rem !important;
+            }
         }
 
-        $user->role_id = $request->role_id;
-        $user->save();
+        @media (max-width: 576px) {
+            .user-card .card-header {
+                flex-direction: column;
+                align-items: flex-start !important;
+            }
+            .action-buttons {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                margin-top: 1rem;
+                margin-left: 0;
+            }
+            .action-buttons .btn {
+                margin-left: 0;
+                margin-right: 0.5rem;
+            }
+        }
+
+        /* Update the CSS for table styling */
+        .table-responsive {
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+        }
         
-        return response()->json(['data' => $user->load('role')], Response::HTTP_OK);
-    }
+        .user-table {
+            margin-bottom: 0;
+        }
+        
+        .user-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            border-bottom: 2px solid rgba(0,0,0,0.05);
+        }
+        
+        .user-table .user-avatar {
+            margin-right: 0.5rem;
+            width: 35px;
+            height: 35px;
+            font-size: 1rem;
+        }
+        
+        .badge-learning-style {
+            padding: 0.35rem 0.75rem;
+            border-radius: 50px;
+            font-weight: 500;
+            font-size: 0.75rem;
+            text-transform: lowercase;
+        }
+        
+        .badge-learning-style.activist {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .badge-learning-style.reflector {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .badge-learning-style.theorist {
+            background-color: #9b59b6;
+            color: white;
+        }
+        
+        .badge-learning-style.pragmatist {
+            background-color: #f39c12;
+            color: white;
+        }
+        
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+        
+        .btn-delete:hover {
+            background-color: #c82333;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand" href="#">
+                <img src="../assets/logo/pup.png" alt="PUP Logo">
+                <span class="d-none d-sm-inline">FORESITE: Admin Portal</span>
+                <span class="d-inline d-sm-none">FORESITE</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="dashboard.html">
+                            <i class="fas fa-home me-2"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="users.html">
+                            <i class="fas fa-users me-2"></i>Users
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="progress.html">
+                            <i class="fas fa-chart-line me-2"></i>Progress
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="courses.html">
+                            <i class="fas fa-book me-2"></i>Courses
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn-logout" href="login.html" id="logoutBtn">
+                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="users-container">
+        <h1 class="section-title">User Management</h1>
+        
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <div class="row align-items-center">
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white">
+                            <i class="fas fa-search text-muted"></i>
+                        </span>
+                        <input type="text" id="searchInput" class="form-control border-start-0" placeholder="Search users...">
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <select id="roleFilter" class="form-select">
+                        <option value="all">All Roles</option>
+                        <option value="student">Students</option>
+                        <option value="faculty">Faculty</option>
+                    </select>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <button class="btn w-100" style="background-color: var(--maroon); color: white;" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                        <i class="fas fa-plus me-2"></i>Add User
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- User List Container -->
+        <div id="userListContainer">
+            <!-- Loading Spinner (Initially Shown) -->
+            <div class="spinner-container" id="loadingSpinner">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+            
+            <!-- Empty State (Hidden Initially) -->
+            <div class="empty-state d-none" id="emptyState">
+                <i class="fas fa-users-slash"></i>
+                <h3>No Users Found</h3>
+                <p>There are no users matching your current filters. Try adjusting your search criteria or add a new user.</p>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                    <i class="fas fa-plus me-2"></i>Add New User
+                </button>
+            </div>
+            
+            <!-- User List (Hidden Initially) -->
+            <div id="userList" class="d-none">
+                <div class="table-responsive">
+                    <table class="table table-hover user-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Learning Style</th>
+                                <th class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- User rows will be dynamically added here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pagination -->
+        <div class="pagination-container">
+            <nav aria-label="User list pagination">
+                <ul class="pagination" id="pagination">
+                    <!-- Pagination items will be dynamically generated -->
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Add User Modal -->
+    <div class="modal fade" id="addUserModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addUserForm">
+                        <div class="mb-3">
+                            <label for="userName" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="userName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="userEmail" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="userEmail" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="userRole" class="form-label">Role</label>
+                            <select class="form-select" id="userRole" required>
+                                <option value="">Select Role</option>
+                                <option value="student">Student</option>
+                                <option value="faculty">Faculty</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="userPassword" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="userPassword" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="userConfirmPassword" class="form-label">Confirm Password</label>
+                            <input type="password" class="form-control" id="userConfirmPassword" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="saveUserBtn">Save User</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Delete</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this user? This action cannot be undone.</p>
+                    <p class="fw-bold" id="deleteUserName"></p>
+                    <input type="hidden" id="deleteUserId">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete User</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    /**
-     * Get the enrollments for a user.
-     */
-    public function getEnrollments(string $id): JsonResponse
-    {
-        $user = User::find($id);
-        
-        if (!$user) {
-            return response()->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
-        }
-        
-        $enrollments = Enrollment::with('course')->where('user_id', $id)->get();
-        
-        return response()->json(['data' => $enrollments], Response::HTTP_OK);
-    }
-    
-    /**
-     * Get the assessment attempts for a user.
-     */
-    public function getAssessmentAttempts(string $id): JsonResponse
-    {
-        $user = User::find($id);
-        
-        if (!$user) {
-            return response()->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
-        }
-        
-        $attempts = AssessmentAttempt::with('assessment')->where('user_id', $id)->get();
-        
-        return response()->json(['data' => $attempts], Response::HTTP_OK);
-    }
-    
-    /**
-     * Get the certificates for a user.
-     */
-    public function getCertificates(string $id): JsonResponse
-    {
-        $user = User::find($id);
-        
-        if (!$user) {
-            return response()->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
-        }
-        
-        $certificates = Certificate::with('course')->where('user_id', $id)->get();
-        
-        return response()->json(['data' => $certificates], Response::HTTP_OK);
-    }
-    
-    /**
-     * Get feedback received by the user.
-     */
-    public function getReceivedFeedback(string $id): JsonResponse
-    {
-        $user = User::find($id);
-        
-        if (!$user) {
-            return response()->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
-        }
-        
-        $feedback = Feedback::with(['module', 'faculty'])
-            ->where('student_id', $id)
-            ->get();
-        
-        return response()->json(['data' => $feedback], Response::HTTP_OK);
-    }
-    
-    /**
-     * Get feedback given by the user (for faculty).
-     */
-    public function getGivenFeedback(string $id): JsonResponse
-    {
-        $user = User::find($id);
-        
-        if (!$user) {
-            return response()->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
-        }
-        
-        $feedback = Feedback::with(['module', 'student'])
-            ->where('faculty_id', $id)
-            ->get();
-        
-        return response()->json(['data' => $feedback], Response::HTTP_OK);
-    }
-
-    /**
-     * Get assessment results for a user.
-     */
-    public function getAssessmentResults(string $id): JsonResponse
-    {
-        $user = User::find($id);
-        
-        if (!$user) {
-            return response()->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
-        }
-        
-        $assessmentResults = AssessmentResult::with(['course.learningStyle'])
-            ->where('user_id', $id)
-            ->orderBy('result_id', 'desc')
-            ->get();
-        
-        // Decode JSON fields
-        foreach ($assessmentResults as $result) {
-            $result->answers = json_decode($result->answers);
-            $result->result = json_decode($result->result);
-        }
-        
-        return response()->json(['data' => $assessmentResults], Response::HTTP_OK);
-    }
-}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const userListContainer = document.getElementById('userListContainer');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const emptyState = document.getElementById('emptyState');
+            const userList = document.getElementById('userList');
+            const pagination = document.getElementById('pagination');
+            const searchInput = document.getElementById('searchInput');
+            const roleFilter = document.getElementById('roleFilter');
+            
+            // API base URL
+            const API_BASE_URL = 'https://foresite-backend-no-collaborative-dsb4yx.laravel.cloud/api/v1';
+            
+            // Current page and filters state
+            let currentPage = 1;
+            let itemsPerPage = 10;
+            let filteredUsers = [];
+            let allUsers = [];
+            
+            // Fetch users from API
+            async function fetchUsers() {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/users/`);
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch users: ${response.status} ${response.statusText}`);
+                    }
+                    const responseData = await response.json();
+                    
+                    // Handle different API response structures
+                    let usersArray;
+                    
+                    if (Array.isArray(responseData)) {
+                        // If the API returns an array directly
+                        usersArray = responseData;
+                    } else if (responseData.data && Array.isArray(responseData.data)) {
+                        // If the API returns {data: [...]}
+                        usersArray = responseData.data;
+                    } else if (responseData.users && Array.isArray(responseData.users)) {
+                        // If the API returns {users: [...]}
+                        usersArray = responseData.users;
+                    } else if (responseData.results && Array.isArray(responseData.results)) {
+                        // If the API returns {results: [...]}
+                        usersArray = responseData.results;
+                    } else {
+                        // If we can't determine the structure
+                        console.error('Unknown API response structure:', responseData);
+                        throw new Error('Invalid API response format: Could not find user data');
+                    }
+                    
+                    console.log('API response parsed successfully. Found', usersArray.length, 'users');
+                    
+                    // Transform each user object to match our expected format
+                    allUsers = usersArray.map(user => {
+                        // Determine the name based on available fields
+                        let userName = 'Unknown User';
+                        if (user.name) {
+                            userName = user.name;
+                        } else if (user.first_name || user.last_name) {
+                            userName = `${user.first_name || ''} ${user.last_name || ''}`.trim();
+                        } else if (user.username) {
+                            userName = user.username;
+                        }
+                        
+                        // Determine user ID
+                        const userId = user.id || user.user_id || user._id || null;
+                        
+                        // Determine role
+                        let userRole = '';
+                        if (typeof user.role === 'string') {
+                            userRole = user.role;
+                        } else if (user.role && user.role.role_name) {
+                            userRole = user.role.role_name;
+                        } else if (user.role && user.role.name) {
+                            userRole = user.role.name;
+                        } else if (user.role_name) {
+                            userRole = user.role_name;
+                        }
+                        
+                        return {
+                            id: userId,
+                            email: user.email || '',
+                            name: userName,
+                            username: userName,
+                            is_active: user.is_active !== undefined ? user.is_active : true,
+                            last_login: user.last_login || null,
+                            role: userRole,
+                            role_id: user.role_id || (user.role && user.role.role_id) || null,
+                            created_at: user.created_at || ''
+                        };
+                    });
+                    
+                    filteredUsers = [...allUsers];
+                    
+                    // Apply initial filtering
+                    applyFilters();
+                    
+                    // Hide spinner
+                    loadingSpinner.classList.add('d-none');
+                    
+                    // Show either empty state or user list
+                    if (filteredUsers.length === 0) {
+                        emptyState.classList.remove('d-none');
+                    } else {
+                        userList.classList.remove('d-none');
+                        renderUsers();
+                        setupPagination();
+                    }
+                } catch (error) {
+                    console.error('Error fetching users:', error);
+                    loadingSpinner.classList.add('d-none');
+                    
+                    let errorMessage = error.message;
+                    let suggestionMessage = '';
+                    
+                    // Handle network errors (like CORS)
+                    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+                        errorMessage = 'Network error: Could not connect to the API server';
+                        suggestionMessage = `
+                            <p class="mt-2">This might be due to:</p>
+                            <ul class="text-start">
+                                <li>The API server is not running</li>
+                                <li>CORS policy is blocking the request</li>
+                                <li>Network connectivity issues</li>
+                            </ul>
+                        `;
+                    }
+                    
+                    // Show error message with more details
+                    userListContainer.innerHTML = `
+                        <div class="alert alert-danger" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Failed to load users.</strong> 
+                            <p class="mb-0 mt-1">${errorMessage}</p>
+                            ${suggestionMessage}
+                            <button class="btn btn-outline-danger mt-3" onclick="fetchUsers()">
+                                <i class="fas fa-sync-alt me-2"></i>Try Again
+                            </button>
+                        </div>
+                    `;
+                }
+            }
+            
+            // Render users to the DOM
+            function renderUsers() {
+                const tableBody = userList.querySelector('tbody');
+                if (!tableBody) {
+                    console.error('Table body not found');
+                    return;
+                }
+                
+                tableBody.innerHTML = '';
+                
+                // Calculate pagination
+                const startIndex = (currentPage - 1) * itemsPerPage;
+                const endIndex = startIndex + itemsPerPage;
+                const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
+                
+                if (paginatedUsers.length === 0) {
+                    emptyState.classList.remove('d-none');
+                    userList.classList.add('d-none');
+                    return;
+                }
+                
+                emptyState.classList.add('d-none');
+                userList.classList.remove('d-none');
+                
+                // Create user rows and fetch learning styles
+                paginatedUsers.forEach(user => {
+                    const isStudent = (user.role || '').toLowerCase() === 'student';
+                    const isFaculty = (user.role || '').toLowerCase() === 'faculty' || (user.role || '').toLowerCase() === 'teacher';
+                    
+                    const badgeClass = isStudent ? 'student' : 'faculty';
+                    const userInitials = getUserInitials(user.name || user.username || 'User');
+                    
+                    // Safely escape HTML to prevent XSS
+                    const safeUserName = escapeHtml(user.name || user.username || 'Unknown User');
+                    const safeUserEmail = escapeHtml(user.email || 'No email provided');
+                    const safeUserRole = escapeHtml(user.role || 'Unknown');
+                    
+                    // Create table row
+                    const row = document.createElement('tr');
+                    
+                    // Name column with avatar
+                    const nameCell = document.createElement('td');
+                    nameCell.className = 'd-flex align-items-center';
+                    nameCell.innerHTML = `
+                        <div class="user-avatar">
+                            ${userInitials}
+                        </div>
+                        <div>
+                            ${safeUserName}
+                        </div>
+                    `;
+                    
+                    // Email column
+                    const emailCell = document.createElement('td');
+                    emailCell.textContent = safeUserEmail;
+                    
+                    // Role column
+                    const roleCell = document.createElement('td');
+                    roleCell.innerHTML = `<span class="badge badge-role ${badgeClass}">${safeUserRole}</span>`;
+                    
+                    // Learning Style column (placeholder, will be updated)
+                    const learningStyleCell = document.createElement('td');
+                    learningStyleCell.innerHTML = `<div class="spinner-border spinner-border-sm text-secondary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>`;
+                    
+                    // Action column
+                    const actionCell = document.createElement('td');
+                    actionCell.className = 'text-center';
+                    actionCell.innerHTML = `
+                        <button class="btn btn-delete" onclick="deleteUser(${user.id || 0}, '${safeUserName.replace(/'/g, "\\'")}')">
+                            <i class="fas fa-trash fa-sm"></i>
+                        </button>
+                    `;
+                    
+                    // Append cells to row
+                    row.appendChild(nameCell);
+                    row.appendChild(emailCell);
+                    row.appendChild(roleCell);
+                    row.appendChild(learningStyleCell);
+                    row.appendChild(actionCell);
+                    
+                    // Append row to table
+                    tableBody.appendChild(row);
+                    
+                    // Fetch learning style for this user
+                    fetchLearningStyle(user.id, learningStyleCell, user.role);
+                });
+            }
+            
+            // Function to fetch learning style for a user
+            async function fetchLearningStyle(userId, cell, userRole) {
+                if (!userId) {
+                    cell.innerHTML = `<span class="text-muted">Not available</span>`;
+                    return;
+                }
+                
+                // For faculty, immediately show "Not applicable" without API call
+                if (userRole && userRole.toLowerCase() === 'faculty') {
+                    cell.innerHTML = `<span class="text-muted">Not applicable</span>`;
+                    return;
+                }
+                
+                try {
+                    const response = await fetch(`${API_BASE_URL}/users/${userId}/assessment-results`);
+                    
+                    if (!response.ok) {
+                        cell.innerHTML = `<span class="text-muted">Not assessed</span>`;
+                        return;
+                    }
+                    
+                    const data = await response.json();
+                    
+                    let learningStyle = 'Not assessed';
+                    let styleClass = '';
+                    
+                    // Try to find the learning style in the response
+                    if (data && data.data && data.data.length > 0) {
+                        // Find the first assessment result with a learning style
+                        const resultWithStyle = data.data.find(result => 
+                            result.result && result.result.learning_style
+                        );
+                        
+                        if (resultWithStyle && resultWithStyle.result) {
+                            learningStyle = resultWithStyle.result.learning_style;
+                            // Set the appropriate CSS class based on the learning style
+                            styleClass = learningStyle.toLowerCase();
+                        }
+                    }
+                    
+                    // Update the cell with the learning style
+                    if (styleClass) {
+                        cell.innerHTML = `<span class="badge badge-learning-style ${styleClass}">${learningStyle}</span>`;
+                    } else {
+                        cell.innerHTML = `<span class="text-muted">${learningStyle}</span>`;
+                    }
+                    
+                } catch (error) {
+                    console.error('Error fetching learning style:', error);
+                    cell.innerHTML = `<span class="text-danger">Error</span>`;
+                }
+            }
+            
+            // Setup pagination
+            function setupPagination() {
+                pagination.innerHTML = '';
+                const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+                
+                if (totalPages <= 1) {
+                    return;
+                }
+                
+                // Previous button
+                const prevLi = document.createElement('li');
+                prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+                prevLi.innerHTML = `<a class="page-link" href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>`;
+                prevLi.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (currentPage > 1) {
+                        currentPage--;
+                        renderUsers();
+                        setupPagination();
+                        window.scrollTo(0, 0);
+                    }
+                });
+                pagination.appendChild(prevLi);
+                
+                // Page numbers
+                const maxPages = 5;
+                const startPage = Math.max(1, currentPage - Math.floor(maxPages / 2));
+                const endPage = Math.min(totalPages, startPage + maxPages - 1);
+                
+                for (let i = startPage; i <= endPage; i++) {
+                    const pageLi = document.createElement('li');
+                    pageLi.className = `page-item ${i === currentPage ? 'active' : ''}`;
+                    pageLi.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+                    pageLi.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        currentPage = i;
+                        renderUsers();
+                        setupPagination();
+                        window.scrollTo(0, 0);
+                    });
+                    pagination.appendChild(pageLi);
+                }
+                
+                // Next button
+                const nextLi = document.createElement('li');
+                nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+                nextLi.innerHTML = `<a class="page-link" href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>`;
+                nextLi.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (currentPage < totalPages) {
+                        currentPage++;
+                        renderUsers();
+                        setupPagination();
+                        window.scrollTo(0, 0);
+                    }
+                });
+                pagination.appendChild(nextLi);
+            }
+            
+            // Filter users based on search input and filter dropdowns
+            function applyFilters() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const roleValue = roleFilter.value;
+                
+                filteredUsers = allUsers.filter(user => {
+                    // Search filter
+                    const nameMatch = (user.name || user.username || '').toLowerCase().includes(searchTerm);
+                    const emailMatch = (user.email || '').toLowerCase().includes(searchTerm);
+                    const searchMatch = nameMatch || emailMatch;
+                    
+                    // Role filter
+                    let roleMatch = true;
+                    if (roleValue !== 'all') {
+                        roleMatch = (user.role || '').toLowerCase() === roleValue;
+                    }
+                    
+                    // Exclude admin users
+                    const isAdmin = (user.role || '').toLowerCase() === 'admin';
+                    
+                    return searchMatch && roleMatch && !isAdmin;
+                });
+                
+                // Reset to page 1 when applying filters
+                currentPage = 1;
+                
+                // Update UI
+                if (filteredUsers.length === 0) {
+                    userList.classList.add('d-none');
+                    emptyState.classList.remove('d-none');
+                } else {
+                    emptyState.classList.add('d-none');
+                    userList.classList.remove('d-none');
+                    renderUsers();
+                    setupPagination();
+                }
+            }
+            
+            // Helper function to get user initials
+            function getUserInitials(name) {
+                if (!name) return '?';
+                return name.split(' ')
+                    .map(word => word.charAt(0))
+                    .join('')
+                    .toUpperCase()
+                    .substring(0, 2);
+            }
+            
+            // Helper function to escape HTML
+            function escapeHtml(unsafe) {
+                if (typeof unsafe !== 'string') return '';
+                return unsafe
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            }
+            
+            // Event listeners
+            searchInput.addEventListener('input', applyFilters);
+            roleFilter.addEventListener('change', applyFilters);
+            
+            // Global functions for delete (make them available to onclick)
+            
+            window.deleteUser = function(userId, userName) {
+                if (!userId) {
+                    console.error('Cannot delete user: Invalid user ID');
+                    return;
+                }
+                
+                document.getElementById('deleteUserId').value = userId;
+                document.getElementById('deleteUserName').textContent = userName || 'this user';
+                
+                const deleteModal = new bootstrap.Modal(document.getElementById('deleteUserModal'));
+                deleteModal.show();
+            };
+            
+            // Initialize user list
+            fetchUsers();
+            
+            // Update the Add User Form Submission
+            document.getElementById('saveUserBtn').addEventListener('click', async function() {
+                const form = document.getElementById('addUserForm');
+                if (form.checkValidity()) {
+                    try {
+                        // Get form data
+                        const name = document.getElementById('userName').value;
+                        const email = document.getElementById('userEmail').value;
+                        const role = document.getElementById('userRole').value;
+                        const password = document.getElementById('userPassword').value;
+                        const confirmPassword = document.getElementById('userConfirmPassword').value;
+                        
+                        // Check if passwords match
+                        if (password !== confirmPassword) {
+                            alert('Passwords do not match');
+                            return;
+                        }
+                        
+                        // Determine role_id based on selected role
+                        let roleId;
+                        switch(role) {
+                            case 'student':
+                                roleId = 1;
+                                break;
+                            case 'faculty':
+                                roleId = 2;
+                                break;
+                            default:
+                                alert('Please select a valid role');
+                                return;
+                        }
+                        
+                        // Split the name into first and last name
+                        const nameParts = name.split(' ');
+                        const firstName = nameParts[0] || '';
+                        const lastName = nameParts.slice(1).join(' ') || '';
+                        
+                        // Prepare the request data
+                        const userData = {
+                            first_name: firstName,
+                            last_name: lastName,
+                            email: email,
+                            password: password,
+                            role_id: roleId,
+                            is_active: true
+                        };
+                        
+                        // Show loading indicator
+                        const saveBtn = document.getElementById('saveUserBtn');
+                        const originalText = saveBtn.innerHTML;
+                        saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...';
+                        saveBtn.disabled = true;
+                        
+                        // Make API request to create user
+                        const response = await fetch(`${API_BASE_URL}/users`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(userData)
+                        });
+                        
+                        // Reset button state
+                        saveBtn.innerHTML = originalText;
+                        saveBtn.disabled = false;
+                        
+                        if (!response.ok) {
+                            const errorData = await response.json();
+                            throw new Error(errorData.error ? JSON.stringify(errorData.error) : 'Failed to create user');
+                        }
+                        
+                        // Get created user data
+                        const data = await response.json();
+                        console.log('User created successfully:', data);
+                        
+                        // Close modal
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('addUserModal'));
+                        modal.hide();
+                        
+                        // Clear form
+                        form.reset();
+                        
+                        // Show success message
+                        const alertDiv = document.createElement('div');
+                        alertDiv.className = 'alert alert-success alert-dismissible fade show';
+                        alertDiv.setAttribute('role', 'alert');
+                        alertDiv.innerHTML = `
+                            <i class="fas fa-check-circle me-2"></i>
+                            User created successfully!
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        `;
+                        userListContainer.prepend(alertDiv);
+                        
+                        // Auto dismiss the alert after 5 seconds
+                        setTimeout(() => {
+                            alertDiv.classList.remove('show');
+                            setTimeout(() => alertDiv.remove(), 150);
+                        }, 5000);
+                        
+                        // Refresh user list
+                        fetchUsers();
+                    } catch (error) {
+                        console.error('Error creating user:', error);
+                        alert(`Failed to create user: ${error.message}`);
+                    }
+                } else {
+                    form.reportValidity();
+                }
+            });
+            
+            // Update the Delete User Confirmation
+            document.getElementById('confirmDeleteBtn').addEventListener('click', async function() {
+                try {
+                    const userId = document.getElementById('deleteUserId').value;
+                    if (!userId) {
+                        throw new Error('User ID is missing');
+                    }
+                    
+                    // Show loading indicator
+                    const deleteBtn = document.getElementById('confirmDeleteBtn');
+                    const originalText = deleteBtn.innerHTML;
+                    deleteBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Deleting...';
+                    deleteBtn.disabled = true;
+                    
+                    // Make API request to delete user
+                    const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    // Reset button state
+                    deleteBtn.innerHTML = originalText;
+                    deleteBtn.disabled = false;
+                    
+                    if (!response.ok) {
+                        if (response.status === 404) {
+                            throw new Error('User not found');
+                        } else {
+                            const errorData = await response.json();
+                            throw new Error(errorData.error || 'Failed to delete user');
+                        }
+                    }
+                    
+                    // Close modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('deleteUserModal'));
+                    modal.hide();
+                    
+                    // Show success message
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert alert-success alert-dismissible fade show';
+                    alertDiv.setAttribute('role', 'alert');
+                    alertDiv.innerHTML = `
+                        <i class="fas fa-check-circle me-2"></i>
+                        User deleted successfully!
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    `;
+                    userListContainer.prepend(alertDiv);
+                    
+                    // Auto dismiss the alert after 5 seconds
+                    setTimeout(() => {
+                        alertDiv.classList.remove('show');
+                        setTimeout(() => alertDiv.remove(), 150);
+                    }, 5000);
+                    
+                    // Refresh user list
+                    fetchUsers();
+                } catch (error) {
+                    console.error('Error deleting user:', error);
+                    alert(`Failed to delete user: ${error.message}`);
+                }
+            });
+            
+            // Logout functionality
+            document.getElementById('logoutBtn').addEventListener('click', function(e) {
+                // Simple logout - in a real app you'd handle this with an API call
+                e.preventDefault();
+                window.location.href = 'login.html';
+            });
+        });
+    </script>
+</body>
+</html>
