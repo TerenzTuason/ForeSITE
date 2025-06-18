@@ -1030,11 +1030,19 @@ INSERT INTO module_assessment (course_id, module_number, assessment_title, asses
     ),
     JSON_OBJECT(
       'step_title', 'CLA Exploration',
-      'step_description', 'Use Causal Layered Analysis to identify: • Litany: The visible facts (e.g., trends, headlines) • Systemic Causes: The deeper causes (e.g., policies, economic systems) • Worldviews: The cultural beliefs influencing the issue • Myths/Metaphors: The deep, often unspoken narratives'
+      'step_description', 'Use Causal Layered Analysis to identify: 
+      • Litany: The visible facts (e.g., trends, headlines) 
+      • Systemic Causes: The deeper causes (e.g., policies, economic systems)
+      • Worldviews: The cultural beliefs influencing the issue 
+      • Myths/Metaphors: The deep, often unspoken narratives'
     ),
     JSON_OBJECT(
       'step_title', 'Build Scenarios',
-      'step_description', 'Create four future scenarios for your issue: • Best Case: Ideal future • Worst Case: Worst possible future • Middle Ground: Plausible future • Wildcard: Unlikely but possible future'
+      'step_description', 'Create four future scenarios for your issue: 
+      • Best Case: Ideal future 
+      • Worst Case: Worst possible future 
+      • Middle Ground: Plausible future 
+      • Wildcard: Unlikely but possible future'
     ),
     JSON_OBJECT(
       'step_title', 'Reflection',
@@ -1131,11 +1139,16 @@ INSERT INTO module_assessment (course_id, module_number, assessment_title, asses
     ),
     JSON_OBJECT(
       'step_title', 'Apply Causal Layered Analysis (CLA):',
-      'step_description', '• Litany: Identify and describe the surface-level facts about this issue (e.g., current news or headlines). • Systemic Causes: Explore the underlying systems or structures that contribute to this issue. How is this issue supported by existing systems? • Worldviews: Reflect on the beliefs or values that influence how people view or respond to this issue. What assumptions are made about this issue in society? • Metaphors and Myths: Identify any metaphors or myths associated with this issue that might influence decision-making or policy.'
+      'step_description', '• Litany: Identify and describe the surface-level facts about this issue (e.g., current news or headlines). 
+      • Systemic Causes: Explore the underlying systems or structures that contribute to this issue. How is this issue supported by existing systems? 
+      • Worldviews: Reflect on the beliefs or values that influence how people view or respond to this issue. What assumptions are made about this issue in society? 
+      • Metaphors and Myths: Identify any metaphors or myths associated with this issue that might influence decision-making or policy.'
     ),
     JSON_OBJECT(
       'step_title', 'Apply the Futures Triangle:',
-      'step_description', '• Pull (Vision): Define a possible vision for the future in relation to this issue. What is the ideal future youd like to see? • Push (Trends): List the current trends or megatrends pushing us towards this future. How are these trends shaping what will happen? • Weight (Barriers): Discuss the historical barriers that might prevent this future vision. What past decisions, systems, or traditions are limiting change?'
+      'step_description', '• Pull (Vision): Define a possible vision for the future in relation to this issue. What is the ideal future youd like to see? 
+      • Push (Trends): List the current trends or megatrends pushing us towards this future. How are these trends shaping what will happen? 
+      • Weight (Barriers): Discuss the historical barriers that might prevent this future vision. What past decisions, systems, or traditions are limiting change?'
     ),
     JSON_OBJECT(
       'step_title', 'Problem-Solving',
