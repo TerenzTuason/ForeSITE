@@ -14,6 +14,12 @@ use App\Models\AssessmentAttempt;
 use App\Models\Certificate;
 use App\Models\Feedback;
 use App\Models\AssessmentResult;
+use Illuminate\Support\Facades\DB;
+use App\Models\ModuleProgress;
+use App\Models\Notification;
+use App\Models\QuestionnaireResponse;
+use App\Models\Score;
+use App\Models\StudentProfile;
 
 class UserController extends Controller
 {
@@ -106,20 +112,41 @@ class UserController extends Controller
      */
     public function destroy(string $id): JsonResponse
     {
-        $user = User::find($id);
-        
-        if (!$user) {
-            return response()->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
+        DB::beginTransaction();
+        try {
+            $user = User::find($id);
+
+            if (!$user) {
+                DB::rollBack();
+                return response()->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
+            }
+
+            // Delete related records
+            StudentProfile::where('user_id', $id)->delete();
+            Enrollment::where('user_id', $id)->delete();
+            AssessmentAttempt::where('user_id', $id)->delete();
+            AssessmentResult::where('user_id', $id)->delete();
+            Certificate::where('user_id', $id)->delete();
+            ModuleProgress::where('user_id', $id)->delete();
+            Notification::where('user_id', $id)->delete();
+            QuestionnaireResponse::where('user_id', $id)->delete();
+
+            // Handle records where the user could be a student or faculty
+            Feedback::where('student_id', $id)->orWhere('faculty_id', $id)->delete();
+            Score::where('student_id', $id)->orWhere('faculty_id',id)->delete();
+
+            // Finally, delete the user
+            $user->delete();
+
+            DB::commit();
+
+            return response()->json(null, Response::HTTP_NO_CONTENT);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            // Log the error for debugging purposes
+            \Log::error("Error deleting user with ID {$id}: " . $e->getMessage());
+            return response()->json(['error' => 'An unexpected error occurred while deleting the user.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-        
-        // Delete related records first
-        if ($user->studentProfile) {
-            $user->studentProfile->delete();
-        }
-        
-        $user->delete();
-        
-        return response()->json(null, Response::HTTP_NO_CONTENT);
     }
 
     /**
