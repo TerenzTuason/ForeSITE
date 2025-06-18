@@ -1230,7 +1230,10 @@ INSERT INTO module_assessment (course_id, module_number, assessment_title, asses
   JSON_ARRAY(
     JSON_OBJECT(
       'step_title', 'Classify the key concepts from the Introduction to Futures Thinking into three categories:',
-      'step_description', '• Key Themes (Multiple Futures, Drivers of Change, Scenarios, Uncertainty, Systems Thinking) • Benefits of Futures Thinking (Understand Forces, Spot Gaps, Build Consensus, Adapt Strategies, Encourage Action) • Tools and Methods (PESTLE, Horizon Scanning, Three Horizons Model)'
+      'step_description', '
+      • Key Themes (Multiple Futures, Drivers of Change, Scenarios, Uncertainty, Systems Thinking) 
+      • Benefits of Futures Thinking (Understand Forces, Spot Gaps, Build Consensus, Adapt Strategies, Encourage Action) 
+      • Tools and Methods (PESTLE, Horizon Scanning, Three Horizons Model)'
     ),
     JSON_OBJECT(
       'step_title', 'Create a list',
