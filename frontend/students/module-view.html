@@ -2004,7 +2004,7 @@
             if (!isCurrentScreenCompleted) {
               btnContinue.prop("disabled", false);
               btnContinue.off("click").on("click", function () {
-                const currentScreenNumber = getScreenNumberFromId(currentId);
+                const currentScreenNumber = currentId;
 
                 // On the last screen, we only mark this screen as complete,
                 // then update the module progress percentage without marking the module itself as "completed".
