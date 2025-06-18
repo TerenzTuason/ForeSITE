@@ -91,17 +91,17 @@ INSERT INTO courses (name, description, objectives, structure, learning_style_id
   '[
     {
       "module": 1,
-      "title": "Foundations of Futures Thinking",
+      "title": "Introduction to Futures Thinking",
       "focus": "Develop an understanding of futures literacy through drivers analysis, horizon scanning, and strategic framing across time horizons."
     },
     {
       "module": 2,
-      "title": "Mapping Change and Building Insight",
+      "title": "EXPLORING THE FUTURE",
       "focus": "Apply tools such as PESTLE and Futures Wheel to identify critical forces of change and visualize their impacts."
     },
     {
       "module": 3,
-      "title": "Creating Strategic Pathways",
+      "title": "Creating Alternative Futures",
       "focus": "Explore alternative futures using scenario planning, the Futures Triangle, and Causal Layered Analysis to inform resilient strategies."
     }
   ]',
@@ -122,17 +122,17 @@ INSERT INTO courses (name, description, objectives, structure, learning_style_id
   '[
     {
       "module": 1,
-      "title": "Foundations of Futures Thinking",
+      "title": "Introduction to Futures Thinking",
       "focus": "Develop an understanding of futures literacy through drivers analysis, horizon scanning, and strategic framing across time horizons."
     },
     {
       "module": 2,
-      "title": "Mapping Change and Building Insight",
+      "title": "EXPLORING THE FUTURE",
       "focus": "Apply tools such as PESTLE and Futures Wheel to identify critical forces of change and visualize their impacts."
     },
     {
       "module": 3,
-      "title": "Creating Strategic Pathways",
+      "title": "Creating Alternative Futures",
       "focus": "Explore alternative futures using scenario planning, the Futures Triangle, and Causal Layered Analysis to inform resilient strategies."
     }
   ]',
@@ -153,17 +153,17 @@ INSERT INTO courses (name, description, objectives, structure, learning_style_id
   '[
     {
       "module": 1,
-      "title": "Foundations of Futures Thinking",
+      "title": "Introduction to Futures Thinking",
       "focus": "Develop an understanding of futures literacy through drivers analysis, horizon scanning, and strategic framing across time horizons."
     },
     {
       "module": 2,
-      "title": "Mapping Change and Building Insight",
+      "title": "EXPLORING THE FUTURE",
       "focus": "Apply tools such as PESTLE and Futures Wheel to identify critical forces of change and visualize their impacts."
     },
     {
       "module": 3,
-      "title": "Creating Strategic Pathways",
+      "title": "Creating Alternative Futures",
       "focus": "Explore alternative futures using scenario planning, the Futures Triangle, and Causal Layered Analysis to inform resilient strategies."
     }
   ]',
@@ -184,17 +184,17 @@ INSERT INTO courses (name, description, objectives, structure, learning_style_id
   '[
     {
       "module": 1,
-      "title": "Foundations of Futures Thinking",
+      "title": "Introduction to Futures Thinking",
       "focus": "Develop an understanding of futures literacy through drivers analysis, horizon scanning, and strategic framing across time horizons."
     },
     {
       "module": 2,
-      "title": "Mapping Change and Building Insight",
+      "title": "EXPLORING THE FUTURE",
       "focus": "Apply tools such as PESTLE and Futures Wheel to identify critical forces of change and visualize their impacts."
     },
     {
       "module": 3,
-      "title": "Creating Strategic Pathways",
+      "title": "Creating Alternative Futures",
       "focus": "Explore alternative futures using scenario planning, the Futures Triangle, and Causal Layered Analysis to inform resilient strategies."
     }
   ]',
