@@ -244,7 +244,7 @@ CREATE TABLE lesson_screens (
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   '1-video',
   'Introduction to Futures Thinking',
-  null,
+  'Screen 1.1: Sustainability Science Education. (2019, August 24). What is Futures Thinking?. YouTube. https://www.youtube.com/watch?v=0GjAHJSHDTs ',
   null,
   'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185804/1_Introduction_to_Futures_Thinking_egkgxg.mp4',
   '3 minutes 27 seconds'
@@ -278,7 +278,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   '1.2-video',
   'Looking Ahead: The Three Horizons Model',
-  null,
+  'Leader`s Quest. (2022, April 13). Three Horizons: an introduction. https://www.youtube.com/watch?v=p90ZTg0svmM',
   null,
   'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1749389838/1.2_Looking_Ahead_The_Three_Horizons_Model_aemjrp.mp4',
   '6 minutes 4 seconds'
@@ -310,7 +310,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   '1.3-video',
   'Identifying Change Drivers',
-  null,
+  'QR Strategic Foresight. (2025, April 13). Leading Change with Strategic Foresight. https://www.youtube.com/watch?v=OkmAkeMNMz0',
   null,
   'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1749389385/1.3_Identifying_Change_Drivers_dvzt5f.mp4',
   '2 minutes 44 seconds'
@@ -342,7 +342,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   '1.3.1-video',
   'What is PESTLE Analysis?',
-  null,
+  'Management Courses - Mike Clayton. (2023, August 1). What is PESTLE Analysis?. https://www.youtube.com/watch?v=lh2pPQO-WSE',
   null,
   'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1749389594/1.3.1_What_is_PESTLE_Analysis_iij5o2.mp4',
   '4 minutes 4 seconds'
@@ -351,7 +351,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   '1.4-video',
   'Identifying Weak Signals',
-  null,
+  'Ryan, R. (2022, June 8). Strategic Foresight for Teams: Signals and Sensemaking. https://www.youtube.com/watch?v=8CiF82no2oc',
   null,
   'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1749564558/1.4_Identifying_Weak_Signals_imaqwk.mp4',
   '3 minutes 5 seconds'
@@ -375,7 +375,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   '1.5-video',
   'Linking Futures Thinking to the Policy Cycle',
-  null,
+  'Life Cycle Initiative (hosted by UNEP). (2020, January 23). Elearning course: Life Cycle Thinking in Policy Decision Making. https://www.youtube.com/watch?v=iu2LOQSFSaU',
   null,
   'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1749566067/1.5_Linking_Futures_Thinking_to_the_Policy_Cycle_1_vokxbt.mp4',
   '1 minute 54 seconds'
@@ -409,9 +409,9 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   '2.1-video',
   'Driver Mapping',
+  'Future Human by Design. (2019, October 15). Driver Mapping - 1 Minute Future Methods. https://www.youtube.com/watch?v=rg6FEnWm4os',
   null,
-  null,
-  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185724/2.1_Driver_Mapping_lmspxt.mp4',
+  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1750122897/2.1_Driver_Mapping_gsnxf4.mp4',
   '56 seconds'
 );
 
@@ -472,9 +472,9 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   '2.2-video',
   'Horizon Scanning',
+  'UN Global Pulse. (2023a, January 11). Horizon Scanning: A Quick Introduction. https://www.youtube.com/watch?v=1Pd0xSsdCAU',
   null,
-  null,
-  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185779/2.2_Horizon_Scanning_yhuel4.mp4',
+  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1750122961/2.2_Horizon_Scanning_zfbdbm.mp4',
   '2 minutes 4 seconds'
 );
 
@@ -543,7 +543,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   '2.3-video',
   'Understanding Weak Signals and Trends',
-  null,
+  'QR Strategic Foresight. (2025b, April 13). Understanding Weak Signals and Trends. https://www.youtube.com/watch?v=cc-MtfPErQ',
   null,
   'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1749388239/2.3_Understanding_Weak_Signals_and_Trends_wjvz6k.mp4',
   '9 minutes 42 seconds'
@@ -552,7 +552,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   '2.4-video',
   'Trends Identification and Analysis',
-  null,
+  'FUTEE - FREE TV. (2022, November 19). What You Don`t Know About Futures Wheels. https://www.youtube.com/watch?v=QeILzDCS_6U',
   null,
   'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185774/2.3_Trends_Identification_and_Analysis_zfvxos.mp4',
   '9 minutes 34 seconds'
@@ -600,9 +600,9 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   '3.1-video',
   'Causal Layered Analysis',
+  'TEDx Talks. (2013, May 13). Causal Layered Analysis: Sohail Inayatullah at TEDxNoosa. https://www.youtube.com/watch?v=ImWDmFPfifI',
   null,
-  null,
-  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185859/3.1_Causal_Layered_Analysis_u1pfwq.mp4',
+  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1750123304/3.1_Causal_Layered_Analysis_ffuvr6.mp4',
   '19 minutes 11 seconds'
 );
 
@@ -687,9 +687,9 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   '3.2-video',
   'Futures Triangle',
+  'Mora-Montero, J. C. (2020, May 6). futures triangle a strategic foresight method. https://www.youtube.com/watch?v=KuSDCu6aTgM',
   null,
-  null,
-  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185745/3.2_Futures_Triangle_l837ah.mp4',
+  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1750123037/3.2_Futures_Triangle_g8ac4w.mp4',
   '2 minutes 59 seconds'
 );
 
@@ -787,9 +787,9 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   '3.3-video',
   'Scenario Planning',
+  'Professional Academy. (2021, November 23). Scenario Planning - A Simple Overview!. https://www.youtube.com/watch?v=ukr9ItEQX2Y',
   null,
-  null,
-  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185751/3.3_Scenario_Planning_viem5x.mp4',
+  'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1750123049/3.3_Scenario_Planning_pfo05y.mp4',
   '2 minutes 15 seconds'
 );
 
