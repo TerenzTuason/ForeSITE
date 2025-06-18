@@ -550,7 +550,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
-  '2.4-video',
+  '2.3.1-video',
   'Trends Identification and Analysis',
   null,
   null,
@@ -559,7 +559,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
-  '2.3',
+  '2.4',
   'Trends Identification and Analysis',
   'Understanding the cascading impacts of change using structured brainstorming and visualization.',
   '[
@@ -577,7 +577,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
-  '2.3.1',
+  '2.4.1',
   'How to do Futures Wheel Analysis?',
   'Explore the ripple effects of a change! The Futures Wheel helps you map out all the possible consequences of a trend or event.',
   '[
