@@ -1212,7 +1212,10 @@ INSERT INTO module_assessment (
   3, 
   3, 
   'Comparative Analysis of Future Scenarios', 
-  'To understand and compare different future scenarios based on key drivers of change, exploring how variations in these drivers could shape the future through teamwork and collective analysis. As a team, you will compare two future scenarios using the Futures Triangle or Causal Layered Analysis methods. Together, you will analyze how different trends and drivers can shape the future, focusing on the collective impact of these drivers on society, technology, and the environment.',
+  'In this activity, you will compare two distinct future scenarios using the
+Futures Triangle or Causal Layered Analysis methods. This will allow you to analyze how
+different trends and drivers can shape the future, focusing on their impact on society,
+technology, and the environment.',
   NULL, 
   JSON_ARRAY(
     JSON_OBJECT(
