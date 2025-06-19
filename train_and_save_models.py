@@ -159,6 +159,7 @@ def train_and_save_models():
         y_pred_proba = clf.predict_proba(X_val)
         model_metrics[name] = _calculate_metrics(y_val, y_pred, y_pred_proba, training_time)
         _save_evaluation_results(y_val, y_pred, name)
+        _save_confidence_curves(y_val, y_pred_proba, name)
         
         # Save the model
         if name == 'xgboost':
@@ -186,6 +187,7 @@ def train_and_save_models():
     y_pred_cnn = np.argmax(y_pred_proba_cnn, axis=1)
     model_metrics['cnn'] = _calculate_metrics(y_val, y_pred_cnn, y_pred_proba_cnn, training_time)
     _save_evaluation_results(y_val, y_pred_cnn, 'cnn')
+    _save_confidence_curves(y_val, y_pred_proba_cnn, 'cnn')
     
     # Convert to TFLite and save
     converter = tf.lite.TFLiteConverter.from_keras_model(cnn_model)
@@ -214,6 +216,7 @@ def train_and_save_models():
     y_pred_proba_meta = meta_learner.predict_proba(base_predictions_val)
     model_metrics['blending_ensemble'] = _calculate_metrics(y_val, y_pred_meta, y_pred_proba_meta, training_time)
     _save_evaluation_results(y_val, y_pred_meta, 'blending_ensemble')
+    _save_confidence_curves(y_val, y_pred_proba_meta, 'blending_ensemble')
     
     joblib.dump(meta_learner, 'models/blending_meta_learner.joblib')
     print("Blending meta-learner trained and saved.")
@@ -242,6 +245,66 @@ def _save_evaluation_results(y_true, y_pred, model_name):
     plt.savefig(f'evaluation_results/{model_name}_confusion_matrix.png')
     plt.close()
     print(f"Confusion matrix for {model_name} saved.")
+
+
+def _save_confidence_curves(y_true, y_pred_proba, model_name):
+    """Calculates and saves precision-confidence, recall-confidence, and f1-confidence curves."""
+    thresholds = np.linspace(0.01, 1.0, 100)
+    precisions = []
+    recalls = []
+    f1s = []
+
+    for t in thresholds:
+        confidences = np.max(y_pred_proba, axis=1)
+        y_pred = np.argmax(y_pred_proba, axis=1)
+        
+        mask = confidences >= t
+        filtered_y_true = y_true[mask]
+        filtered_y_pred = y_pred[mask]
+        
+        if len(filtered_y_true) == 0:
+            precisions.append(0)
+            recalls.append(0)
+            f1s.append(0)
+        else:
+            precisions.append(precision_score(filtered_y_true, filtered_y_pred, average='weighted', zero_division=0))
+            recalls.append(recall_score(filtered_y_true, filtered_y_pred, average='weighted', zero_division=0))
+            f1s.append(f1_score(filtered_y_true, filtered_y_pred, average='weighted', zero_division=0))
+
+    # Plot Precision-Confidence Curve
+    plt.figure(figsize=(8, 6))
+    plt.plot(thresholds, precisions, label='Precision')
+    plt.title(f'Precision-Confidence Curve for {model_name}')
+    plt.xlabel('Confidence')
+    plt.ylabel('Precision')
+    plt.grid(True)
+    plt.legend()
+    plt.savefig(f'evaluation_results/{model_name}_precision_confidence_curve.png')
+    plt.close()
+
+    # Plot Recall-Confidence Curve
+    plt.figure(figsize=(8, 6))
+    plt.plot(thresholds, recalls, label='Recall')
+    plt.title(f'Recall-Confidence Curve for {model_name}')
+    plt.xlabel('Confidence')
+    plt.ylabel('Recall')
+    plt.grid(True)
+    plt.legend()
+    plt.savefig(f'evaluation_results/{model_name}_recall_confidence_curve.png')
+    plt.close()
+
+    # Plot F1-Confidence Curve
+    plt.figure(figsize=(8, 6))
+    plt.plot(thresholds, f1s, label='F1-Score')
+    plt.title(f'F1-Confidence Curve for {model_name}')
+    plt.xlabel('Confidence')
+    plt.ylabel('F1')
+    plt.grid(True)
+    plt.legend()
+    plt.savefig(f'evaluation_results/{model_name}_f1_confidence_curve.png')
+    plt.close()
+    
+    print(f"Confidence curves for {model_name} saved.")
 
 
 if __name__ == '__main__':
