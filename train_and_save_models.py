@@ -8,10 +8,15 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, roc_auc_score
+from sklearn.metrics import (
+    accuracy_score, f1_score, precision_score, recall_score, roc_auc_score,
+    classification_report, confusion_matrix
+)
 from sklearn.preprocessing import LabelBinarizer
 import xgboost as xgb
 import time
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 from classifier_config import (
     STYLE_QUESTIONS,
@@ -129,6 +134,8 @@ def train_and_save_models():
 
     if not os.path.exists('models'):
         os.makedirs('models')
+    if not os.path.exists('evaluation_results'):
+        os.makedirs('evaluation_results')
 
     model_metrics = {}
 
@@ -151,6 +158,7 @@ def train_and_save_models():
         y_pred = clf.predict(X_val)
         y_pred_proba = clf.predict_proba(X_val)
         model_metrics[name] = _calculate_metrics(y_val, y_pred, y_pred_proba, training_time)
+        _save_evaluation_results(y_val, y_pred, name)
         
         # Save the model
         if name == 'xgboost':
@@ -177,6 +185,7 @@ def train_and_save_models():
     y_pred_proba_cnn = cnn_model.predict(X_val)
     y_pred_cnn = np.argmax(y_pred_proba_cnn, axis=1)
     model_metrics['cnn'] = _calculate_metrics(y_val, y_pred_cnn, y_pred_proba_cnn, training_time)
+    _save_evaluation_results(y_val, y_pred_cnn, 'cnn')
     
     # Convert to TFLite and save
     converter = tf.lite.TFLiteConverter.from_keras_model(cnn_model)
@@ -204,6 +213,7 @@ def train_and_save_models():
     y_pred_meta = meta_learner.predict(base_predictions_val)
     y_pred_proba_meta = meta_learner.predict_proba(base_predictions_val)
     model_metrics['blending_ensemble'] = _calculate_metrics(y_val, y_pred_meta, y_pred_proba_meta, training_time)
+    _save_evaluation_results(y_val, y_pred_meta, 'blending_ensemble')
     
     joblib.dump(meta_learner, 'models/blending_meta_learner.joblib')
     print("Blending meta-learner trained and saved.")
@@ -214,6 +224,24 @@ def train_and_save_models():
     print("Model metrics saved to models/model_metrics.json")
     
     print("\nAll models and metrics have been trained and saved in the 'models/' directory.")
+
+
+def _save_evaluation_results(y_true, y_pred, model_name):
+    """Saves the classification report and confusion matrix."""
+    report = classification_report(y_true, y_pred)
+    with open(f'evaluation_results/{model_name}_classification_report.txt', 'w') as f:
+        f.write(report)
+    print(f"Classification report for {model_name} saved.")
+
+    cm = confusion_matrix(y_true, y_pred)
+    plt.figure(figsize=(10, 7))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
+    plt.title(f'Confusion Matrix for {model_name}')
+    plt.ylabel('Actual')
+    plt.xlabel('Predicted')
+    plt.savefig(f'evaluation_results/{model_name}_confusion_matrix.png')
+    plt.close()
+    print(f"Confusion matrix for {model_name} saved.")
 
 
 if __name__ == '__main__':
