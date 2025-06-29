@@ -1,5 +1,6 @@
 # This file is for setting up the local development and training environment.
 # It ensures that the library versions used for training match the deployment environment.
+# Fixed versions to prevent dependency conflicts experienced during setup.
 
 flask==3.0.2
 flask-cors==4.0.0
@@ -9,4 +10,13 @@ xgboost==1.7.6
 pandas==2.1.4
 joblib==1.5.1
 tensorflow==2.15.0 # Use the full tensorflow for local training
+
+# Fixed versions to resolve import/compatibility issues
+protobuf==3.20.3 # Required for TensorFlow 2.15.0 compatibility
+matplotlib==3.8.4 # Fixed circular import issues
+seaborn==0.13.2 # For plotting
+Pillow==10.2.0 # Fixed _imaging import issues
+kiwisolver==1.4.7 # Fixed _cext module issues (matplotlib dependency)
+
+# Development tools
 ipython # Useful for interactive debugging 
