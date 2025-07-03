@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
@@ -10,10 +10,13 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Enrollment;
-use App\Models\AssessmentAttempt;
 use App\Models\Certificate;
 use App\Models\Feedback;
 use App\Models\AssessmentResult;
+use Illuminate\Support\Facades\DB;
+use App\Models\ModuleProgress;
+use App\Models\Score;
+use App\Models\StudentProfile;
 
 class UserController extends Controller
 {
@@ -106,20 +109,22 @@ class UserController extends Controller
      */
     public function destroy(string $id): JsonResponse
     {
-        $user = User::find($id);
-        
-        if (!$user) {
-            return response()->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
+        try {
+            $user = User::find($id);
+
+            if (!$user) {
+                return response()->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
+            }
+
+            // The ON DELETE CASCADE constraint in the database will handle related records.
+            $user->delete();
+
+            return response()->json(null, Response::HTTP_NO_CONTENT);
+        } catch (\Exception $e) {
+            // Log the error for debugging purposes
+            \Log::error("Error deleting user with ID {$id}: " . $e->getMessage());
+            return response()->json(['error' => 'An unexpected error occurred while deleting the user.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-        
-        // Delete related records first
-        if ($user->studentProfile) {
-            $user->studentProfile->delete();
-        }
-        
-        $user->delete();
-        
-        return response()->json(null, Response::HTTP_NO_CONTENT);
     }
 
     /**
@@ -181,22 +186,6 @@ class UserController extends Controller
         $enrollments = Enrollment::with('course')->where('user_id', $id)->get();
         
         return response()->json(['data' => $enrollments], Response::HTTP_OK);
-    }
-    
-    /**
-     * Get the assessment attempts for a user.
-     */
-    public function getAssessmentAttempts(string $id): JsonResponse
-    {
-        $user = User::find($id);
-        
-        if (!$user) {
-            return response()->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
-        }
-        
-        $attempts = AssessmentAttempt::with('assessment')->where('user_id', $id)->get();
-        
-        return response()->json(['data' => $attempts], Response::HTTP_OK);
     }
     
     /**

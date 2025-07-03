@@ -24,7 +24,7 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     last_login TIMESTAMP NULL,
     is_active BOOLEAN DEFAULT TRUE,
-    FOREIGN KEY (role_id) REFERENCES roles(role_id)
+    FOREIGN KEY (role_id) REFERENCES roles(role_id) ON DELETE CASCADE
 );
 
 -- Laravel sessions table for database session driver
@@ -60,8 +60,8 @@ CREATE TABLE student_profiles (
     dominant_learning_style_id INT,
     profile_created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     last_updated TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(user_id),
-    FOREIGN KEY (dominant_learning_style_id) REFERENCES learning_styles(style_id)
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (dominant_learning_style_id) REFERENCES learning_styles(style_id) ON DELETE CASCADE
 );
 
 -- Courses table
@@ -73,7 +73,7 @@ CREATE TABLE courses (
     structure JSON NOT NULL,
     learning_style_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (learning_style_id) REFERENCES learning_styles(style_id)
+    FOREIGN KEY (learning_style_id) REFERENCES learning_styles(style_id) ON DELETE CASCADE
 );
 
 -- Insert default courses
@@ -91,17 +91,17 @@ INSERT INTO courses (name, description, objectives, structure, learning_style_id
   '[
     {
       "module": 1,
-      "title": "Foundations of Futures Thinking",
+      "title": "Introduction to Futures Thinking",
       "focus": "Develop an understanding of futures literacy through drivers analysis, horizon scanning, and strategic framing across time horizons."
     },
     {
       "module": 2,
-      "title": "Mapping Change and Building Insight",
+      "title": "EXPLORING THE FUTURE",
       "focus": "Apply tools such as PESTLE and Futures Wheel to identify critical forces of change and visualize their impacts."
     },
     {
       "module": 3,
-      "title": "Creating Strategic Pathways",
+      "title": "Creating Alternative Futures",
       "focus": "Explore alternative futures using scenario planning, the Futures Triangle, and Causal Layered Analysis to inform resilient strategies."
     }
   ]',
@@ -122,17 +122,17 @@ INSERT INTO courses (name, description, objectives, structure, learning_style_id
   '[
     {
       "module": 1,
-      "title": "Foundations of Futures Thinking",
+      "title": "Introduction to Futures Thinking",
       "focus": "Develop an understanding of futures literacy through drivers analysis, horizon scanning, and strategic framing across time horizons."
     },
     {
       "module": 2,
-      "title": "Mapping Change and Building Insight",
+      "title": "EXPLORING THE FUTURE",
       "focus": "Apply tools such as PESTLE and Futures Wheel to identify critical forces of change and visualize their impacts."
     },
     {
       "module": 3,
-      "title": "Creating Strategic Pathways",
+      "title": "Creating Alternative Futures",
       "focus": "Explore alternative futures using scenario planning, the Futures Triangle, and Causal Layered Analysis to inform resilient strategies."
     }
   ]',
@@ -153,17 +153,17 @@ INSERT INTO courses (name, description, objectives, structure, learning_style_id
   '[
     {
       "module": 1,
-      "title": "Foundations of Futures Thinking",
+      "title": "Introduction to Futures Thinking",
       "focus": "Develop an understanding of futures literacy through drivers analysis, horizon scanning, and strategic framing across time horizons."
     },
     {
       "module": 2,
-      "title": "Mapping Change and Building Insight",
+      "title": "EXPLORING THE FUTURE",
       "focus": "Apply tools such as PESTLE and Futures Wheel to identify critical forces of change and visualize their impacts."
     },
     {
       "module": 3,
-      "title": "Creating Strategic Pathways",
+      "title": "Creating Alternative Futures",
       "focus": "Explore alternative futures using scenario planning, the Futures Triangle, and Causal Layered Analysis to inform resilient strategies."
     }
   ]',
@@ -184,17 +184,17 @@ INSERT INTO courses (name, description, objectives, structure, learning_style_id
   '[
     {
       "module": 1,
-      "title": "Foundations of Futures Thinking",
+      "title": "Introduction to Futures Thinking",
       "focus": "Develop an understanding of futures literacy through drivers analysis, horizon scanning, and strategic framing across time horizons."
     },
     {
       "module": 2,
-      "title": "Mapping Change and Building Insight",
+      "title": "EXPLORING THE FUTURE",
       "focus": "Apply tools such as PESTLE and Futures Wheel to identify critical forces of change and visualize their impacts."
     },
     {
       "module": 3,
-      "title": "Creating Strategic Pathways",
+      "title": "Creating Alternative Futures",
       "focus": "Explore alternative futures using scenario planning, the Futures Triangle, and Causal Layered Analysis to inform resilient strategies."
     }
   ]',
@@ -211,8 +211,8 @@ CREATE TABLE assessment_results (
     course_id INT NOT NULL,
     answers JSON NOT NULL,
     result JSON NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(user_id),
-    FOREIGN KEY (course_id) REFERENCES courses(course_id)
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE
 );
 
 -- Student enrollment in courses
@@ -224,9 +224,9 @@ CREATE TABLE enrollments (
     enrollment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     completion_status ENUM('not_started', 'in_progress', 'completed') DEFAULT 'not_started',
     completion_date TIMESTAMP NULL,
-    FOREIGN KEY (user_id) REFERENCES users(user_id),
-    FOREIGN KEY (course_id) REFERENCES courses(course_id),
-    FOREIGN KEY (assessment_result_id) REFERENCES assessment_results(result_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE,
+    FOREIGN KEY (assessment_result_id) REFERENCES assessment_results(result_id) ON DELETE CASCADE,
     UNIQUE KEY unique_enrollment (user_id, course_id)
 );
 
@@ -244,7 +244,7 @@ CREATE TABLE lesson_screens (
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   '1-video',
   'Introduction to Futures Thinking',
-  null,
+  'Sustainability Science Education. (2019, August 24). What is Futures Thinking?. https://www.youtube.com/watch?v=0GjAHJSHDTs',
   null,
   'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185804/1_Introduction_to_Futures_Thinking_egkgxg.mp4',
   '3 minutes 27 seconds'
@@ -278,7 +278,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   '1.2-video',
   'Looking Ahead: The Three Horizons Model',
-  null,
+  'Leader`s Quest. (2022, April 13). Three Horizons: an introduction. https://www.youtube.com/watch?v=p90ZTg0svmM',
   null,
   'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1749389838/1.2_Looking_Ahead_The_Three_Horizons_Model_aemjrp.mp4',
   '6 minutes 4 seconds'
@@ -310,7 +310,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   '1.3-video',
   'Identifying Change Drivers',
-  null,
+  'QR Strategic Foresight. (2025, April 13). Leading Change with Strategic Foresight. https://www.youtube.com/watch?v=OkmAkeMNMz0',
   null,
   'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1749389385/1.3_Identifying_Change_Drivers_dvzt5f.mp4',
   '2 minutes 44 seconds'
@@ -342,7 +342,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   '1.3.1-video',
   'What is PESTLE Analysis?',
-  null,
+  'Management Courses - Mike Clayton. (2023, August 1). What is PESTLE Analysis?. https://www.youtube.com/watch?v=lh2pPQO-WSE',
   null,
   'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1749389594/1.3.1_What_is_PESTLE_Analysis_iij5o2.mp4',
   '4 minutes 4 seconds'
@@ -351,7 +351,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   '1.4-video',
   'Identifying Weak Signals',
-  null,
+  'Ryan, R. (2022, June 8). Strategic Foresight for Teams: Signals and Sensemaking. https://www.youtube.com/watch?v=8CiF82no2oc',
   null,
   'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1749564558/1.4_Identifying_Weak_Signals_imaqwk.mp4',
   '3 minutes 5 seconds'
@@ -375,7 +375,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   '1.5-video',
   'Linking Futures Thinking to the Policy Cycle',
-  null,
+  'Life Cycle Initiative (hosted by UNEP). (2020, January 23). Elearning course: Life Cycle Thinking in Policy Decision Making. https://www.youtube.com/watch?v=iu2LOQSFSaU',
   null,
   'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1749566067/1.5_Linking_Futures_Thinking_to_the_Policy_Cycle_1_vokxbt.mp4',
   '1 minute 54 seconds'
@@ -409,7 +409,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   '2.1-video',
   'Driver Mapping',
-  null,
+  'Future Human by Design. (2019, October 15). Driver Mapping - 1 Minute Future Methods. https://www.youtube.com/watch?v=rg6FEnWm4os',
   null,
   'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1750122897/2.1_Driver_Mapping_gsnxf4.mp4',
   '56 seconds'
@@ -472,7 +472,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   '2.2-video',
   'Horizon Scanning',
-  null,
+  'UN Global Pulse. (2023a, January 11). Horizon Scanning: A Quick Introduction. https://www.youtube.com/watch?v=1Pd0xSsdCAU',
   null,
   'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1750122961/2.2_Horizon_Scanning_zfbdbm.mp4',
   '2 minutes 4 seconds'
@@ -543,23 +543,23 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   '2.3-video',
   'Understanding Weak Signals and Trends',
-  null,
+  'QR Strategic Foresight. (2025b, April 13). Understanding Weak Signals and Trends. https://www.youtube.com/watch?v=cc-MtfPErQ',
   null,
   'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1749388239/2.3_Understanding_Weak_Signals_and_Trends_wjvz6k.mp4',
   '9 minutes 42 seconds'
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
-  '2.4-video',
+  '2.3.1-video',
   'Trends Identification and Analysis',
-  null,
+  'FUTEE - FREE TV. (2022, November 19). What You Don`t Know About Futures Wheels. https://www.youtube.com/watch?v=QeILzDCS_6U',
   null,
   'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1748185774/2.3_Trends_Identification_and_Analysis_zfvxos.mp4',
   '9 minutes 34 seconds'
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
-  '2.3',
+  '2.4',
   'Trends Identification and Analysis',
   'Understanding the cascading impacts of change using structured brainstorming and visualization.',
   '[
@@ -577,7 +577,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
 );
 
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url) VALUES(
-  '2.3.1',
+  '2.4.1',
   'How to do Futures Wheel Analysis?',
   'Explore the ripple effects of a change! The Futures Wheel helps you map out all the possible consequences of a trend or event.',
   '[
@@ -600,7 +600,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   '3.1-video',
   'Causal Layered Analysis',
-  null,
+  'TEDx Talks. (2013, May 13). Causal Layered Analysis: Sohail Inayatullah at TEDxNoosa. https://www.youtube.com/watch?v=ImWDmFPfifI',
   null,
   'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1750123304/3.1_Causal_Layered_Analysis_ffuvr6.mp4',
   '19 minutes 11 seconds'
@@ -687,7 +687,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   '3.2-video',
   'Futures Triangle',
-  null,
+  'Mora-Montero, J. C. (2020, May 6). futures triangle a strategic foresight method. https://www.youtube.com/watch?v=KuSDCu6aTgM',
   null,
   'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1750123037/3.2_Futures_Triangle_g8ac4w.mp4',
   '2 minutes 59 seconds'
@@ -787,7 +787,7 @@ INSERT INTO lesson_screens (screen_number, screen_title, screen_description, scr
 INSERT INTO lesson_screens (screen_number, screen_title, screen_description, screen_content, screen_url, screen_duration) VALUES(
   '3.3-video',
   'Scenario Planning',
-  null,
+  'Professional Academy. (2021, November 23). Scenario Planning - A Simple Overview!. https://www.youtube.com/watch?v=ukr9ItEQX2Y',
   null,
   'https://res.cloudinary.com/dwn5t3o4j/video/upload/v1750123049/3.3_Scenario_Planning_pfo05y.mp4',
   '2 minutes 15 seconds'
@@ -961,7 +961,7 @@ CREATE TABLE module_assessment (
     assessment_objective TEXT NULL,
     assessment_scenario TEXT NULL,
     assessment_instructions JSON NULL,
-    FOREIGN KEY (course_id) REFERENCES courses(course_id)
+    FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE
 );
 
 INSERT INTO module_assessment (course_id, module_number, assessment_title, assessment_objective, assessment_scenario, assessment_instructions) VALUES (
@@ -1030,11 +1030,19 @@ INSERT INTO module_assessment (course_id, module_number, assessment_title, asses
     ),
     JSON_OBJECT(
       'step_title', 'CLA Exploration',
-      'step_description', 'Use Causal Layered Analysis to identify: • Litany: The visible facts (e.g., trends, headlines) • Systemic Causes: The deeper causes (e.g., policies, economic systems) • Worldviews: The cultural beliefs influencing the issue • Myths/Metaphors: The deep, often unspoken narratives'
+      'step_description', 'Use Causal Layered Analysis to identify: 
+      • Litany: The visible facts (e.g., trends, headlines) 
+      • Systemic Causes: The deeper causes (e.g., policies, economic systems)
+      • Worldviews: The cultural beliefs influencing the issue 
+      • Myths/Metaphors: The deep, often unspoken narratives'
     ),
     JSON_OBJECT(
       'step_title', 'Build Scenarios',
-      'step_description', 'Create four future scenarios for your issue: • Best Case: Ideal future • Worst Case: Worst possible future • Middle Ground: Plausible future • Wildcard: Unlikely but possible future'
+      'step_description', 'Create four future scenarios for your issue: 
+      • Best Case: Ideal future 
+      • Worst Case: Worst possible future 
+      • Middle Ground: Plausible future 
+      • Wildcard: Unlikely but possible future'
     ),
     JSON_OBJECT(
       'step_title', 'Reflection',
@@ -1131,11 +1139,16 @@ INSERT INTO module_assessment (course_id, module_number, assessment_title, asses
     ),
     JSON_OBJECT(
       'step_title', 'Apply Causal Layered Analysis (CLA):',
-      'step_description', '• Litany: Identify and describe the surface-level facts about this issue (e.g., current news or headlines). • Systemic Causes: Explore the underlying systems or structures that contribute to this issue. How is this issue supported by existing systems? • Worldviews: Reflect on the beliefs or values that influence how people view or respond to this issue. What assumptions are made about this issue in society? • Metaphors and Myths: Identify any metaphors or myths associated with this issue that might influence decision-making or policy.'
+      'step_description', '• Litany: Identify and describe the surface-level facts about this issue (e.g., current news or headlines). 
+      • Systemic Causes: Explore the underlying systems or structures that contribute to this issue. How is this issue supported by existing systems? 
+      • Worldviews: Reflect on the beliefs or values that influence how people view or respond to this issue. What assumptions are made about this issue in society? 
+      • Metaphors and Myths: Identify any metaphors or myths associated with this issue that might influence decision-making or policy.'
     ),
     JSON_OBJECT(
       'step_title', 'Apply the Futures Triangle:',
-      'step_description', '• Pull (Vision): Define a possible vision for the future in relation to this issue. What is the ideal future youd like to see? • Push (Trends): List the current trends or megatrends pushing us towards this future. How are these trends shaping what will happen? • Weight (Barriers): Discuss the historical barriers that might prevent this future vision. What past decisions, systems, or traditions are limiting change?'
+      'step_description', '• Pull (Vision): Define a possible vision for the future in relation to this issue. What is the ideal future youd like to see? 
+      • Push (Trends): List the current trends or megatrends pushing us towards this future. How are these trends shaping what will happen? 
+      • Weight (Barriers): Discuss the historical barriers that might prevent this future vision. What past decisions, systems, or traditions are limiting change?'
     ),
     JSON_OBJECT(
       'step_title', 'Problem-Solving',
@@ -1199,7 +1212,10 @@ INSERT INTO module_assessment (
   3, 
   3, 
   'Comparative Analysis of Future Scenarios', 
-  'To understand and compare different future scenarios based on key drivers of change, exploring how variations in these drivers could shape the future through teamwork and collective analysis. As a team, you will compare two future scenarios using the Futures Triangle or Causal Layered Analysis methods. Together, you will analyze how different trends and drivers can shape the future, focusing on the collective impact of these drivers on society, technology, and the environment.',
+  'In this activity, you will compare two distinct future scenarios using the
+Futures Triangle or Causal Layered Analysis methods. This will allow you to analyze how
+different trends and drivers can shape the future, focusing on their impact on society,
+technology, and the environment.',
   NULL, 
   JSON_ARRAY(
     JSON_OBJECT(
@@ -1230,7 +1246,10 @@ INSERT INTO module_assessment (course_id, module_number, assessment_title, asses
   JSON_ARRAY(
     JSON_OBJECT(
       'step_title', 'Classify the key concepts from the Introduction to Futures Thinking into three categories:',
-      'step_description', '• Key Themes (Multiple Futures, Drivers of Change, Scenarios, Uncertainty, Systems Thinking) • Benefits of Futures Thinking (Understand Forces, Spot Gaps, Build Consensus, Adapt Strategies, Encourage Action) • Tools and Methods (PESTLE, Horizon Scanning, Three Horizons Model)'
+      'step_description', '
+      • Key Themes (Multiple Futures, Drivers of Change, Scenarios, Uncertainty, Systems Thinking) 
+      • Benefits of Futures Thinking (Understand Forces, Spot Gaps, Build Consensus, Adapt Strategies, Encourage Action) 
+      • Tools and Methods (PESTLE, Horizon Scanning, Three Horizons Model)'
     ),
     JSON_OBJECT(
       'step_title', 'Create a list',
@@ -1326,9 +1345,9 @@ CREATE TABLE module_assessment_progress (
     module_progress_id INT NOT NULL,
     status ENUM('not_started', 'in_progress', 'completed') DEFAULT 'not_started',
     file_url VARCHAR(255),  
-    FOREIGN KEY (module_assessment_id) REFERENCES module_assessment(assessment_id),
-    FOREIGN KEY (user_id) REFERENCES users(user_id),
-    FOREIGN KEY (module_progress_id) REFERENCES module_progress(progress_id)
+    FOREIGN KEY (module_assessment_id) REFERENCES module_assessment(assessment_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (module_progress_id) REFERENCES module_progress(progress_id) ON DELETE CASCADE
 );
 
 -- Certificates table
@@ -1338,8 +1357,8 @@ CREATE TABLE certificates (
     course_id INT NOT NULL,
     issue_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     certificate_url VARCHAR(255),
-    FOREIGN KEY (user_id) REFERENCES users(user_id),
-    FOREIGN KEY (course_id) REFERENCES courses(course_id)
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE
 );
 
 -- Scores table
@@ -1348,8 +1367,8 @@ CREATE TABLE scores (
     faculty_id INT NOT NULL,
     score INT NOT NULL CHECK (score BETWEEN 1 AND 5),
     module_assessment_progress_id INT NOT NULL,
-    FOREIGN KEY (faculty_id) REFERENCES users(user_id),
-    FOREIGN KEY (module_assessment_progress_id) REFERENCES module_assessment_progress(assessment_progress_id)
+    FOREIGN KEY (faculty_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (module_assessment_progress_id) REFERENCES module_assessment_progress(assessment_progress_id) ON DELETE CASCADE
 );
 
 -- Faculty feedback table
@@ -1358,8 +1377,8 @@ CREATE TABLE feedback (
     faculty_id INT NOT NULL,
     feedback TEXT NOT NULL,
     module_assessment_progress_id INT NOT NULL,
-    FOREIGN KEY (faculty_id) REFERENCES users(user_id),
-    FOREIGN KEY (module_assessment_progress_id) REFERENCES module_assessment_progress(assessment_progress_id)
+    FOREIGN KEY (faculty_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (module_assessment_progress_id) REFERENCES module_assessment_progress(assessment_progress_id) ON DELETE CASCADE
 );
 
 -- System log for monitoring and auditing
@@ -1371,7 +1390,7 @@ CREATE TABLE system_logs (
     ip_address VARCHAR(45),
     user_agent TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
 -- Insert default roles
