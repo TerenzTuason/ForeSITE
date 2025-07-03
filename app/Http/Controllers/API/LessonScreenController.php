@@ -38,7 +38,7 @@ class LessonScreenController extends Controller
                 'string',
                 'max:255',
                 function ($attribute, $value, $fail) {
-                    if ($value && !str_contains($value, 'res.cloudinary.com/dwn5t3o4j')) {
+                    if ($value && !str_contains($value, 'res.cloudinary.com/diugfyxou')) {
                         $fail('The screen URL must be a valid Cloudinary URL.');
                     }
                 },
