@@ -461,49 +461,34 @@
                         <div class="mb-3">
                             <label for="contentType" class="form-label">Content Type</label>
                             <select class="form-select" id="contentType">
-                                <option value="content">Content</option>
+                                <option value="text">Text Content</option>
+                                <option value="image">Image</option>
                                 <option value="video">Video</option>
                             </select>
                         </div>
                         
-                        <div id="contentSection" class="mb-3">
+                        <div id="textContentSection" class="mb-3">
                             <label for="screenContent" class="form-label">Content</label>
-                            <textarea class="form-control" id="screenContent" rows="5" placeholder="Enter the lesson content here..."></textarea>
-                            
-                            <div class="mt-3">
-                                <label for="contentImageUrl" class="form-label">Image (Optional)</label>
-                                <input type="url" class="form-control" id="contentImageUrl" 
-                                       placeholder="https://example.com/image.jpg" readonly>
-                                <div class="form-text">Image URL will be automatically populated after file upload</div>
-                            </div>
-
-                            <div class="mt-2">
-                                <label class="form-label">Upload Image (Optional)</label>
-                                <input type="file" class="form-control" id="contentImageUpload" accept=".jpg,.jpeg,.png,.gif">
-                                <div class="form-text">
-                                    Supported formats: JPG, JPEG, PNG, GIF
-                                </div>
-                                <div class="progress mt-2 d-none" id="contentImageProgress">
-                                    <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-                                </div>
-                            </div>
+                            <textarea class="form-control" id="screenContent" rows="5"></textarea>
                         </div>
                         
-                        <div id="videoSection" class="mb-3 d-none">
-                            <label for="videoUrl" class="form-label">Video URL</label>
-                            <input type="url" class="form-control" id="videoUrl" 
-                                   placeholder="https://example.com/video.mp4" readonly>
-                            <div class="form-text">Video URL will be automatically populated after file upload</div>
+                        <div id="urlContentSection" class="mb-3 d-none">
+                            <label for="screenUrl" class="form-label">Content URL</label>
+                            <input type="url" class="form-control" id="screenUrl" 
+                                   placeholder="https://example.com/content" readonly>
+                            <div class="form-text">URL will be automatically populated after file upload</div>
+                        </div>
 
-                            <div class="mt-2">
-                                <label class="form-label">Upload Video</label>
-                                <input type="file" class="form-control" id="videoUpload" accept=".mp4,.webm,.mov">
-                                <div class="form-text">
-                                    Supported formats: MP4, WEBM, MOV
-                                </div>
-                                <div class="progress mt-2 d-none" id="videoProgress">
-                                    <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-                                </div>
+                        <div id="uploadSection" class="mb-3 d-none">
+                            <label class="form-label">File Upload</label>
+                            <input type="file" class="form-control" id="fileUpload" accept=".jpg,.jpeg,.png,.gif,.mp4,.webm,.mov">
+                            <div class="form-text" id="uploadHelp">
+                                Supported formats:<br>
+                                Images: JPG, JPEG, PNG, GIF<br>
+                                Videos: MP4, WEBM, MOV
+                            </div>
+                            <div class="progress mt-2 d-none">
+                                <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                             </div>
                         </div>
                         
@@ -553,12 +538,12 @@
         };
 
         // Handle file upload to Cloudinary
-        async function uploadToCloudinary(file, targetInputId, progressBarId) {
+        async function uploadToCloudinary(file) {
             const formData = new FormData();
             const contentType = document.getElementById('contentType').value;
             
             // Determine folder based on content type
-            const uploadFolder = contentType === 'video' ? 'lesson_videos' : 'lesson_images';
+            const uploadFolder = 'lesson_images'; // Always use lesson_images folder
             const timestamp = Math.round((new Date).getTime()/1000);
 
             // Build upload params
@@ -573,7 +558,7 @@
             formData.append('signature', signature);
             formData.append('api_key', CLOUDINARY_CONFIG.apiKey);
             
-            const progressBar = document.getElementById(progressBarId);
+            const progressBar = document.querySelector('.progress');
             const progressBarInner = progressBar.querySelector('.progress-bar');
             progressBar.classList.remove('d-none');
             
@@ -590,7 +575,7 @@
                 }
 
                 const data = await response.json();
-                document.getElementById(targetInputId).value = data.secure_url;
+                document.getElementById('screenUrl').value = data.secure_url;
                 showAlert('success', 'File uploaded successfully!');
                 progressBar.classList.add('d-none');
                 return data.secure_url;
@@ -681,56 +666,55 @@
             `;
             document.head.appendChild(styleElement);
 
-            // Add file input change handlers
-            document.getElementById('contentImageUpload').addEventListener('change', async function(e) {
+            // Add file input change handler
+            document.getElementById('fileUpload').addEventListener('change', async function(e) {
                 const file = e.target.files[0];
                 if (!file) return;
 
+                const contentType = document.getElementById('contentType').value;
+                const isImage = contentType === 'image';
+                const isVideo = contentType === 'video';
+
                 // Validate file type
                 const fileType = file.type.split('/')[0];
-                if (fileType !== 'image') {
-                    showAlert('danger', 'Please select an image file.');
+                if ((isImage && fileType !== 'image') || (isVideo && fileType !== 'video')) {
+                    showAlert('danger', `Please select a ${contentType} file.`);
                     this.value = '';
                     return;
                 }
 
                 try {
-                    await uploadToCloudinary(file, 'contentImageUrl', 'contentImageProgress');
+                    await uploadToCloudinary(file);
                 } catch (error) {
                     console.error('Error during upload:', error);
                 }
             });
 
-            document.getElementById('videoUpload').addEventListener('change', async function(e) {
-                const file = e.target.files[0];
-                if (!file) return;
-
-                // Validate file type
-                const fileType = file.type.split('/')[0];
-                if (fileType !== 'video') {
-                    showAlert('danger', 'Please select a video file.');
-                    this.value = '';
-                    return;
-                }
-
-                try {
-                    await uploadToCloudinary(file, 'videoUrl', 'videoProgress');
-                } catch (error) {
-                    console.error('Error during upload:', error);
-                }
-            });
-
-            // Content type change handler
+            // Modify content type change handler
             document.getElementById('contentType').addEventListener('change', function(e) {
-                const contentSection = document.getElementById('contentSection');
-                const videoSection = document.getElementById('videoSection');
+                const textSection = document.getElementById('textContentSection');
+                const urlSection = document.getElementById('urlContentSection');
+                const uploadSection = document.getElementById('uploadSection');
+                const fileInput = document.getElementById('fileUpload');
                 
-                if (e.target.value === 'content') {
-                    contentSection.classList.remove('d-none');
-                    videoSection.classList.add('d-none');
-                } else if (e.target.value === 'video') {
-                    contentSection.classList.add('d-none');
-                    videoSection.classList.remove('d-none');
+                switch(e.target.value) {
+                    case 'text':
+                        textSection.classList.remove('d-none');
+                        urlSection.classList.add('d-none');
+                        uploadSection.classList.add('d-none');
+                        break;
+                    case 'image':
+                        textSection.classList.add('d-none');
+                        urlSection.classList.remove('d-none');
+                        uploadSection.classList.remove('d-none');
+                        fileInput.accept = '.jpg,.jpeg,.png,.gif';
+                        break;
+                    case 'video':
+                        textSection.classList.add('d-none');
+                        urlSection.classList.remove('d-none');
+                        uploadSection.classList.remove('d-none');
+                        fileInput.accept = '.mp4,.webm,.mov';
+                        break;
                 }
             });
         });
@@ -1214,28 +1198,22 @@
                     screensHTML = '<p class="text-muted">No lesson screens available for this module.</p>';
                 } else {
                     screens.forEach(screen => {
-                        // Determine content type based on screen data
+                        // Determine content type based on URL extension
                         let contentType = 'content';
                         let contentIcon = 'fa-file-alt';
                         let contentClass = 'success';
                         
-                        // Check if this is a video lesson
-                        const hasScreenContent = screen.screen_content && screen.screen_content.length > 0;
-                        const hasVideoUrl = screen.screen_url && (
-                            screen.screen_url.includes('.mp4') || 
-                            screen.screen_url.includes('.webm') || 
-                            screen.screen_url.includes('.mov') ||
-                            screen.screen_number.includes('-video')
-                        );
-
-                        if (hasVideoUrl && !hasScreenContent) {
-                            contentType = 'video';
-                            contentIcon = 'fa-video';
-                            contentClass = 'info';
-                        } else {
-                            contentType = 'content';
-                            contentIcon = 'fa-file-text';
-                            contentClass = 'success';
+                        if (screen.screen_url) {
+                            const url = screen.screen_url.toLowerCase();
+                            if (url.endsWith('.mp4') || url.endsWith('.webm') || url.endsWith('.avi') || url.endsWith('.mov')) {
+                                contentType = 'video';
+                                contentIcon = 'fa-video';
+                                contentClass = 'info';
+                            } else if (url.endsWith('.jpg') || url.endsWith('.jpeg') || url.endsWith('.png') || url.endsWith('.gif') || url.endsWith('.svg')) {
+                                contentType = 'image';
+                                contentIcon = 'fa-image';
+                                contentClass = 'primary';
+                            }
                         }
                         
                         screensHTML += `
@@ -1283,12 +1261,6 @@
             document.getElementById('lessonScreenForm').reset();
             document.getElementById('moduleNumber').value = moduleNumber;
             document.getElementById('screenNumber').value = `${moduleNumber}.${getNextScreenNumber(moduleNumber)}`;
-            
-            // Set default content type and show appropriate section
-            document.getElementById('contentType').value = 'content';
-            document.getElementById('contentSection').classList.remove('d-none');
-            document.getElementById('videoSection').classList.add('d-none');
-            
             modal.show();
         }
 
@@ -1322,49 +1294,16 @@
             document.getElementById('screenDescription').value = screen.screen_description || '';
             document.getElementById('screenDuration').value = screen.screen_duration || '';
 
-            // Reset form fields
-            document.getElementById('screenContent').value = '';
-            document.getElementById('contentImageUrl').value = '';
-            document.getElementById('videoUrl').value = '';
-
-            // Determine content type and populate fields
-            const hasScreenContent = screen.screen_content && screen.screen_content.length > 0;
-            const hasVideoUrl = screen.screen_url && (
-                screen.screen_url.includes('.mp4') || 
-                screen.screen_url.includes('.webm') || 
-                screen.screen_url.includes('.mov') ||
-                screen.screen_number.includes('-video')
-            );
-
-            if (hasVideoUrl && !hasScreenContent) {
-                // This is a video lesson
-                document.getElementById('contentType').value = 'video';
-                document.getElementById('videoUrl').value = screen.screen_url;
-                document.getElementById('contentSection').classList.add('d-none');
-                document.getElementById('videoSection').classList.remove('d-none');
+            if (screen.screen_url) {
+                document.getElementById('contentType').value = 'url';
+                document.getElementById('screenUrl').value = screen.screen_url;
+                document.getElementById('textContentSection').classList.add('d-none');
+                document.getElementById('urlContentSection').classList.remove('d-none');
             } else {
-                // This is content (with optional image)
-                document.getElementById('contentType').value = 'content';
-                
-                // Populate screen content
-                if (hasScreenContent) {
-                    // Convert array content to readable text
-                    const contentText = screen.screen_content.map(item => {
-                        if (Array.isArray(item)) {
-                            return item.map(subItem => `  • ${subItem}`).join('\n');
-                        }
-                        return item;
-                    }).join('\n\n');
-                    document.getElementById('screenContent').value = contentText;
-                }
-                
-                // Populate image URL if it exists
-                if (screen.screen_url && !hasVideoUrl) {
-                    document.getElementById('contentImageUrl').value = screen.screen_url;
-                }
-                
-                document.getElementById('contentSection').classList.remove('d-none');
-                document.getElementById('videoSection').classList.add('d-none');
+                document.getElementById('contentType').value = 'text';
+                document.getElementById('screenContent').value = screen.screen_content?.content || '';
+                document.getElementById('textContentSection').classList.remove('d-none');
+                document.getElementById('urlContentSection').classList.add('d-none');
             }
 
             modal.show();
@@ -1445,50 +1384,18 @@
 
             // Handle content based on type
             const contentType = document.getElementById('contentType').value;
-            if (contentType === 'content') {
+            if (contentType === 'text') {
                 const content = document.getElementById('screenContent').value;
-                const imageUrl = document.getElementById('contentImageUrl').value;
-                
-                // Format screen_content as an array, split by lines and handle bullet points
-                if (content.trim()) {
-                    const lines = content.trim().split('\n').filter(line => line.trim());
-                    const formattedContent = [];
-                    let currentList = [];
-                    
-                    for (const line of lines) {
-                        const trimmedLine = line.trim();
-                        if (trimmedLine.startsWith('•') || trimmedLine.startsWith('  •')) {
-                            // This is a bullet point
-                            currentList.push(trimmedLine.replace(/^(\s*•\s*)/, ''));
-                        } else {
-                            // This is a regular line
-                            if (currentList.length > 0) {
-                                formattedContent.push(currentList);
-                                currentList = [];
-                            }
-                            formattedContent.push(trimmedLine);
-                        }
-                    }
-                    
-                    // Add any remaining list items
-                    if (currentList.length > 0) {
-                        formattedContent.push(currentList);
-                    }
-                    
-                    screenData.screen_content = formattedContent;
-                } else {
-                    screenData.screen_content = null;
-                }
-                
-                // Set image URL if provided
-                screenData.screen_url = imageUrl.trim() || null;
-            } else if (contentType === 'video') {
-                const videoUrl = document.getElementById('videoUrl').value;
-                if (!videoUrl || !videoUrl.trim()) {
-                    showAlert('danger', 'Please upload a video file first');
+                // Format screen_content as an array
+                screenData.screen_content = content.trim() ? [content.trim()] : null;
+                screenData.screen_url = null;
+            } else {
+                const url = document.getElementById('screenUrl').value;
+                if (!url || !url.trim()) {
+                    showAlert('danger', 'Please upload a file first');
                     return;
                 }
-                screenData.screen_url = videoUrl.trim();
+                screenData.screen_url = url.trim();
                 screenData.screen_content = null;
             }
 
@@ -1596,23 +1503,9 @@
             e.target.setCustomValidity('');
         });
 
-        document.getElementById('contentImageUrl').addEventListener('input', function(e) {
+        document.getElementById('screenUrl').addEventListener('input', function(e) {
             const value = e.target.value;
-            if (value) {
-                try {
-                    new URL(value);
-                    e.target.setCustomValidity('');
-                } catch {
-                    e.target.setCustomValidity('Please enter a valid URL');
-                }
-            } else {
-                e.target.setCustomValidity('');
-            }
-        });
-
-        document.getElementById('videoUrl').addEventListener('input', function(e) {
-            const value = e.target.value;
-            if (value) {
+            if (document.getElementById('contentType').value === 'url' && value) {
                 try {
                     new URL(value);
                     e.target.setCustomValidity('');
