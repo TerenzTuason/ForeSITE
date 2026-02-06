@@ -1,138 +1,115 @@
 # ForeSITE Learning System
 
-## Frontend
-*Frontend setup instructions will be added once the frontend development begins.*
+An adaptive learning platform that personalizes Futures Thinking education using Honey-Mumford learning styles. Classifies learners (Activist, Reflector, Theorist, Pragmatist) and adapts content accordingly.
 
-## Backend Setup
+---
 
-### Prerequisites
-1. XAMPP (Download from [https://www.apachefriends.org/](https://www.apachefriends.org/))
-2. Composer (Download from [https://getcomposer.org/download/](https://getcomposer.org/download/))
-3. PHP 8.1 or higher
-4. MySQL 5.7 or higher
-5. Laravel CLI (Install using `composer global require laravel/installer`)
+## Project Structure
 
-### Database Setup
-1. Install XAMPP and start Apache and MySQL services from the XAMPP Control Panel
-2. Import the schema.sql file directly into the database using phpMyAdmin:
-   - Click on the "Import" tab
-   - Click "Choose File" and select the schema.sql file from the project root
-   - Click "Go" to import the schema
+```
+ForeSITE/
+├── frontend/          # Static HTML/CSS web app
+├── backend/           # Laravel PHP API
+├── algorithm/         # ML learning-style classifier (Python/Flask)
+├── schema.sql         # Database schema (import via phpMyAdmin)
+├── vercel.json        # Deployment config (Vercel)
+└── KeyElementsOftheSystem.md
+```
 
-### Backend Installation
-1. Clone the repository:
-   ```bash
-   git clone [repository-url]
-   cd ForeSITE
-   ```
+---
 
-2. Navigate to the backend directory:
-   ```bash
-   cd backend
-   ```
+## Directory Guide
 
-3. Install PHP dependencies using Composer:
-   ```bash
-   composer install
-   ```
+### `frontend/`
+Static web pages. Open `index.html` in a browser or serve with any static server.
 
-4. Generate application key:
-   ```bash
-   php artisan key:generate
-   ```
+| Path | Purpose |
+|------|---------|
+| `index.html` | Landing page |
+| `login.html`, `register.html` | Auth pages |
+| `admin/` | Admin dashboard, users, courses, progress |
+| `faculty/` | Faculty dashboard, learner management |
+| `students/` | Student dashboard, courses, modules, assessments, profile |
+| `components/` | Reusable navbars |
+| `assets/` | Images, videos, logos |
+| `styles/main.css` | Global styles |
 
-5. Configure your database connection in `.env` file:
-   ```
-   DB_CONNECTION=mysql
-   DB_HOST=127.0.0.1
-   DB_PORT=3306
-   DB_DATABASE=foresite_db
-   DB_USERNAME=root
-   DB_PASSWORD=
-   ```
+### `backend/`
+Laravel API. Handles auth, courses, enrollments, progress, chat, assessments.
 
-6. Start the Laravel development server:
-   ```bash
-   php artisan serve
-   ```
+| Path | Purpose |
+|------|---------|
+| `routes/api.php` | All API routes |
+| `app/Http/Controllers/API/` | API controllers |
+| `app/Models/` | Eloquent models |
+| `database/migrations/` | DB migrations |
+| `config/` | App config |
 
-The backend API will be available at `https://foresite-backend-collaborative-qmyiqy.laravel.cloud/api/v1`
+### `algorithm/`
+Flask API that predicts learning style from 80-question responses.
 
-## Learning Style Classifier API
+| File | Purpose |
+|------|---------|
+| `app.py` | Flask app, `/predict` endpoint |
+| `learning_style_classifier.py` | ML ensemble (Decision Tree, RF, SVM, XGBoost, CNN) |
+| `classifier_config.py` | Model params, question mappings |
+| `requirements.txt` | Python dependencies |
 
-The project includes a machine learning-based API that classifies users into Honey-Mumford learning styles based on their questionnaire responses.
+---
 
-### Prerequisites
+## Quick Setup
 
-1. Python 3.11 (Download from [https://www.python.org/downloads/release/python-3110/](https://www.python.org/downloads/release/python-3110/))
+### 1. Database
+- Install XAMPP, start Apache + MySQL
+- phpMyAdmin → Import → select `schema.sql` from project root
 
-### Setup and Running
+### 2. Backend
+```bash
+cd backend
+composer install
+php artisan key:generate
+# Edit .env: DB_DATABASE=foresite_db, DB_USERNAME=root, DB_PASSWORD=
+php artisan serve
+```
+API: `http://localhost:8000/api/v1`
 
-1. Install the required dependencies:
+### 3. Algorithm (Learning Style API)
 ```bash
 cd algorithm
 pip install -r requirements.txt
-```
-
-2. Run the Flask application:
-```bash
 python app.py
 ```
+API: `http://localhost:5000`
 
-The server will start on `http://localhost:5000` or `http://127.0.0.1:5000`.
+### 4. Frontend
+Open `frontend/index.html` in a browser, or use a simple server:
+```bash
+cd frontend && python -m http.server 3000
+```
 
-### API Usage
+---
 
-#### Predict Learning Style
+## API Quick Reference
 
-**Endpoint:** `POST /predict`
+### Learning Style Prediction
+`POST /predict` (algorithm, port 5000)
 
-**Request Body:**
 ```json
-{
-    "answers": [0, 1, 0, 1, ...] // Array of 80 binary values (0 or 1)
-}
+{ "answers": [0, 1, 0, ...] }  // 80 binary values
 ```
 
-**Example Request for Pragmatist Style:**
-```json
-{
-    "answers": [
-        0, 0, 0, 0, 1, 0, 0, 0, 1, 0,  // 1-10
-        1, 0, 0, 0, 0, 0, 0, 0, 1, 0,  // 11-20
-        1, 0, 0, 0, 0, 0, 1, 0, 0, 0,  // 21-30
-        0, 0, 0, 0, 1, 0, 1, 0, 0, 0,  // 31-40
-        0, 0, 0, 1, 0, 0, 0, 0, 1, 1,  // 41-50
-        0, 0, 1, 1, 0, 1, 0, 0, 1, 0,  // 51-60
-        0, 0, 0, 0, 1, 0, 0, 1, 1, 1,  // 61-70
-        0, 0, 1, 1, 0, 0, 0, 0, 0, 1   // 71-80
-    ]
-}
-```
+Response: `{ "learning_style": "reflector", "confidence": 0.85, ... }`
 
-**Example Request for Reflector Style:**
-```json
-{
-    "answers": [
-        0, 0, 0, 0, 0, 0, 1, 0, 0, 0,  // 1-10: Yes to Q7 (likes thorough preparation)
-        0, 0, 1, 0, 1, 1, 0, 0, 0, 0,  // 11-20: Yes to Q13,15,16 (thorough job, careful interpretation, weighing alternatives)
-        0, 0, 0, 0, 1, 1, 0, 1, 1, 0,  // 21-30: Yes to Q25,26,28,29 (meticulous, careful, gathering information)
-        1, 0, 1, 0, 0, 1, 0, 0, 1, 0,  // 31-40: Yes to Q31,33,36,39 (listens first, observes others, worries about rushing)
-        0, 1, 0, 0, 0, 1, 0, 0, 0, 0,  // 41-50: Yes to Q41,46 (thorough analysis, standing back)
-        0, 1, 0, 0, 1, 0, 0, 0, 0, 1,  // 51-60: Yes to Q52,55,60 (specific discussions, multiple drafts, many alternatives)
-        0, 1, 0, 0, 0, 1, 1, 0, 0, 0,  // 61-70: Yes to Q62,66,67 (low profile, careful thinking, listening)
-        0, 0, 0, 0, 0, 1, 1, 0, 0, 0   // 71-80: Yes to Q76,77 (interested in others' thoughts, methodical)
-    ]
-}
-```
+### Backend API
+See `backend/API_DOCUMENTATION.md` for full endpoint list. Main routes under `/api/v1/`:
+- `auth/login`, `auth/register`
+- `courses`, `users`, `enrollments`
+- `module-progress`, `module-assessments`
+- `chat/`, `groups/`, `scores/`, `feedback/`
 
-This example emphasizes Reflector characteristics by setting positive responses (1) to questions that indicate:
-- Preference for thorough preparation and implementation
-- Careful observation and analysis before action
-- Interest in gathering multiple perspectives
-- Tendency to listen more than speak
-- Methodical and detailed approach to work
-- Preference for standing back and observing
+---
 
-**Response:**
-```
+## Deployment
+`vercel.json` routes:
+- `/algorithm/*` → Python Flask app
+- `/api/*` → PHP Laravel backend
